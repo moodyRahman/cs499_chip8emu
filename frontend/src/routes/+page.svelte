@@ -1,6 +1,6 @@
 
 <script>
-    import { add } from "$lib/wasm/release.js";
+    import { add } from "$lib/chip8/release.js";
     $: count = 0
 </script>
 
