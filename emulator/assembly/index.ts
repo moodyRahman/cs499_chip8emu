@@ -15,4 +15,4 @@ export function read_internal(): i32 {
   return internal_counter;
 }
 
-export { write_to_memory, read_from_memory, read_all_memory };
+// export { write_to_memory, read_from_memory, read_all_memory };
