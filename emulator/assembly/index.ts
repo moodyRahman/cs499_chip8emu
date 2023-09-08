@@ -1,4 +1,5 @@
 // The entry file of your WebAssembly module.
+import { write_to_memory, read_from_memory } from "./cpu";
 
 let internal_counter: i32 = 0;
 
@@ -13,3 +14,5 @@ export function add_internal(): void {
 export function read_internal(): i32 {
   return internal_counter;
 }
+
+export { write_to_memory, read_from_memory };
