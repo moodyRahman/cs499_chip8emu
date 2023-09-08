@@ -1,15 +1,24 @@
 
 <script>
-    import { add, add_internal, read_internal, write_to_memory, read_from_memory} from "$lib/chip8/release.js";
+    import { add, add_internal, read_internal, write_to_memory, read_all_memory, read_from_memory } from "$lib/chip8/release.js";
     let x = 0
     let cell = "";
     let data = "";
 
     let sixer = 0;
 
+    $: trigger = 0
+
     const write = () => {
         write_to_memory(parseInt(cell), parseInt(data))
     }
+
+
+    $: readAllMemory=() => {
+        trigger;
+        return read_all_memory();
+    }
+
 </script>
 
 <h1>Welcome to SvelteKit</h1>
@@ -41,8 +50,8 @@
 
     <button on:click={write}>write to memory</button>
 
-    <button on:click={() => {sixer = read_from_memory(6)}}>
-        memory at 6 contains: {sixer}
-    </button>
+</p>
 
+<p>
+    {readAllMemory()} <button on:click={() => {trigger++}} >read from memory</button>
 </p>

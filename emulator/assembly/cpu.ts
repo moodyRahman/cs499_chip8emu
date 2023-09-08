@@ -7,3 +7,7 @@ export function write_to_memory(location: i32, value: i32): void {
 export function read_from_memory(location: i32): i32 {
   return arr[location];
 }
+
+export function read_all_memory(): Array<i32> {
+  return arr;
+}
