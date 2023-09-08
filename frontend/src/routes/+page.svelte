@@ -1,7 +1,8 @@
 
 <script>
-    import { add } from "$lib/chip8/release.js";
-    $: count = 0
+    import { add, add_internal, read_internal } from "$lib/chip8/release.js";
+    let x = 0
+
 </script>
 
 <h1>Welcome to SvelteKit</h1>
@@ -13,5 +14,10 @@
 </p>
 
 <p>
-    {add(4, 5)}
+    <button on:click={() => {add_internal()}}>
+        click here to add one to the wasm module
+    </button>
+    <button on:click={() => {x = read_internal()} }>
+        read internal: {x}
+    </button>
 </p>
