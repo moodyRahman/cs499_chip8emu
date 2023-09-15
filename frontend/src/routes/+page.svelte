@@ -1,41 +1,28 @@
 
 <script lang="ts">
-    import { add, add_internal, read_internal, write_to_memory, read_all_memory, read_from_memory } from "$lib/chip8/release.js";
-	import { draw } from "svelte/transition";
+    import { 
+        add, add_internal, 
+        read_internal, write_to_memory, 
+        read_all_memory, read_from_memory, 
+        read_display, draw, init, random_color } 
+    from "$lib/chip8/release.js";
+    
     let x = 0
     let cell = "";
     let data = "";
 
-    let sixer = 0;
-
-    // let val = [
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-
-      
-    // ];
-
-    let val = Array.from(Array(1000), _ => {
-        return Array.from(Array(100), _ => Math.floor(Math.random()*100000))
-    } );
-
-    let interval_id = 0
-
-    let draw_timestamps: number[] = [];
-
 
     $: trigger = 0
+
+    init();
+
+    const reactive_read_display = (): boolean[][] => {
+        display = read_display();
+        return read_display()
+    }
+
+    $: display = reactive_read_display()
+
 
     const write = () => {
         write_to_memory(parseInt(cell), parseInt(data))
@@ -81,74 +68,53 @@
     <input bind:value={data} placeholder="data" > 
 
     <button on:click={write}>write to memory</button>
-
+    hmm
 </p>
 
 <p>
     {readAllMemory()} <button on:click={() => {trigger++}} >read from memory</button>
 </p>
 
-
-<p>
-
-    {val.length} rows, {val[0].length} columns of data <br>
-</p>
-<div>
-    rerendering test:
-    <button on:click={() => {
-
-        if (interval_id === 0) {
-            interval_id = setInterval(() => {
-                let rx = Math.floor(Math.random() * val.length)
-                let ry = Math.floor(Math.random() * val[0].length)
-
-                let new_buffer = val.map((x, ix) => x.map((y, iy) => {
-                    // return (ix === rx && iy === ry)?(y === 0?1:0):(y)
-                    return (ix === rx && iy === ry)?(0):(y)
-
-                }))
-
-                console.log("made a whole new buffer")
-                val=new_buffer
-                draw_timestamps = [...draw_timestamps, Date.now()]
-            }, 0.1)
-        }
-        else {
-            clearInterval(interval_id)
-            interval_id = 0;
-        }
-
-
-    }}>
-        start
-    </button>
-
-    {draw_timestamps[draw_timestamps.length - 1] - draw_timestamps[draw_timestamps.length - 2]} milliseconds since the last draw
-
-<br>
-    {((mood)=>{
-        const l_1000 = draw_timestamps.slice(-100).reverse()
-
-        return Array.from(Array(99).keys()).map((x, i) => {
-            return l_1000[x] - l_1000[x + 1]
-        })
-        .reduce((sum, curr) => {
-            return sum + curr
-        }) / 100
-    })(draw_timestamps)}
-
-<!-- {draw_timestamps.slice(-1000).map((x, i) => {
-    return x - draw_timestamps.slice(-1001)[i-1];
-}).reduce((sum, curr) => {return sum + curr}, 0)} -->
-
-
-    milliseconds since the last draw, 1000 sample average
-
-
-    <div style="padding: 10px; text-wrap: wrap; word-break: break-all;">
-    {#each val as row}
-        {row}
+<div class="grid-container">
+    
+    {#each display as row, x}
+        {#each row as cell, y}
+            <div class="disp{cell}" >{x}, {y}</div>
+        {/each}
     {/each}
-    </div>
 
+    <!-- {display} -->
+
+    <button on:click={() => {
+        random_color(Math.floor(Math.random() * 10) , Math.random() * 10 ); 
+        reactive_read_display()
+    }}>draw</button>
+
+<button on:click={() => {
+    draw(Math.floor(Math.random() * 10) , Math.random() * 10 ); 
+    reactive_read_display()
+}}>other draw</button>
 </div>
+
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); /* 20 columns */
+    grid-template-rows: repeat(10, 1fr); /* 20 rows */
+    gap: 1px; /* Adjust gap size as needed */
+    width: 400px; /* Adjust the width of the grid container */
+    height: 400px; /* Adjust the height of the grid container */
+}
+
+.dispfalse {
+    background-color: gray;
+}
+</style>

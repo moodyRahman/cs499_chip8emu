@@ -1,5 +1,6 @@
 // The entry file of your WebAssembly module.
 import { write_to_memory, read_from_memory, read_all_memory } from "./cpu";
+import { draw, read_display } from "./display";
 
 let internal_counter: i32 = 0;
 
