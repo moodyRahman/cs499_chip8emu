@@ -88,12 +88,12 @@
     <button on:click={() => {
         random_color(Math.floor(Math.random() * 10) , Math.random() * 10 ); 
         reactive_read_display()
-    }}>draw</button>
+    }}>draw via cpu implemented method</button>
 
 <button on:click={() => {
     draw(Math.floor(Math.random() * 10) , Math.random() * 10 ); 
     reactive_read_display()
-}}>other draw</button>
+}}>draw via directly accessing the draw functions</button>
 </div>
 
 
