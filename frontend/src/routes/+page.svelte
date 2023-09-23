@@ -1,5 +1,7 @@
 
 <script lang="ts">
+	import { data_test } from "$lib/chip8/debug";
+
 
     import * as chip8 from "$lib/chip8/release.js";
     
@@ -9,19 +11,8 @@
 
     let cpu_tick = chip8.read_cpu_tick();
 
-
-    // $: trigger = 0
-
     chip8.init();
 
-    const reactive_read_display = (): boolean[][] => {
-        display = chip8.read_display();
-        return chip8.read_display()
-    }
-
-    $: display = chip8.read_display();
-
-    // console.log(chip8.cpu)
     
 
     const bindFunc = (wasmfunc: CallableFunction) => {
@@ -37,18 +28,9 @@
     let {func: read_all_memory, trigger: read_all_memory_trigger} = bindFunc(chip8.read_all_memory)    
     $: read_all_memory(read_all_memory_trigger)
 
-    
+
     let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.read_display)
     $: read_display(read_display_trigger)
-
-
-    let cpu_funcs = {}
-
-
-    $: readAllMemory=() => {
-        // trigger;
-        return chip8.read_all_memory();
-    }
 
     // while (true) {
     //     val++;
@@ -125,6 +107,11 @@
         cpu contains: {cpu_tick}
     </button>
 
+</div>
+
+<div>
+    <!-- {JSON.parse(chip8.data_test()).prop} -->
+    {JSON.parse(chip8.data_test()).name}
 </div>
 
 

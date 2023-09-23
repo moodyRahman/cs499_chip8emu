@@ -14,10 +14,14 @@
     }
   },
   "scripts": {
-    "asbuild:debug": "asc assembly/*.ts --bindings --target debug",
-    "asbuild:release": "asc assembly/*.ts --bindings --target release",
+    "asbuild:debug": "asc assembly/*.ts --transform json-as/transform --bindings --target debug",
+    "asbuild:release": "asc assembly/*.ts --transform json-as/transform --bindings --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release && cp ./build/* ../frontend/src/lib/chip8",
     "test": "node tests",
     "start": "npx serve ."
+  },
+  "dependencies": {
+    "json-as": "^0.5.61",
+    "visitor-as": "^0.11.4"
   }
 }
