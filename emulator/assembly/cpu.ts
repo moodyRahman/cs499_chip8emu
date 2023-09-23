@@ -1,9 +1,9 @@
-import { read_display, draw } from "./display";
+import { read_display, draw, buffer } from "./display";
 
 class CPU {
   ram: Array<i32> = new Array<i32>(20);
   rom: Array<string> = new Array<string>(1024);
-  time: number = 0;
+  time: i32 = 0;
   constructor() {}
 
   tick(): number {
@@ -34,3 +34,5 @@ export function load_rom(contents: string): void {
   cpu.rom = [];
   cpu.rom = contents.split("\n");
 }
+
+export { cpu };

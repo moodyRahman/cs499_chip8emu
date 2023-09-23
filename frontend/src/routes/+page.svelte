@@ -1,37 +1,53 @@
 
 <script lang="ts">
-    import { 
-        add, add_internal, 
-        read_internal, write_to_memory, 
-        read_all_memory, read_from_memory, 
-        read_display, draw, init, random_color } 
-    from "$lib/chip8/release.js";
+
+    import * as chip8 from "$lib/chip8/release.js";
     
     let x = 0
     let cell = "";
     let data = "";
 
+    let cpu_tick = chip8.read_cpu_tick();
 
-    $: trigger = 0
 
-    init();
+    // $: trigger = 0
+
+    chip8.init();
 
     const reactive_read_display = (): boolean[][] => {
-        display = read_display();
-        return read_display()
+        display = chip8.read_display();
+        return chip8.read_display()
     }
 
-    $: display = reactive_read_display()
+    $: display = chip8.read_display();
 
+    // console.log(chip8.cpu)
+    
 
-    const write = () => {
-        write_to_memory(parseInt(cell), parseInt(data))
+    const bindFunc = (wasmfunc: CallableFunction) => {
+        
+        return {
+            func: (_trigger: number) => {  
+                return wasmfunc()
+            },
+            trigger: 0
+        }
     }
+    
+    let {func: read_all_memory, trigger: read_all_memory_trigger} = bindFunc(chip8.read_all_memory)    
+    $: read_all_memory(read_all_memory_trigger)
+
+    
+    let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.read_display)
+    $: read_display(read_display_trigger)
+
+
+    let cpu_funcs = {}
 
 
     $: readAllMemory=() => {
-        trigger;
-        return read_all_memory();
+        // trigger;
+        return chip8.read_all_memory();
     }
 
     // while (true) {
@@ -49,10 +65,10 @@
 </p>
 
 <p>
-    <button on:click={() => {add_internal()}}>
+    <button on:click={() => {chip8.add_internal()}}>
         click here to add one to the wasm module
     </button>
-    <button on:click={() => {x = read_internal()} }>
+    <button on:click={() => {x = chip8.read_internal()} }>
         read internal: {x}
     </button>
 </p>
@@ -67,17 +83,19 @@
     <input bind:value={cell} placeholder="location" > 
     <input bind:value={data} placeholder="data" > 
 
-    <button on:click={write}>write to memory</button>
+    <button on:click={() => {
+        chip8.write_to_memory(parseInt(cell), parseInt(data))
+    }}>write to memory</button>
     hmm
 </p>
 
 <p>
-    {readAllMemory()} <button on:click={() => {trigger++}} >read from memory</button>
+    {read_all_memory(read_all_memory_trigger)} <button on:click={() => {read_all_memory_trigger++}} >read from memory</button>
 </p>
 
 <div class="grid-container">
     
-    {#each display as row, x}
+    {#each read_display(read_display_trigger) as row, x}
         {#each row as cell, y}
             <div class="disp{cell}" >{x}, {y}</div>
         {/each}
@@ -86,15 +104,29 @@
     <!-- {display} -->
 
     <button on:click={() => {
-        random_color(Math.floor(Math.random() * 10) , Math.random() * 10 ); 
-        reactive_read_display()
+        chip8.random_color(Math.floor(Math.random() * 10) , Math.random() * 10 ); 
+        read_display_trigger++
     }}>draw via cpu implemented method</button>
 
 <button on:click={() => {
-    draw(Math.floor(Math.random() * 10) , Math.random() * 10 ); 
-    reactive_read_display()
+    chip8.draw(Math.floor(Math.random() * 10) , Math.random() * 10 ); 
+    read_display_trigger++
 }}>draw via directly accessing the draw functions</button>
 </div>
+
+<div>
+    <button on:click={chip8.trigger_cpu_tick}>
+        tick cpu
+    </button>
+
+    <button on:click={() => {
+        cpu_tick = chip8.read_cpu_tick()
+    }}>
+        cpu contains: {cpu_tick}
+    </button>
+
+</div>
+
 
 
 <style>

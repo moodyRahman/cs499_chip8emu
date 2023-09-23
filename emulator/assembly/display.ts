@@ -16,3 +16,5 @@ export function init(): void {
     }
   }
 }
+
+export { buffer };
