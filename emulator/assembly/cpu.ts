@@ -52,6 +52,10 @@ class CPU {
   //Special pseudo-registers not accessible to Chip-8 programs
   pc: u16 = 0x200; //used to store the currently executing address (starts at address 0x200 which is where most chip-8 programs start)
   sp: u8 = 0; //used to point to the topmost level of the stack
+  index: u16 = 0; //The Index Register is a special register used to store memory addresses for use in operations. 
+                  //It’s a 16-bit register because the maximum memory address (0xFFF) is too big for an 8-bit register.
+  dt: u8 = 0; //The CHIP-8 has a simple timer used for timing. If the timer value is zero, it stays zero. 
+              //If it is loaded with a value, it will decrement at a rate of 60Hz.
 
   //The stack is an array of 16 16-bit values, used to store the address that the interpreter 
   //shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
@@ -102,6 +106,9 @@ class CPU {
     //Reset Psuedo-Registers
     this.pc = 0x200;
     this.sp = 0;
+    this.index = 0;
+    this.dt = 0;
+    this.st = 0;
   
     //Clear stack:
     for(let j = 0; j < 16; j++){
@@ -201,7 +208,7 @@ class CPU {
     }
   }
 
-  SNE(){ //The interpreter compares register Vx to kk, and if they are NOT equal, increments the program counter by 2.
+  SNEbyte(){ //The interpreter compares register Vx to kk, and if they are NOT equal, increments the program counter by 2.
     if(this.V[this.x] != this.kk){
       this.pc += 2;
     }
@@ -243,7 +250,7 @@ class CPU {
          //then the corresponding bit in the result is set to 1. Otherwise, it is 0.
 
 
-    //Still not sure how to do XOR in AssemblyScript
+    this.V[this.x] ^= this.V[this.y];
   }
 
   ADDregister(){ //The values of Vx and Vy are added together. 
@@ -258,7 +265,7 @@ class CPU {
     this.V[this.x] = value;
   }
 
-  SUBregister(){ //If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
+  SUB(){ //If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
     this.V[0xF] = 0;
     if(this.V[this.x] > this.V[this.y]){
       this.V[0xF] = 1;
@@ -269,7 +276,102 @@ class CPU {
   SHR(){ //If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2.
     let overflow = this.V[this.x] % 2;
     this.V[0xF] = overflow;
-    this.V[this.x] /= 2;
+    this.V[this.x] = this.V[this.x] >> 1;
+  }
+
+  SUBN(){ //If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
+    this.V[0xF] = 0;
+    if(this.V[this.y] > this.V[this.x]){
+      this.V[0xF] = 1;
+    }
+    this.V[this.x] = this.V[this.y] - this.V[this.x];
+  }
+
+  SHL(){ //If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
+    let checker = this.V[this.x] >> 7; //moves MSB to LSB place
+    this.V[0xF] = checker;
+    this.V[this.x] = this.V[this.x] << 1;
+  }
+
+  SNEregister(){ //The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
+    if(this.V[this.x] != this.V[this.y]){
+      this.pc += 2;
+    }
+  }
+
+  LDimm(){ //The value of register I is set to nnn.
+    this.index = this.nnn;
+  }
+
+  JPregister(){ //The program counter is set to nnn plus the value of V0.
+    this.pc = this.nnn + this.V[0];
+  }
+
+  RND(){ //The interpreter generates a random number from 0 to 255, which is then ANDed with the value kk. 
+         //The results are stored in Vx. See instruction 8xy2 for more information on AND.
+    
+    //Need to figure out how generating random numbers work in AssemblyScript
+  }
+
+  DRW(){ //The interpreter reads n bytes from memory, starting at the address stored in I. 
+         //These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). 
+         //Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. 
+         //If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen.
+
+    //Can't be implemented at the moment since no Display class implemented
+  }
+
+  SKP(){ //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
+
+    //Still discussing how the keyboard will be implemented for this project
+  }
+
+  SKNP(){ //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
+    
+  }
+
+  LDret(){ //The value of DT is placed into Vx.
+    this.V[this.x] = this.dt;
+
+  }
+
+  LDkey(){ //All execution stops until a key is pressed, then the value of that key is stored in Vx.
+
+  }
+
+  LDter(){ //DT is set equal to the value of Vx.
+    this.dt = this.V[this.x];
+  }
+
+  LDser(){ //ST is set equal to the value of Vx.
+    
+    //cant be implemented without sound handler
+  }
+
+  ADDindex(){ //The values of I and Vx are added, and the results are stored in I.
+    this.index += this.V[this.x];
+  }
+
+  LDsprite(){ //The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx.
+    //Cant be implemented without display class
+  }
+
+  LDbr(){ //The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I, 
+          //the tens digit at location I+1, and the ones digit at location I+2.
+
+    //I am so lost what to do with this one
+  }
+
+  LDmemWr(){ //The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I.
+    for(let i = 0; i <= this.x; i++){
+      this.memory.write(this.index + i, this.V[i]);
+    }
+  }
+
+  LDmemRd(){ //The interpreter reads values from memory starting at location I into registers V0 through Vx.
+    for(let i = 0; i <= this.x; i++){
+      this.V[i] = this.memory.read(this.index + i);
+    }
   }
 
 }
