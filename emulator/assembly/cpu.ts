@@ -1,6 +1,3 @@
-//import { read_display, draw, buffer } from "./display";
-
-
 //Memory class
 class Memory{
     
@@ -76,9 +73,6 @@ class CPU {
   x: u8 = 0; //A 4-bit value, the lower 4 bits of the high byte of the instruction
   y: u8 = 0; //A 4-bit value, the upper 4 bits of the low byte of the instruction
   kk: u8 = 0; //An 8-bit value, the lowest 8 bits of the instruction
-
-  //ram: Array<i32> = new Array<i32>(20);
-  //rom: Array<string> = new Array<string>(1024);
   
   time: i32 = 0;
 
@@ -91,11 +85,6 @@ class CPU {
     this.loadMemory(memToLoad);
     this.loadDisplay(displayOutput);
     this.loadSound(handleSound);
-  }
-
-  tick(): number {
-    this.time++;
-    return this.time;
   }
 
   reset(){
@@ -146,8 +135,26 @@ class CPU {
     this.pc += 2;
   }
 
+  decodeTable = [
+    {0xE0: this.CLS, 0xEE: this.RET, nibbles: 2}, //Object type for further decode
+	  this.JPimm,
+	  this.CALL,
+	  this.SEbyte,
+	  this.SNEbyte,
+	  {0: this.SEregister, nibbles: 1},
+	  this.LDbyte,
+	  this.ADDbyte,
+	  {0: this.LDregister, 1: this.OR, 2: this.AND, 3: this.XOR, 4: this.ADDregister, 5: this.SUB, 6: this.SHR, 7: this.SUBN, 0xE: this.SHL, nibbles: 1}, //Object type for further decode
+	  {0: this.SNEregister, nibbles: 1}, //Object type for further decode
+	  this.LDindex,
+	  this.JPregister,
+	  this.RND,
+	  this.DRW,
+	  {0x9E: this.SKP, 0xA1: this.SKNP, nibbles: 2}, //Object type for further decode
+	  {0x07: this.LDret, 0x0A: this.LDkey, 0x15: this.LDter, 0x18: this.LDser, 0x1E: this.ADDindex, 0x29: this.LDsprite, 0x33: this.LDbr, 0x55: this.LDmemWr, 0x65: this.LDmemRd, nibbles: 2} //Object type for further decode
+  ]
+
   IRDecode(instruction){
-    //This I am still trying to figure out how to do.
     //For now my idea is to first decode every instruction the same way using bit masks with the special decode variables I created like so:
     this.nnn = instruction & 0x0FFF; //gets last 12 instruction bits (0 through 11)
     this.n = instruction & 0x000F; //gets last 4 instruction bits (0 through 3)
@@ -155,15 +162,17 @@ class CPU {
     this.y = (instruction & 0x00F0) >> 4; //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
     this.kk = instruction & 0x00FF; //gets last 8 instruction bits (0 through 7)
 
-    //Then above this decode function I will have an array of function pointers, and then based on specific op code we call that function pointer.
+    //Above this I have an array of function pointers, and then based on specific op code we call that function pointer.
 
-    //I'll have if/elif/else calls to ensure that based on the decoded instruction and the opcode, we call the correct function pointer from our array.
+    //Get the return value from decodeTable using the value found from instruction bits: 12 through 15
+    let decodeOne = this.decodeTable[instruction & 0xF000 >> 12];
 
-    //So far I see a pattern with the instruction types and therefore 4 possibilities can occur:
-    // 1. Some instructions just need the opcode to execute, so we check that and execute the correct function (CLS or RET)
-    // 2. Other instructions have one nibble they are dependent on so if we find that to be the case, then further decode will be needed
-    // 3. Some have 2 nibbles they are dependent on so we decode further for that
-    // 4. Finally we have an instruction with 3 nibble dependencies so we will need to decode further for that 
+    //Now we check the return type from decode table:
+      //If return type is a function, great we return and execute that function
+      //If it is not a function but an object, then we need to decode a lil further
+    if(typeof decodeOne === "function") {
+			return decodeOne;
+		}
     
   }
 
@@ -187,7 +196,7 @@ class CPU {
     this.pc = this.sp;
   }
 
-  JP(){ //The interpreter sets the program counter to nnn.
+  JPimm(){ //The interpreter sets the program counter to nnn.
     this.pc = this.nnn;
   }
 
@@ -299,7 +308,7 @@ class CPU {
     }
   }
 
-  LDimm(){ //The value of register I is set to nnn.
+  LDindex(){ //The value of register I is set to nnn.
     this.index = this.nnn;
   }
 
@@ -327,7 +336,7 @@ class CPU {
   }
 
   SKNP(){ //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
-    
+    //cant be implemented without keyboard
   }
 
   LDret(){ //The value of DT is placed into Vx.
@@ -336,7 +345,7 @@ class CPU {
   }
 
   LDkey(){ //All execution stops until a key is pressed, then the value of that key is stored in Vx.
-
+    //cant be implemented without keyboard
   }
 
   LDter(){ //DT is set equal to the value of Vx.
@@ -359,7 +368,15 @@ class CPU {
   LDbr(){ //The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I, 
           //the tens digit at location I+1, and the ones digit at location I+2.
 
-    //I am so lost what to do with this one
+    let bcd = this.V[this.x];
+    this.memory.write(this.index, bcd/100); //writes hundreds place into memory at address: Index
+    bcd /= 10; //removes ones place
+    bcd %= 10; //Singles out tens place;
+    this.memory.write(this.index+1, bcd); //writes tens place into memory at address: index + 1
+    bcd = this.V[this.x];
+    bcd %= 10; //singles out ones place;
+    this.memory.write(this.index+2, bcd) // writes ones place into memory at address: index + 2
+
   }
 
   LDmemWr(){ //The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I.
@@ -375,40 +392,3 @@ class CPU {
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-/*
-const cpu = new CPU();
-
-export function write_to_memory(location: i32, value: i32): void {
-  cpu.ram[location] = value;
-}
-
-export function random_color(x: i32, y: i32): void {
-  draw(x, y);
-}
-
-export function read_from_memory(location: i32): i32 {
-  return cpu.ram[location];
-}
-
-export function read_all_memory(): Array<i32> {
-  return cpu.ram;
-}
-
-export function load_rom(contents: string): void {
-  cpu.rom = [];
-  cpu.rom = contents.split("\n");
-}
-
-export { cpu };
-*/
