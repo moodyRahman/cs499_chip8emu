@@ -1,5 +1,4 @@
 // The entry file of your WebAssembly module.
-import { write_to_memory, read_from_memory, read_all_memory, cpu } from "./cpu";
 import { draw, read_display, buffer } from "./display";
 
 import { JSON } from "json-as";
@@ -16,14 +15,6 @@ export function add_internal(): void {
 
 export function read_internal(): i32 {
   return internal_counter;
-}
-
-export function trigger_cpu_tick(): void {
-  cpu.tick();
-}
-
-export function read_cpu_tick(): i32 {
-  return cpu.time;
 }
 
 // @ts-ignore
