@@ -130,7 +130,7 @@ class CPU {
     this.pc += 2;
   }
 
-  decodeTable_func(inst: any): void {
+  decodeTable_func(inst: any): funcref {
     this.nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
     this.n = inst & 0x000f; //gets last 4 instruction bits (0 through 3)
     this.x = (inst & 0x0f00) >> 8; //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
@@ -139,90 +139,92 @@ class CPU {
     this.i = inst & (0xf000 >> 12); // gets first 4 bits of instruction
     if (this.i == 0x0) {
       if (this.nnn == 0x0e0) {
-        this.CLS();
+        return this.CLS;
       }
       if (this.nnn == 0x0ee) {
-        this.RET();
+        return this.RET;
       } else {
-        this.SYS();
+        return this.SYS;
       }
     } else if (this.i == 0x1) {
-      this.JPimm();
+      return this.JPimm;
     } else if (this.i == 0x2) {
-      this.CALL();
+      return this.CALL;
     } else if (this.i == 0x3) {
-      this.SEbyte();
+      return this.SEbyte;
     } else if (this.i == 0x4) {
-      this.SNEbyte();
+      return this.SNEbyte;
     } else if (this.i == 0x5) {
-      this.SKP();
+      return this.SKP;
     } else if (this.i == 0x6) {
-      this.LDbyte();
+      return this.LDbyte;
     } else if ((this.i = 0x7)) {
-      this.ADDbyte();
+      return this.ADDbyte;
     } else if ((this.i = 0x8)) {
       if (this.n == 0x0) {
-        this.LDregister();
+        return this.LDregister;
       }
       if (this.n == 0x1) {
-        this.OR();
+        return this.OR;
       }
       if (this.n == 0x2) {
-        this.AND();
+        return this.AND;
       }
       if (this.n == 0x3) {
-        this.XOR();
+        return this.XOR;
       }
       if (this.n == 0x4) {
-        this.ADDregister();
+        return this.ADDregister;
       }
       if (this.n == 0x5) {
-        this.SUB();
+        return this.SUB;
       }
       if (this.n == 0x6) {
-        this.SHR();
+        return this.SHR;
       }
       if (this.n == 0x7) {
-        this.SUBN();
+        return this.SUBN;
       }
       if (this.n == 0xe) {
-        this.SHL();
+        return this.SHL;
       }
     } else if (this.i == 0xa) {
-      this.SNEregister();
+      return this.SNEregister;
     } else if (this.i == 0xb) {
-      this.JPregister();
+      return this.JPregister;
     } else if (this.i == 0xc) {
-      this.RND();
+      return this.RND;
     } else if (this.i == 0xd) {
-      this.DRW();
+      return this.DRW;
     } else if (this.i == 0xe) {
       if (this.kk == 0x9e) {
-        this.SKP();
+        return this.SKP;
       } else if (this.kk == 0xa1) {
-        this.SKNP();
+        return this.SKNP;
       }
     } else if (this.i == 0xf) {
       if (this.kk == 0x07) {
-        this.LDret();
+        return this.LDret;
       } else if (this.kk == 0x0a) {
-        this.LDkey();
+        return this.LDkey;
       } else if (this.kk == 0x15) {
-        this.LDter();
+        return this.LDter;
       } else if (this.kk == 0x18) {
-        this.LDser();
+        return this.LDser;
       } else if (this.kk == 0x1e) {
-        this.ADDindex();
+        return this.ADDindex;
       } else if (this.kk == 0x29) {
-        this.LDsprite();
+        return this.LDsprite;
       } else if (this.kk == 0x33) {
-        this.LDbr();
+        return this.LDbr;
       } else if (this.kk == 0x55) {
-        this.LDmemWr();
+        return this.LDmemWr;
       } else if (this.kk == 0x65) {
-        this.LDmemRd();
+        return this.LDmemRd;
       }
     }
+
+    return () => {};
   }
 
   // decodeTable = [
@@ -279,8 +281,6 @@ class CPU {
     //Get the return value from decodeTable using the value found from instruction bits: 12 through 15
     // let decodeOne = this.decodeTable[`${instruction & (0xf000 >> 12)}`]();
 
-    this.decodeTable_func(instruction);
-
     //Now we check the return type from decode table:
     //If return type is a function, great we return and execute that function
     //If it is not a function but an object, then we need to decode a lil further
@@ -288,7 +288,7 @@ class CPU {
     // if (typeof decodeOne === "function") {
     //   return decodeOne;
     // }
-    return () => {};
+    return this.decodeTable_func(instruction);
   }
 
   //CPU Instructions for Execution:
