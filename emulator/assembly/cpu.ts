@@ -16,13 +16,13 @@ class Memory {
     }
   }
 
-  read(address: number): u8 {
+  read(address: u16): u8 {
     //get the entry stored in Memory at address provided
     //ensure that the address does not overflow by only taking in the last 12 bits of the address parameter
     return this.mem[address & 0xfff];
   }
 
-  write(address: number, value: number): void {
+  write(address: u16, value: u8): void {
     //store an entry in Memory at address provided
     //ensure that the address does not overflow by only taking in the last 12 bits of the address parameter
     //Value provided as parameter should only fit into one byte of space
@@ -130,101 +130,108 @@ class CPU {
     this.pc += 2;
   }
 
-  decodeTable_func(inst: any): funcref {
+  decodeTable_func(inst: u16): void {
     this.nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
-    this.n = inst & 0x000f; //gets last 4 instruction bits (0 through 3)
-    this.x = (inst & 0x0f00) >> 8; //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
-    this.y = (inst & 0x00f0) >> 4; //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
-    this.kk = inst & 0x00ff; //gets last 8 instruction bits (0 through 7)
-    this.i = inst & (0xf000 >> 12); // gets first 4 bits of instruction
+    this.n = u8(inst & 0x000f); //gets last 4 instruction bits (0 through 3)
+    this.x = u8(inst & (0x0f00 >> 8)); //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
+    this.y = u8(inst & (0x00f0 >> 4)); //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
+    this.kk = u8(inst & 0x00ff); //gets last 8 instruction bits (0 through 7)
+    this.i = u8(inst & (0xf000 >> 12)); // gets first 4 bits of instruction
+
+    console.log("reading instruction debugs");
+    console.log("nnn contains " + this.nnn.toString());
+    console.log("n contains " + this.n.toString());
+    console.log("x contains " + this.x.toString());
+    console.log("y contains " + this.y.toString());
+    console.log("kk contains " + this.kk.toString());
+    console.log("i contains " + this.i.toString());
+
     if (this.i == 0x0) {
       if (this.nnn == 0x0e0) {
-        return this.CLS;
+        this.CLS();
       }
       if (this.nnn == 0x0ee) {
-        return this.RET;
+        this.RET();
       } else {
-        return this.SYS;
+        this.SYS();
       }
     } else if (this.i == 0x1) {
-      return this.JPimm;
+      this.JPimm();
     } else if (this.i == 0x2) {
-      return this.CALL;
+      this.CALL();
     } else if (this.i == 0x3) {
-      return this.SEbyte;
+      this.SEbyte();
     } else if (this.i == 0x4) {
-      return this.SNEbyte;
+      this.SNEbyte();
     } else if (this.i == 0x5) {
-      return this.SKP;
+      this.SKP();
     } else if (this.i == 0x6) {
-      return this.LDbyte;
+      this.LDbyte();
     } else if ((this.i = 0x7)) {
-      return this.ADDbyte;
+      this.ADDbyte();
     } else if ((this.i = 0x8)) {
       if (this.n == 0x0) {
-        return this.LDregister;
+        this.LDregister();
       }
       if (this.n == 0x1) {
-        return this.OR;
+        this.OR();
       }
       if (this.n == 0x2) {
-        return this.AND;
+        this.AND();
       }
       if (this.n == 0x3) {
-        return this.XOR;
+        this.XOR();
       }
       if (this.n == 0x4) {
-        return this.ADDregister;
+        this.ADDregister();
       }
       if (this.n == 0x5) {
-        return this.SUB;
+        this.SUB();
       }
       if (this.n == 0x6) {
-        return this.SHR;
+        this.SHR();
       }
       if (this.n == 0x7) {
-        return this.SUBN;
+        this.SUBN();
       }
       if (this.n == 0xe) {
-        return this.SHL;
+        this.SHL();
       }
     } else if (this.i == 0xa) {
-      return this.SNEregister;
+      this.SNEregister();
     } else if (this.i == 0xb) {
-      return this.JPregister;
+      this.JPregister();
     } else if (this.i == 0xc) {
-      return this.RND;
+      this.RND();
     } else if (this.i == 0xd) {
-      return this.DRW;
+      this.DRW();
     } else if (this.i == 0xe) {
       if (this.kk == 0x9e) {
-        return this.SKP;
+        this.SKP();
       } else if (this.kk == 0xa1) {
-        return this.SKNP;
+        this.SKNP();
       }
     } else if (this.i == 0xf) {
       if (this.kk == 0x07) {
-        return this.LDret;
+        this.LDret();
       } else if (this.kk == 0x0a) {
-        return this.LDkey;
+        this.LDkey();
       } else if (this.kk == 0x15) {
-        return this.LDter;
+        this.LDter();
       } else if (this.kk == 0x18) {
-        return this.LDser;
+        this.LDser();
       } else if (this.kk == 0x1e) {
-        return this.ADDindex;
+        this.ADDindex();
       } else if (this.kk == 0x29) {
-        return this.LDsprite;
+        this.LDsprite();
       } else if (this.kk == 0x33) {
-        return this.LDbr;
+        this.LDbr();
       } else if (this.kk == 0x55) {
-        return this.LDmemWr;
+        this.LDmemWr();
       } else if (this.kk == 0x65) {
-        return this.LDmemRd;
+        this.LDmemRd();
       }
     }
-
-    return () => {};
   }
 
   // decodeTable = [
@@ -268,7 +275,7 @@ class CPU {
   //   }, //Object type for further decode
   // ];
 
-  IRDecode(instruction: any): funcref {
+  IRDecode(instruction: u16): void {
     //For now my idea is to first decode every instruction the same way using bit masks with the special decode variables I created like so:
     // this.nnn = instruction & 0x0fff; //gets last 12 instruction bits (0 through 11)
     // this.n = instruction & 0x000f; //gets last 4 instruction bits (0 through 3)
@@ -288,7 +295,7 @@ class CPU {
     // if (typeof decodeOne === "function") {
     //   return decodeOne;
     // }
-    return this.decodeTable_func(instruction);
+    this.decodeTable_func(instruction);
   }
 
   //CPU Instructions for Execution:
@@ -520,31 +527,27 @@ class CPU {
 
   LDmemWr(): void {
     //The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I.
-    for (let i = 0; i <= this.x; i++) {
+    for (let i: u8 = 0; i <= this.x; i++) {
       this.memory.write(this.index + i, this.V[i]);
     }
   }
 
   LDmemRd(): void {
     //The interpreter reads values from memory starting at location I into registers V0 through Vx.
-    for (let i = 0; i <= this.x; i++) {
+    for (let i: u8 = 0; i <= this.x; i++) {
       this.V[i] = this.memory.read(this.index + i);
     }
   }
 }
 
-const cpu = new CPU(0, 0, 0);
-
 /**/
 // start defining the high level API for the CPU here
 /**/
 
-export function test_cpu(): u16 {
-  // const f = cpu.decodeTable_func(1)[0];
-  // const z = cpu.decodeTable_func(1)[1];
+const cpu = new CPU(0, 0, 0);
 
-  // // console.log(f);
-  // console.log(`${z}`);
-
-  return 10;
+export function read_instruction(): u8 {
+  const i: u16 = 0x6110;
+  cpu.IRDecode(i);
+  return cpu.V[1];
 }
