@@ -1,5 +1,6 @@
 // The entry file of your WebAssembly module.
-import { draw, read_display, buffer } from "./display";
+// import { CPU } from "./cpu";
+// import { draw, read_display, buffer } from "./display";
 
 import { JSON } from "json-as";
 
@@ -18,19 +19,7 @@ export function read_internal(): i32 {
 }
 
 // @ts-ignore
-@json
-class Data {
-  name!: string;
-}
 
-export function data_test(): string {
-  let x: Data = {
-    name: "moody",
-  };
-
-  return JSON.stringify(x);
-}
-
-export { buffer };
+// export { buffer };
 
 // export { write_to_memory, read_from_memory, read_all_memory };

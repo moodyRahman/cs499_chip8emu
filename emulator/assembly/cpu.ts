@@ -67,19 +67,20 @@ class CPU {
   x: u8 = 0; //A 4-bit value, the lower 4 bits of the high byte of the instruction
   y: u8 = 0; //A 4-bit value, the upper 4 bits of the low byte of the instruction
   kk: u8 = 0; //An 8-bit value, the lowest 8 bits of the instruction
+  i: u8 = 0; //the first 4 bitys of an instruction
   st: number = 0; // sound timer register
 
   time: i32 = 0;
 
   //Constructor and Functions
-  constructor(memToLoad: any, displayOutput: any, handleSound: any) {
+  constructor(memToLoad: number, displayOutput: number, handleSound: number) {
     //Instantiate values with the reset function
     this.reset();
 
     //Call starter functions
-    this.loadMemory(memToLoad);
-    this.loadDisplay(displayOutput);
-    this.loadSound(handleSound);
+    // this.loadMemory(memToLoad);
+    // this.loadDisplay(displayOutput);
+    // this.loadSound(handleSound);
   }
 
   reset(): void {
@@ -129,68 +130,164 @@ class CPU {
     this.pc += 2;
   }
 
-  decodeTable: any[] = [
-    // { 0xe0: this.CLS, 0xee: this.RET, nibbles: 2 }, //Object type for further decode
-    { "0xe0": this.CLS, "0xee": this.RET, nibbles: 2 }, //we can't have numbers as json keys,
-    // TODO: lets talk about how to deal with this, maybe if we enforce all numbers to be in hex, we can just cast them to strings and proceed
-    this.JPimm,
-    this.CALL,
-    this.SEbyte,
-    this.SNEbyte,
-    { "0": this.SEregister, nibbles: 1 },
-    this.LDbyte,
-    this.ADDbyte,
-    {
-      "0": this.LDregister,
-      "1": this.OR,
-      "2": this.AND,
-      "3": this.XOR,
-      "4": this.ADDregister,
-      "5": this.SUB,
-      "6": this.SHR,
-      "7": this.SUBN,
-      "0xe": this.SHL,
-      nibbles: 1,
-    }, //Object type for further decode
-    { "0": this.SNEregister, nibbles: 1 }, //Object type for further decode
-    this.LDindex,
-    this.JPregister,
-    this.RND,
-    this.DRW,
-    { "0x9e": this.SKP, "0xa1": this.SKNP, nibbles: 2 }, //Object type for further decode
-    {
-      "0x07": this.LDret,
-      "0x0a": this.LDkey,
-      "0x15": this.LDter,
-      "0x18": this.LDser,
-      "0x1e": this.ADDindex,
-      "0x29": this.LDsprite,
-      "0x33": this.LDbr,
-      "0x55": this.LDmemWr,
-      "0x65": this.LDmemRd,
-      nibbles: 2,
-    }, //Object type for further decode
-  ];
+  decodeTable_func(inst: any): void {
+    this.nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
+    this.n = inst & 0x000f; //gets last 4 instruction bits (0 through 3)
+    this.x = (inst & 0x0f00) >> 8; //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
+    this.y = (inst & 0x00f0) >> 4; //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
+    this.kk = inst & 0x00ff; //gets last 8 instruction bits (0 through 7)
+    this.i = inst & (0xf000 >> 12); // gets first 4 bits of instruction
+    if (this.i == 0x0) {
+      if (this.nnn == 0x0e0) {
+        this.CLS();
+      }
+      if (this.nnn == 0x0ee) {
+        this.RET();
+      } else {
+        this.SYS();
+      }
+    } else if (this.i == 0x1) {
+      this.JPimm();
+    } else if (this.i == 0x2) {
+      this.CALL();
+    } else if (this.i == 0x3) {
+      this.SEbyte();
+    } else if (this.i == 0x4) {
+      this.SNEbyte();
+    } else if (this.i == 0x5) {
+      this.SKP();
+    } else if (this.i == 0x6) {
+      this.LDbyte();
+    } else if ((this.i = 0x7)) {
+      this.ADDbyte();
+    } else if ((this.i = 0x8)) {
+      if (this.n == 0x0) {
+        this.LDregister();
+      }
+      if (this.n == 0x1) {
+        this.OR();
+      }
+      if (this.n == 0x2) {
+        this.AND();
+      }
+      if (this.n == 0x3) {
+        this.XOR();
+      }
+      if (this.n == 0x4) {
+        this.ADDregister();
+      }
+      if (this.n == 0x5) {
+        this.SUB();
+      }
+      if (this.n == 0x6) {
+        this.SHR();
+      }
+      if (this.n == 0x7) {
+        this.SUBN();
+      }
+      if (this.n == 0xe) {
+        this.SHL();
+      }
+    } else if (this.i == 0xa) {
+      this.SNEregister();
+    } else if (this.i == 0xb) {
+      this.JPregister();
+    } else if (this.i == 0xc) {
+      this.RND();
+    } else if (this.i == 0xd) {
+      this.DRW();
+    } else if (this.i == 0xe) {
+      if (this.kk == 0x9e) {
+        this.SKP();
+      } else if (this.kk == 0xa1) {
+        this.SKNP();
+      }
+    } else if (this.i == 0xf) {
+      if (this.kk == 0x07) {
+        this.LDret();
+      } else if (this.kk == 0x0a) {
+        this.LDkey();
+      } else if (this.kk == 0x15) {
+        this.LDter();
+      } else if (this.kk == 0x18) {
+        this.LDser();
+      } else if (this.kk == 0x1e) {
+        this.ADDindex();
+      } else if (this.kk == 0x29) {
+        this.LDsprite();
+      } else if (this.kk == 0x33) {
+        this.LDbr();
+      } else if (this.kk == 0x55) {
+        this.LDmemWr();
+      } else if (this.kk == 0x65) {
+        this.LDmemRd();
+      }
+    }
+  }
+
+  // decodeTable = [
+  //   { "0xe0": this.CLS, "0xee": this.RET, nibbles: 2 }, //we can't have numbers as json keys,
+  //   this.JPimm,
+  //   this.CALL,
+  //   this.SEbyte,
+  //   this.SNEbyte,
+  //   { "0": this.SEregister, nibbles: 1 },
+  //   this.LDbyte,
+  //   this.ADDbyte,
+  //   {
+  //     "0": this.LDregister,
+  //     "1": this.OR,
+  //     "2": this.AND,
+  //     "3": this.XOR,
+  //     "4": this.ADDregister,
+  //     "5": this.SUB,
+  //     "6": this.SHR,
+  //     "7": this.SUBN,
+  //     "0xe": this.SHL,
+  //     nibbles: 1,
+  //   }, //Object type for further decode
+  //   { "0": this.SNEregister, nibbles: 1 }, //Object type for further decode
+  //   this.LDindex,
+  //   this.JPregister,
+  //   this.RND,
+  //   this.DRW,
+  //   { "0x9e": this.SKP, "0xa1": this.SKNP, nibbles: 2 }, //Object type for further decode
+  //   {
+  //     "0x07": this.LDret,
+  //     "0x0a": this.LDkey,
+  //     "0x15": this.LDter,
+  //     "0x18": this.LDser,
+  //     "0x1e": this.ADDindex,
+  //     "0x29": this.LDsprite,
+  //     "0x33": this.LDbr,
+  //     "0x55": this.LDmemWr,
+  //     "0x65": this.LDmemRd,
+  //     nibbles: 2,
+  //   }, //Object type for further decode
+  // ];
 
   IRDecode(instruction: any): funcref {
     //For now my idea is to first decode every instruction the same way using bit masks with the special decode variables I created like so:
-    this.nnn = instruction & 0x0fff; //gets last 12 instruction bits (0 through 11)
-    this.n = instruction & 0x000f; //gets last 4 instruction bits (0 through 3)
-    this.x = (instruction & 0x0f00) >> 8; //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
-    this.y = (instruction & 0x00f0) >> 4; //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
-    this.kk = instruction & 0x00ff; //gets last 8 instruction bits (0 through 7)
+    // this.nnn = instruction & 0x0fff; //gets last 12 instruction bits (0 through 11)
+    // this.n = instruction & 0x000f; //gets last 4 instruction bits (0 through 3)
+    // this.x = (instruction & 0x0f00) >> 8; //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
+    // this.y = (instruction & 0x00f0) >> 4; //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
+    // this.kk = instruction & 0x00ff; //gets last 8 instruction bits (0 through 7)
 
     //Above this I have an array of function pointers, and then based on specific op code we call that function pointer.
 
     //Get the return value from decodeTable using the value found from instruction bits: 12 through 15
-    let decodeOne = this.decodeTable[instruction & (0xf000 >> 12)];
+    // let decodeOne = this.decodeTable[`${instruction & (0xf000 >> 12)}`]();
+
+    this.decodeTable_func(instruction);
 
     //Now we check the return type from decode table:
     //If return type is a function, great we return and execute that function
     //If it is not a function but an object, then we need to decode a lil further
-    if (typeof decodeOne === "function") {
-      return decodeOne;
-    }
+
+    // if (typeof decodeOne === "function") {
+    //   return decodeOne;
+    // }
     return () => {};
   }
 
@@ -434,4 +531,20 @@ class CPU {
       this.V[i] = this.memory.read(this.index + i);
     }
   }
+}
+
+const cpu = new CPU(0, 0, 0);
+
+/**/
+// start defining the high level API for the CPU here
+/**/
+
+export function test_cpu(): u16 {
+  // const f = cpu.decodeTable_func(1)[0];
+  // const z = cpu.decodeTable_func(1)[1];
+
+  // // console.log(f);
+  // console.log(`${z}`);
+
+  return 10;
 }
