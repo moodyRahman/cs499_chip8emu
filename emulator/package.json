@@ -14,8 +14,8 @@
     }
   },
   "scripts": {
-    "asbuild:debug": "asc assembly/*.ts --exportRuntime --enable reference-types --enable gc --target debug",
-    "asbuild:release": "asc assembly/*.ts --exportRuntime --enable reference-types --enable gc --target release",
+    "asbuild:debug": "asc assembly/*.ts --enable reference-types --target debug",
+    "asbuild:release": "asc assembly/*.ts --enable reference-types --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release && cp ./build/* ../frontend/src/lib/chip8",
     "test": "node tests",
     "start": "npx serve ."
