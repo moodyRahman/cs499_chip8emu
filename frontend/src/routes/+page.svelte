@@ -25,7 +25,7 @@ import * as chip8 from "$lib/chip8/debug.js";
     $: read_instruction(read_instruction_trigger)
 
 
-    let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {console.log("running");return chip8.read_all_registers()})
+    let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     $: read_all_registers(read_all_registers_trigger)
     
 </script>
