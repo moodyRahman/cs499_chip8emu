@@ -133,18 +133,12 @@ class CPU {
   decodeTable_func(inst: u16): void {
     this.nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
     this.n = u8(inst & 0x000f); //gets last 4 instruction bits (0 through 3)
-    this.x = u8(inst & (0x0f00 >> 8)); //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
-    this.y = u8(inst & (0x00f0 >> 4)); //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
+    this.x = u8((inst >> 8) & 0x000f); //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
+    this.y = u8((inst >> 4) & 0x000f); //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
     this.kk = u8(inst & 0x00ff); //gets last 8 instruction bits (0 through 7)
-    this.i = u8(inst & (0xf000 >> 12)); // gets first 4 bits of instruction
+    this.i = u8((inst >> 12) & 0x000f); // gets first 4 bits of instruction
 
-    console.log("reading instruction debugs");
-    console.log("nnn contains " + this.nnn.toString());
-    console.log("n contains " + this.n.toString());
-    console.log("x contains " + this.x.toString());
-    console.log("y contains " + this.y.toString());
-    console.log("kk contains " + this.kk.toString());
-    console.log("i contains " + this.i.toString());
+    // console.log(().toString(16));
 
     if (this.i == 0x0) {
       if (this.nnn == 0x0e0) {
@@ -547,7 +541,7 @@ class CPU {
 const cpu = new CPU(0, 0, 0);
 
 export function read_instruction(): u8 {
-  const i: u16 = 0x6110;
+  const i: u16 = 0x6120;
   cpu.IRDecode(i);
   return cpu.V[1];
 }
