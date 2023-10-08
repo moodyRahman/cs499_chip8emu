@@ -33,7 +33,11 @@ import * as chip8 from "$lib/chip8/debug.js";
 
 
 <div>
-    {read_all_registers(read_all_registers_trigger)}
+    <div class="registers">
+    {#each read_all_registers(read_all_registers_trigger) as register, i}
+        <span class="register">V{i},{register}  </span>
+    {/each}
+    </div>
 </div>
 
 <div>
@@ -56,3 +60,16 @@ import * as chip8 from "$lib/chip8/debug.js";
     (read as 0x6120, it's been split up to accomodate annotations)
 </pre>
 </div>
+
+
+<style>
+
+    .registers {
+        width: 50%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+    .register {
+        margin-left: 10px;
+    }
+</style>
