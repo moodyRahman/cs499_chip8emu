@@ -544,7 +544,10 @@ class CPU {
 
 const cpu = new CPU(0, 0, 0);
 
-export function read_instruction(inp: u16): u8 {
+export function read_instruction(inp: u16): void {
   cpu.IRDecode(inp);
-  return cpu.V[1];
+}
+
+export function read_all_registers(): Uint8Array {
+  return cpu.V;
 }
