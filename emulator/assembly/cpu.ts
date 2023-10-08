@@ -138,7 +138,11 @@ class CPU {
     this.kk = u8(inst & 0x00ff); //gets last 8 instruction bits (0 through 7)
     this.i = u8((inst >> 12) & 0x000f); // gets first 4 bits of instruction
 
-    // console.log(().toString(16));
+    console.log(inst.toString(16));
+
+    if (inst == 0) {
+      return;
+    }
 
     if (this.i == 0x0) {
       if (this.nnn == 0x0e0) {
@@ -540,8 +544,7 @@ class CPU {
 
 const cpu = new CPU(0, 0, 0);
 
-export function read_instruction(): u8 {
-  const i: u16 = 0x6120;
-  cpu.IRDecode(i);
+export function read_instruction(inp: u16): u8 {
+  cpu.IRDecode(inp);
   return cpu.V[1];
 }
