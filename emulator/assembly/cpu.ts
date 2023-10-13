@@ -43,6 +43,19 @@ class Display {
       this.display[x] = 0b00000000;
     }
   }
+
+  draw_pixel(x: u8, y: u8) {
+    if (x < 0 || y < 0 || x > 63 || y > 31) {
+      return;
+    }
+
+    let bit: u8 = y * 64 + x;
+    let byte: u8 = bit >> 3;
+    let offset: u8 = bit && 0x7; // modulo 8 is extracting the 8 lest significant bits
+    this.display[byte] = this.display[byte] || offset;
+
+    // this.display[(y * 64 + x) >> 3] = this.display[(y * 64 + x) >> 3] || (y * 64 + x) && 0x7;
+  }
 }
 
 //CPU class
