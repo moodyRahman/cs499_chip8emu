@@ -34,6 +34,17 @@ class Memory {
   //Load ROM function
 }
 
+class Display {
+  //Tentatively trying out this approach, because we only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
+  display: Uint8Array = new Uint8Array(256);
+
+  clear(): void {
+    for (let x = 0; x < 256; x++) {
+      this.display[x] = 0b00000000;
+    }
+  }
+}
+
 //CPU class
 class CPU {
   //16 8 bit registers are needed
@@ -55,7 +66,8 @@ class CPU {
 
   memory: Memory = new Memory();
 
-  display: boolean = false; //This is temporary since we haven't made the Display object yet
+  //Tentatively trying out this approach, because we only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
+  display: Display = new Display();
   soundHandler: boolean = false; //This is temporary since we haven't made the SoundHandler object yet
 
   //Instruction variable to hold current instruction bits (16) for decode and execute:
@@ -99,6 +111,9 @@ class CPU {
     for (let j = 0; j < 16; j++) {
       this.Stack[j] = 0;
     }
+
+    // reset display
+    this.display.clear();
 
     //reset decode variables:
     this.nnn = 0;
@@ -305,7 +320,7 @@ class CPU {
 
   CLS(): void {
     //Clear the display.
-    //this.display.clear();
+    this.display.clear();
   }
 
   RET(): void {
@@ -550,4 +565,10 @@ export function read_instruction(inp: u16): void {
 
 export function read_all_registers(): Uint8Array {
   return cpu.V;
+}
+
+// if we can get some way to trigger a callback in javascript when the display gets updated, that would be ideal
+// until then, we'll just have to keep polling this function and rendering it.
+export function display(): Uint8Array {
+  return cpu.display.display;
 }
