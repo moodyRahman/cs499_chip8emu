@@ -40,19 +40,21 @@ class Display {
 
   clear(): void {
     for (let x = 0; x < 256; x++) {
-      this.display[x] = 0b00000000;
+      this.display[x] = 0;
     }
   }
 
-  draw_pixel(x: u8, y: u8) {
+  draw_pixel(x: u8, y: u8): void {
     if (x < 0 || y < 0 || x > 63 || y > 31) {
       return;
     }
 
-    let bit: u8 = y * 64 + x;
-    let byte: u8 = bit >> 3;
-    let offset: u8 = bit && 0x7; // modulo 8 is extracting the 8 lest significant bits
-    this.display[byte] = this.display[byte] || offset;
+    let bit: u8 = y * 64 + x; // convert the x-y coordinate to the exact bit we care about
+    let byte: u8 = bit >> 3; // which byte this bit belongs to
+    let offset: u8 = bit & 0x7; // modulo 8 is extracting the 8 lest significant bits, aka where in the byte do we flip
+
+    // we went to set the byte[offset]
+    this.display[byte] = this.display[byte] | (0x80 >> offset);
 
     // this.display[(y * 64 + x) >> 3] = this.display[(y * 64 + x) >> 3] || (y * 64 + x) && 0x7;
   }
@@ -584,4 +586,8 @@ export function read_all_registers(): Uint8Array {
 // until then, we'll just have to keep polling this function and rendering it.
 export function display(): Uint8Array {
   return cpu.display.display;
+}
+
+export function debug_set_pixel(x: u8, y: u8): void {
+  cpu.display.draw_pixel(x, y);
 }
