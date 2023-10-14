@@ -34,6 +34,32 @@ class Memory {
   //Load ROM function
 }
 
+class Display {
+  //Tentatively trying out this approach, because we only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
+  display: Uint8Array = new Uint8Array(256);
+
+  clear(): void {
+    for (let x = 0; x < 256; x++) {
+      this.display[x] = 0;
+    }
+  }
+
+  draw_pixel(x: u8, y: u8): void {
+    if (x < 0 || y < 0 || x > 63 || y > 31) {
+      return;
+    }
+
+    let bit: u8 = (y << 6) + x; // convert the x-y coordinate to the exact bit we care about
+    let byte: u8 = bit >> 3; // which byte this bit belongs to
+    let offset: u8 = bit & 0x7; // modulo 8 is extracting the 8 lest significant bits, aka where in the byte do we flip
+
+    // we went to set the byte[offset]
+    this.display[byte] = this.display[byte] | (0x80 >> offset);
+
+    // this.display[(y * 64 + x) >> 3] = this.display[(y * 64 + x) >> 3] || (y * 64 + x) && 0x7;
+  }
+}
+
 //CPU class
 class CPU {
   //16 8 bit registers are needed
@@ -55,7 +81,8 @@ class CPU {
 
   memory: Memory = new Memory();
 
-  display: boolean = false; //This is temporary since we haven't made the Display object yet
+  //Tentatively trying out this approach, because we only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
+  display: Display = new Display();
   soundHandler: boolean = false; //This is temporary since we haven't made the SoundHandler object yet
 
   //Instruction variable to hold current instruction bits (16) for decode and execute:
@@ -100,6 +127,9 @@ class CPU {
       this.Stack[j] = 0;
     }
 
+    // reset display
+    this.display.clear();
+
     //reset decode variables:
     this.nnn = 0;
     this.n = 0;
@@ -138,8 +168,6 @@ class CPU {
     this.kk = u8(inst & 0x00ff); //gets last 8 instruction bits (0 through 7)
     this.i = u8((inst >> 12) & 0x000f); // gets first 4 bits of instruction
 
-    console.log(inst.toString(16));
-
     if (inst == 0) {
       return;
     }
@@ -165,9 +193,9 @@ class CPU {
       this.SKP();
     } else if (this.i == 0x6) {
       this.LDbyte();
-    } else if ((this.i = 0x7)) {
+    } else if (this.i == 0x7) {
       this.ADDbyte();
-    } else if ((this.i = 0x8)) {
+    } else if (this.i == 0x8) {
       if (this.n == 0x0) {
         this.LDregister();
       }
@@ -194,6 +222,11 @@ class CPU {
       }
       if (this.n == 0xe) {
         this.SHL();
+      }
+
+      if (this.n == 0x8) {
+        console.log("here");
+        this.DRAW_PIXEL();
       }
     } else if (this.i == 0xa) {
       this.SNEregister();
@@ -305,7 +338,7 @@ class CPU {
 
   CLS(): void {
     //Clear the display.
-    //this.display.clear();
+    this.display.clear();
   }
 
   RET(): void {
@@ -321,6 +354,14 @@ class CPU {
   JPimm(): void {
     //The interpreter sets the program counter to nnn.
     this.pc = this.nnn;
+  }
+
+  DRAW_PIXEL(): void {
+    //The interpreter sets the program counter to nnn.
+    console.log(this.x.toString());
+    console.log(this.y.toString());
+
+    this.display.draw_pixel(this.x, this.y);
   }
 
   CALL(): void {
@@ -550,4 +591,14 @@ export function read_instruction(inp: u16): void {
 
 export function read_all_registers(): Uint8Array {
   return cpu.V;
+}
+
+// if we can get some way to trigger a callback in javascript when the display gets updated, that would be ideal
+// until then, we'll just have to keep polling this function and rendering it.
+export function display(): Uint8Array {
+  return cpu.display.display;
+}
+
+export function debug_set_pixel(x: u8, y: u8): void {
+  cpu.display.draw_pixel(x, y);
 }

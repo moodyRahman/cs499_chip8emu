@@ -2,7 +2,8 @@
 
 <script lang="ts">
 
-import * as chip8 from "$lib/chip8/debug.js";
+    import * as chip8 from "$lib/chip8/debug.js";
+	import Octet from "../components/Octet.svelte";
 
     const bindFunc = (wasmfunc: CallableFunction) => {    
         return {
@@ -14,7 +15,9 @@ import * as chip8 from "$lib/chip8/debug.js";
     }
     
     
-    let input = ""    
+    let input = ""
+    let px = 0;
+    let py = 0;
     let register = 0
 
     let {func: read_instruction, trigger: read_instruction_trigger} = bindFunc(() => {
@@ -27,6 +30,8 @@ import * as chip8 from "$lib/chip8/debug.js";
 
     let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     $: read_all_registers(read_all_registers_trigger)
+
+    let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.display);
     
 </script>
 
@@ -35,7 +40,7 @@ import * as chip8 from "$lib/chip8/debug.js";
 <div>
     <div class="registers">
     {#each read_all_registers(read_all_registers_trigger) as register, i}
-        <span class="register">V{i},{register}  </span>
+        <span class="register">V{i},{register.toString(16)}  </span>
     {/each}
     </div>
 </div>
@@ -45,7 +50,7 @@ import * as chip8 from "$lib/chip8/debug.js";
 </div>
 
 <div>
-    <button on:click={() => { read_instruction_trigger++;}}>run the instruction</button>
+    <button on:click={() => { read_instruction_trigger++; read_display_trigger++}}>run the instruction</button>
 </div>
 
 <div>
@@ -59,10 +64,50 @@ import * as chip8 from "$lib/chip8/debug.js";
     
     (read as 0x6120, it's been split up to accomodate annotations)
 </pre>
+
+<pre>
+
+    draw pixel at (0 to 16, 0 to 16):
+    0x
+    8  opcode for a bunch of different things
+    0  x, x-coordinate 
+    0  y, y-coordinate
+    8  n, further opcode for a temporary debug draw pixel function
+    
+    (read as 0x8008)
+</pre>
+</div>
+
+<div class="display-container">
+    
+    {#each read_display(read_display_trigger) as pixel_group }
+    
+        <Octet data={pixel_group} />
+    
+    {/each}
+</div>
+
+<div>
+    <button on:click={() => { chip8.debug_set_pixel(px, py); read_display_trigger++}} >draw pixel</button>
+    <!-- <button on:click={() => { read_display_trigger++}} >update display</button> -->
+
+</div>
+
+
+<div>
+    draw pixels: <input type="number" bind:value={px} placeholder="x"> <input type="number" bind:value={py} placeholder="y">
 </div>
 
 
 <style>
+
+    :global(html) {
+    box-sizing: border-box;
+    }
+    *, *:before, *:after {
+    box-sizing: inherit;
+    }
+
 
     .registers {
         width: 50%;
@@ -72,4 +117,19 @@ import * as chip8 from "$lib/chip8/debug.js";
     .register {
         margin-left: 10px;
     }
+
+    .display-container {
+        display: grid;
+        grid-template-columns: repeat(8, fit-content(12.5%));
+        gap: 0;
+        width: auto;
+    }
+
+    .octet {
+        width: auto;
+        margin-left: 0px;
+    }
+
 </style>
+
+
