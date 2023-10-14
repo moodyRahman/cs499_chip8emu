@@ -49,7 +49,7 @@ class Display {
       return;
     }
 
-    let bit: u8 = y * 64 + x; // convert the x-y coordinate to the exact bit we care about
+    let bit: u8 = (y << 6) + x; // convert the x-y coordinate to the exact bit we care about
     let byte: u8 = bit >> 3; // which byte this bit belongs to
     let offset: u8 = bit & 0x7; // modulo 8 is extracting the 8 lest significant bits, aka where in the byte do we flip
 
