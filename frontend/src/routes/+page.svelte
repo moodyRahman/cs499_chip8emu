@@ -50,7 +50,7 @@
 </div>
 
 <div>
-    <button on:click={() => { read_instruction_trigger++;}}>run the instruction</button>
+    <button on:click={() => { read_instruction_trigger++; read_display_trigger++}}>run the instruction</button>
 </div>
 
 <div>
@@ -63,6 +63,18 @@
     20 kk, the value we'll put into register Vx
     
     (read as 0x6120, it's been split up to accomodate annotations)
+</pre>
+
+<pre>
+
+    draw pixel at (0 to 16, 0 to 16):
+    0x
+    8  opcode for a bunch of different things
+    0  x, x-coordinate 
+    0  y, y-coordinate
+    8  n, further opcode for a temporary debug draw pixel function
+    
+    (read as 0x8008)
 </pre>
 </div>
 

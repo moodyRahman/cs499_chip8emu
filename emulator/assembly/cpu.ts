@@ -168,8 +168,6 @@ class CPU {
     this.kk = u8(inst & 0x00ff); //gets last 8 instruction bits (0 through 7)
     this.i = u8((inst >> 12) & 0x000f); // gets first 4 bits of instruction
 
-    console.log(inst.toString(16));
-
     if (inst == 0) {
       return;
     }
@@ -195,9 +193,9 @@ class CPU {
       this.SKP();
     } else if (this.i == 0x6) {
       this.LDbyte();
-    } else if ((this.i = 0x7)) {
+    } else if (this.i == 0x7) {
       this.ADDbyte();
-    } else if ((this.i = 0x8)) {
+    } else if (this.i == 0x8) {
       if (this.n == 0x0) {
         this.LDregister();
       }
@@ -224,6 +222,11 @@ class CPU {
       }
       if (this.n == 0xe) {
         this.SHL();
+      }
+
+      if (this.n == 0x8) {
+        console.log("here");
+        this.DRAW_PIXEL();
       }
     } else if (this.i == 0xa) {
       this.SNEregister();
@@ -351,6 +354,14 @@ class CPU {
   JPimm(): void {
     //The interpreter sets the program counter to nnn.
     this.pc = this.nnn;
+  }
+
+  DRAW_PIXEL(): void {
+    //The interpreter sets the program counter to nnn.
+    console.log(this.x.toString());
+    console.log(this.y.toString());
+
+    this.display.draw_pixel(this.x, this.y);
   }
 
   CALL(): void {
