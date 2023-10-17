@@ -684,7 +684,8 @@ class CPU {
 
   LDsprite(): void {
     //The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx.
-    //Cant be implemented without display class
+    //Take value in Vx and multiply by 5 (for 5 bytes of each Font)
+    this.index = this.V[this.x] * 5;
   }
 
   LDbr(): void {
