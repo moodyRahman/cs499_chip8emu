@@ -1,3 +1,5 @@
+import { draw } from "./display";
+
 //Memory class
 class Memory {
   //4,096 bytes of RAM
@@ -7,6 +9,7 @@ class Memory {
   //Constructor and Functions
   constructor() {
     this.clear();
+    this.loadFonts();
   }
 
   clear(): void {
@@ -30,18 +33,133 @@ class Memory {
   }
 
   //Font function should implement by Thursday
+  static ogFontTable: StaticArray<u8> = [
+		0xF0, 0x90, 0x90, 0x90, 0xF0, //0
+		0x20, 0x60, 0x20, 0x20, 0x70, //1
+		0xF0, 0x10, 0XF0, 0x80, 0xF0, //2
+		0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
+		0x90, 0x90, 0xF0, 0x10, 0x10, //4
+		0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
+		0xF0, 0x80, 0xF0, 0x90, 0xF0, //6
+		0xF0, 0x10, 0x20, 0x40, 0x40, //7
+		0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
+		0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
+		0xF0, 0x90, 0xF0, 0x90, 0x90, //A
+		0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
+		0xF0, 0x80, 0x80, 0x80, 0xF0, //C
+		0xE0, 0x90, 0x90, 0x90, 0xE0, //D
+		0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
+		0xF0, 0x80, 0xF0, 0x80, 0x80  //F
+	]
+
+  loadFonts(): void{
+    //Load fonts into the first 80 bytes of memory
+		for (let i: u8 = 0; i < 80; i++) {
+			this.mem[i] = Memory.ogFontTable[i];
+		}
+  }
 
   //Load ROM function
+  loadROM(romToLoad: Uint8Array): boolean{
+    if(romToLoad.length > 0xE00){
+      return false; //If file byte length is greater than 3584 bytes, file is too big and cannot execute (it doesnt go past RAM limit)
+    }
+
+    for (let i = 0; i < romToLoad.length; i++) {
+			this.mem[i + 512] = romToLoad[i]; //Store ROM bytes into memory starting from address 512 and on
+                                       //remember, addresses 0-512 are reserved for interpreter
+		}
+
+    this.loadFonts();
+    return true; //If loadROM function sucessfully executed, return true;
+  }
 }
 
-class Display {
-  //Tentatively trying out this approach, because we only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
-  display: Uint8Array = new Uint8Array(256);
 
-  clear(): void {
-    for (let x = 0; x < 256; x++) {
-      this.display[x] = 0;
+
+
+
+
+
+
+
+class Display {
+  //We only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
+  display: Uint8Array = new Uint8Array(256);
+  collision: boolean = false;
+
+  //Reference to Chip-8 Memory
+  memory: Memory = new Memory();
+
+  loadMemRef(memToLoad: Memory):void{
+    this.memory = memToLoad;
+  }
+
+  getCollisionValue(): u8{
+    if(this.collision){
+      return 1;
+    }else{
+      return 0;
     }
+  }
+
+
+
+  clearDisplay(): void { //Set all pixels to 0 in mem
+    for (let i: u16 = 0; i < 256; i++) {
+      this.display[i] = 0;
+    }
+  }
+  
+  drawSprite(x: u8, y: u8, address: u16, length: u8): void{
+    //Check if x and y do not go past display boundry
+    if(x > 63){
+      return;
+    }
+    if(y > 31){
+      return;
+    }
+
+    //Check if we draw past screen
+    let edgeCase: boolean = false;
+    if(x > 56){ //if x > 56 then we will be drawing past the display edge
+      edgeCase = true;
+    }
+
+    let xByteLoc: u8 = x >> 3; //divide by 8
+    let xBitLoc: u8 = x & 0x7; //keep last 3 bits for remainder
+
+    //For every length of the sprite
+    for (let i: u16 = 0; i < length; i++) {
+      //Getting address of byte we start drawing in
+      let drawAddr: u16 = xByteLoc + ((y+i) << 3); //(x / 8) + (ylocation * 8)
+
+      //Check for collision:
+      //We compare the current displayed byte with the new display byte using AND and if the value is anything other than 0
+      //then a collision occured.
+      //We only care about the bits we draw into hence the right shift by xBitLoc many bits.
+      if((this.display[drawAddr] & (this.memory.read(address+i) >> xBitLoc)) != 0){
+        this.collision = true;
+      }
+
+      //Draw pixels on screen (uses XOR)
+      this.display[drawAddr] ^= (this.memory.read(address+i) >> xBitLoc);
+      //If we are not drawing past the edge of display, then continue drawing in next byte
+      if(!edgeCase){
+        //Check for collisions first:
+        //Comparing current display of next byte with new byte using AND
+        //however we only want to check the bits we are drawing into hence the shifting to the left
+        //by 8-xBitLoc many bits
+        if((this.display[drawAddr+1] & (this.memory.read(address+i) << (8-xBitLoc))) != 0){
+          this.collision = true;
+        }
+        
+        //Continue drawing
+        this.display[drawAddr+1] ^= ((this.memory.read(address+i) << (8-xBitLoc)));
+      }
+
+    }
+
   }
 
   draw_pixel(x: u16, y: u16): void {
@@ -49,7 +167,7 @@ class Display {
       return;
     }
 
-    let bit: u16 = y * 64 + x; // convert the x-y coordinate to the exact bit we care about
+    let bit: u16 = (y << 6) + x; // convert the x-y coordinate to the exact bit we care about
     let byte: u16 = bit >> 3; // which byte this bit belongs to
     let offset: u8 = u8(bit & 0x7); // modulo 8 is extracting the 8 lest significant bits, aka where in the byte do we flip
 
@@ -128,7 +246,7 @@ class CPU {
     }
 
     // reset display
-    this.display.clear();
+    this.display.clearDisplay();
 
     //reset decode variables:
     this.nnn = 0;
@@ -138,11 +256,11 @@ class CPU {
     this.kk = 0;
   }
 
-  loadMemory(memoryToLoad: any): void {
+  loadMemory(memoryToLoad: Memory): void {
     this.memory = memoryToLoad;
   }
 
-  loadDisplay(displayToLoad: any): void {
+  loadDisplay(displayToLoad: Display): void {
     this.display = displayToLoad;
   }
 
@@ -155,7 +273,7 @@ class CPU {
     //then we will need to shift those bits to the left by 8 places (memory is 8 bits an address) since this is only half of the instruction.
     //Then we OR equals the bits stored in PC+1 which combines the two halves of the instruction into our CurrInstruction variable.
     //Then we need to set PC to the next instruction for execution.
-    this.CurrInstruction = this.memory.read(this.pc) >> 8;
+    this.CurrInstruction = this.memory.read(this.pc) << 8;
     this.CurrInstruction |= this.memory.read(this.pc + 1);
     this.pc += 2;
   }
@@ -224,10 +342,10 @@ class CPU {
         this.SHL();
       }
 
-      if (this.n == 0x8) {
-        console.log("here");
-        this.DRAW_PIXEL();
-      }
+      // if (this.n == 0x8) {
+      //   console.log("here");
+      //   this.DRAW_PIXEL();
+      // }
     } else if (this.i == 0xa) {
       this.SNEregister();
     } else if (this.i == 0xb) {
@@ -338,7 +456,7 @@ class CPU {
 
   CLS(): void {
     //Clear the display.
-    this.display.clear();
+    this.display.clearDisplay();
   }
 
   RET(): void {
@@ -356,13 +474,13 @@ class CPU {
     this.pc = this.nnn;
   }
 
-  DRAW_PIXEL(): void {
-    //The interpreter sets the program counter to nnn.
-    console.log(this.x.toString());
-    console.log(this.y.toString());
+  // DRAW_PIXEL(): void {
+  //   //The interpreter sets the program counter to nnn.
+  //   console.log(this.x.toString());
+  //   console.log(this.y.toString());
 
-    this.display.draw_pixel(this.x, this.y);
-  }
+  //   this.display.draw_pixel(this.x, this.y);
+  // }
 
   CALL(): void {
     //The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
@@ -498,8 +616,11 @@ class CPU {
 
   RND(): void {
     //The interpreter generates a random number from 0 to 255, which is then ANDed with the value kk.
-    //The results are stored in Vx. See instruction 8xy2 for more information on AND.
-    //Need to figure out how generating random numbers work in AssemblyScript
+    //The results are stored in Vx.
+    let randFloat: f64 = Math.floor(Math.random() * 256);
+    let randInt: u8 = <u8>randFloat; //TypeCasting f64 -> u8
+
+    this.V[this.x] = randInt & this.kk;
   }
 
   DRW(): void {
@@ -507,7 +628,8 @@ class CPU {
     //These bytes are then displayed as sprites on screen at coordinates (Vx, Vy).
     //Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0.
     //If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen.
-    //Can't be implemented at the moment since no Display class implemented
+    this.display.drawSprite(this.V[this.x], this.V[this.y], this.index, this.n);
+    this.V[0xf] = this.display.getCollisionValue();
   }
 
   SKP(): void {
@@ -547,7 +669,8 @@ class CPU {
 
   LDsprite(): void {
     //The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx.
-    //Cant be implemented without display class
+    //Take value in Vx and multiply by 5 (for 5 bytes of each Font)
+    this.index = this.V[this.x] * 5;
   }
 
   LDbr(): void {
