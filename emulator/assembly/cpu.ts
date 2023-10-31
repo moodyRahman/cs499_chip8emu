@@ -161,37 +161,22 @@ class Display {
     }
 
   }
-  
-  
-  
-  
-  // draw_pixel(x: u16, y: u16): void {
-  //   if (x < 0 || y < 0 || x > 63 || y > 31) {
-  //     return;
-  //   }
 
-  //   let bit: u16 = y * 8 + x; // convert the x-y coordinate to the exact bit we care about
-  //   let byte: u16 = bit >> 3; // which byte this bit belongs to
-  //   let offset: u8 = u8(bit & 0x7); // modulo 8 is extracting the 8 lest significant bits, aka where in the byte do we flip
+  draw_pixel(x: u16, y: u16): void {
+    if (x < 0 || y < 0 || x > 63 || y > 31) {
+      return;
+    }
 
-  //   // we went to set the byte[offset]
-  //   this.display[byte] = this.display[byte] | (0x80 >> offset);
+    let bit: u16 = (y << 6) + x; // convert the x-y coordinate to the exact bit we care about
+    let byte: u16 = bit >> 3; // which byte this bit belongs to
+    let offset: u8 = u8(bit & 0x7); // modulo 8 is extracting the 8 lest significant bits, aka where in the byte do we flip
 
-  //   // this.display[(y * 64 + x) >> 3] = this.display[(y * 64 + x) >> 3] || (y * 64 + x) && 0x7;
-  // }
+    // we went to set the byte[offset]
+    this.display[byte] = this.display[byte] | (0x80 >> offset);
+
+    // this.display[(y * 64 + x) >> 3] = this.display[(y * 64 + x) >> 3] || (y * 64 + x) && 0x7;
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 //CPU class
 class CPU {
@@ -634,7 +619,7 @@ class CPU {
     //The results are stored in Vx.
     let randFloat: f64 = Math.floor(Math.random() * 256);
     let randInt: u8 = <u8>randFloat; //TypeCasting f64 -> u8
-    
+
     this.V[this.x] = randInt & this.kk;
   }
 
@@ -643,7 +628,7 @@ class CPU {
     //These bytes are then displayed as sprites on screen at coordinates (Vx, Vy).
     //Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0.
     //If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen.
-    this.display.drawSprite(this.V[this.x], this.V[this.y], this.index , this.n);
+    this.display.drawSprite(this.V[this.x], this.V[this.y], this.index, this.n);
     this.V[0xf] = this.display.getCollisionValue();
   }
 
@@ -737,6 +722,6 @@ export function display(): Uint8Array {
   return cpu.display.display;
 }
 
-// export function debug_set_pixel(x: u8, y: u8): void {
-//   cpu.display.draw_pixel(x, y);
-// }
+export function debug_set_pixel(x: u8, y: u8): void {
+  cpu.display.draw_pixel(x, y);
+}
