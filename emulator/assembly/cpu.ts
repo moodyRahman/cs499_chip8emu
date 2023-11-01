@@ -33,6 +33,7 @@ class Memory {
   }
 
   //Font function should implement by Thursday
+  // prettier-ignore
   static ogFontTable: StaticArray<u8> = [
 		0xF0, 0x90, 0x90, 0x90, 0xF0, //0
 		0x20, 0x60, 0x20, 0x20, 0x70, //1
@@ -52,36 +53,28 @@ class Memory {
 		0xF0, 0x80, 0xF0, 0x80, 0x80  //F
 	]
 
-  loadFonts(): void{
+  loadFonts(): void {
     //Load fonts into the first 80 bytes of memory
-		for (let i: u8 = 0; i < 80; i++) {
-			this.mem[i] = Memory.ogFontTable[i];
-		}
+    for (let i: u8 = 0; i < 80; i++) {
+      this.mem[i] = Memory.ogFontTable[i];
+    }
   }
 
   //Load ROM function
-  loadROM(romToLoad: Uint8Array): boolean{
-    if(romToLoad.length > 0xE00){
+  loadROM(romToLoad: Uint8Array): boolean {
+    if (romToLoad.length > 0xe00) {
       return false; //If file byte length is greater than 3584 bytes, file is too big and cannot execute (it doesnt go past RAM limit)
     }
 
     for (let i = 0; i < romToLoad.length; i++) {
-			this.mem[i + 512] = romToLoad[i]; //Store ROM bytes into memory starting from address 512 and on
-                                       //remember, addresses 0-512 are reserved for interpreter
-		}
+      this.mem[i + 512] = romToLoad[i]; //Store ROM bytes into memory starting from address 512 and on
+      //remember, addresses 0-512 are reserved for interpreter
+    }
 
     this.loadFonts();
     return true; //If loadROM function sucessfully executed, return true;
   }
 }
-
-
-
-
-
-
-
-
 
 class Display {
   //We only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
@@ -91,38 +84,38 @@ class Display {
   //Reference to Chip-8 Memory
   memory: Memory = new Memory();
 
-  loadMemRef(memToLoad: Memory):void{
+  loadMemRef(memToLoad: Memory): void {
     this.memory = memToLoad;
   }
 
-  getCollisionValue(): u8{
-    if(this.collision){
+  getCollisionValue(): u8 {
+    if (this.collision) {
       return 1;
-    }else{
+    } else {
       return 0;
     }
   }
 
-
-
-  clearDisplay(): void { //Set all pixels to 0 in mem
+  clearDisplay(): void {
+    //Set all pixels to 0 in mem
     for (let i: u16 = 0; i < 256; i++) {
       this.display[i] = 0;
     }
   }
-  
-  drawSprite(x: u8, y: u8, address: u16, length: u8): void{
+
+  drawSprite(x: u8, y: u8, address: u16, length: u8): void {
     //Check if x and y do not go past display boundry
-    if(x > 63){
+    if (x > 63) {
       return;
     }
-    if(y > 31){
+    if (y > 31) {
       return;
     }
 
     //Check if we draw past screen
     let edgeCase: boolean = false;
-    if(x > 56){ //if x > 56 then we will be drawing past the display edge
+    if (x > 56) {
+      //if x > 56 then we will be drawing past the display edge
       edgeCase = true;
     }
 
@@ -132,34 +125,40 @@ class Display {
     //For every length of the sprite
     for (let i: u16 = 0; i < length; i++) {
       //Getting address of byte we start drawing in
-      let drawAddr: u16 = xByteLoc + ((y+i) << 3); //(x / 8) + (ylocation * 8)
+      let drawAddr: u16 = xByteLoc + ((y + i) << 3); //(x / 8) + (ylocation * 8)
 
       //Check for collision:
       //We compare the current displayed byte with the new display byte using AND and if the value is anything other than 0
       //then a collision occured.
       //We only care about the bits we draw into hence the right shift by xBitLoc many bits.
-      if((this.display[drawAddr] & (this.memory.read(address+i) >> xBitLoc)) != 0){
+      if (
+        (this.display[drawAddr] & (this.memory.read(address + i) >> xBitLoc)) !=
+        0
+      ) {
         this.collision = true;
       }
 
       //Draw pixels on screen (uses XOR)
-      this.display[drawAddr] ^= (this.memory.read(address+i) >> xBitLoc);
+      this.display[drawAddr] ^= this.memory.read(address + i) >> xBitLoc;
       //If we are not drawing past the edge of display, then continue drawing in next byte
-      if(!edgeCase){
+      if (!edgeCase) {
         //Check for collisions first:
         //Comparing current display of next byte with new byte using AND
         //however we only want to check the bits we are drawing into hence the shifting to the left
         //by 8-xBitLoc many bits
-        if((this.display[drawAddr+1] & (this.memory.read(address+i) << (8-xBitLoc))) != 0){
+        if (
+          (this.display[drawAddr + 1] &
+            (this.memory.read(address + i) << (8 - xBitLoc))) !=
+          0
+        ) {
           this.collision = true;
         }
-        
+
         //Continue drawing
-        this.display[drawAddr+1] ^= ((this.memory.read(address+i) << (8-xBitLoc)));
+        this.display[drawAddr + 1] ^=
+          this.memory.read(address + i) << (8 - xBitLoc);
       }
-
     }
-
   }
 
   draw_pixel(x: u16, y: u16): void {
