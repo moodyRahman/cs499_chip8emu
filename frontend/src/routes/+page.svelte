@@ -13,7 +13,17 @@
             trigger: 0
         }
     }
-    
+
+    const test = async () => {
+        const res = await fetch("http://localhost:3000/assets/roms/SpaceInvaders.ch8");
+        const data = await res.arrayBuffer();
+        
+        const rom = new Uint8Array(data)
+
+        chip8.load_rom(rom);
+    }
+
+    test()
     
     let input = ""
     let px = 0;

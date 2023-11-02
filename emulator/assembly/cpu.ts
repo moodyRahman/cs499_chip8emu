@@ -724,3 +724,11 @@ export function display(): Uint8Array {
 export function debug_set_pixel(x: u8, y: u8): void {
   cpu.display.draw_pixel(x, y);
 }
+
+export function load_rom(rom: Uint8Array): void {
+  cpu.memory.loadROM(rom);
+
+  for (let x: u16 = 0; x < 100; x++) {
+    console.log(cpu.memory.read(512 + x).toString(16));
+  }
+}
