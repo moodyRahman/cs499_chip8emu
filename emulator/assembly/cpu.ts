@@ -341,10 +341,10 @@ class CPU {
         this.SHL();
       }
 
-      // if (this.n == 0x8) {
-      //   console.log("here");
-      //   this.DRAW_PIXEL();
-      // }
+      if (this.n == 0x8) {
+        console.log("here");
+        this.DRAW_PIXEL();
+      }
     } else if (this.i == 0xa) {
       this.SNEregister();
     } else if (this.i == 0xb) {
@@ -473,13 +473,13 @@ class CPU {
     this.pc = this.nnn;
   }
 
-  // DRAW_PIXEL(): void {
-  //   //The interpreter sets the program counter to nnn.
-  //   console.log(this.x.toString());
-  //   console.log(this.y.toString());
+  DRAW_PIXEL(): void {
+    //The interpreter sets the program counter to nnn.
+    console.log(this.x.toString());
+    console.log(this.y.toString());
 
-  //   this.display.draw_pixel(this.x, this.y);
-  // }
+    this.display.draw_pixel(this.x, this.y);
+  }
 
   CALL(): void {
     //The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
