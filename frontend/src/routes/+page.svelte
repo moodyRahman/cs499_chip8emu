@@ -4,6 +4,8 @@
 
     import * as chip8 from "$lib/chip8/debug.js";
 	import Octet from "../components/Octet.svelte";
+    import { onMount } from 'svelte';
+
 
     const bindFunc = (wasmfunc: CallableFunction) => {    
         return {
@@ -14,24 +16,41 @@
         }
     }
 
-    const test = async () => {
-        const res = await fetch("http://localhost:3000/assets/roms/SpaceInvaders.ch8");
-        const data = await res.arrayBuffer();
-        
-        const rom = new Uint8Array(data)
-
-        chip8.load_rom(rom);
-    }
-
-    test()
     
-    let input = ""
+    let arbitrary_inst = ""
     let px = 0;
     let py = 0;
-    let register = 0
+    let rom_name = ""
+    let rom = new Uint8Array()
+
+    let rom_disassem = new Uint16Array();
+
+    (async () => {
+        const res = await fetch("http://localhost:3000/assets/roms/SpaceInvaders.ch8");
+        const buff = await res.arrayBuffer();
+        rom = new Uint8Array(buff);
+        chip8.load_rom(rom);
+
+        const padded_rom = new Uint8Array(buff.byteLength%2 == 0? buff.byteLength:buff.byteLength + 1);
+
+        
+        padded_rom.set(rom, 0);
+        
+
+        rom_disassem = new Uint16Array(padded_rom.buffer);
+
+        console.log(rom_disassem.slice(0, 10))
+	})()
+
+
+    const swap_endian = (x: number) => {
+
+    }
+
+
 
     let {func: read_instruction, trigger: read_instruction_trigger} = bindFunc(() => {
-        const out = chip8.read_instruction(Number(input)); 
+        const out = chip8.read_instruction(Number(arbitrary_inst)); 
         read_all_registers_trigger++; 
         return out
     })    
@@ -56,11 +75,11 @@
 </div>
 
 <div>
-    <input type="text" placeholder="enter instruction here" bind:value={input}>
+    <input type="text" placeholder="enter instruction here" bind:value={arbitrary_inst}>
 </div>
 
 <div>
-    <button on:click={() => { read_instruction_trigger++; read_display_trigger++}}>run the instruction</button>
+    <button on:click={() => { read_instruction_trigger++; read_display_trigger++; console.log(chip8.convert_inst_to_string(Number(arbitrary_inst)))}}>run the instruction</button>
 </div>
 
 <div>
@@ -88,17 +107,44 @@
 </pre>
 </div>
 
-<div class="display-container">
-    
-    {#each read_display(read_display_trigger) as pixel_group }
-    
+<div>
+    <div>
+        load a rom
+    </div>
+    <select bind:value={rom_name}>
+
+        <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
+        <option value="Astrododge.ch8">Astrododge</option>
+        <option value="Breakout.ch8">Breakout</option>
+        <option value="Landing.ch8">Landing</option>
+        <option value="Pong.ch8">Pong</option>
+        <option value="Pong2.ch8">Pong2</option>
+        <option value="SpaceInvaders.ch8">SpaceInvaders</option>
+        <option value="Tetris.ch8">Tetris</option>
+        <option value="TicTacToe.ch8">TicTacToe</option>
+
+    </select>
+</div>
+<div class="lr-container">
+    <div class="display-container">
+        
+        {#each read_display(read_display_trigger) as pixel_group }
+        
         <Octet data={pixel_group} />
-    
-    {/each}
+        
+        {/each}
+    </div>
+    <div>
+        {#each rom_disassem.slice(0, 30) as inst}
+        <!-- {((inst>>8) | (inst<<8))} aa {chip8.convert_inst_to_string(((inst>>8) | (inst<<8)))} <br>  -->
+            {chip8.convert_inst_to_string((inst & 0x00ff) << 8 | (inst>>8))}<br> 
+
+        {/each}
+    </div>
 </div>
 
 <div>
-    <button on:click={() => { chip8.debug_set_pixel(px, py); read_display_trigger++}} >draw pixel</button>
+    <button on:click={() => { chip8.debug_set_pixel(px, py); read_display_trigger++;}} >draw pixel</button>
     <!-- <button on:click={() => { read_display_trigger++}} >update display</button> -->
 
 </div>
@@ -138,6 +184,11 @@
     .octet {
         width: auto;
         margin-left: 0px;
+    }
+
+    .lr-container {
+        display: flex;
+        
     }
 
 </style>

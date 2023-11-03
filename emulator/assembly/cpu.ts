@@ -345,8 +345,10 @@ class CPU {
         console.log("here");
         this.DRAW_PIXEL();
       }
-    } else if (this.i == 0xa) {
+    } else if (this.i == 0x9) {
       this.SNEregister();
+    } else if (this.i == 0xa) {
+      this.LDindex();
     } else if (this.i == 0xb) {
       this.JPregister();
     } else if (this.i == 0xc) {
@@ -728,7 +730,121 @@ export function debug_set_pixel(x: u8, y: u8): void {
 export function load_rom(rom: Uint8Array): void {
   cpu.memory.loadROM(rom);
 
-  for (let x: u16 = 0; x < 100; x++) {
+  for (let x: u16 = 0; x < 5; x++) {
     console.log(cpu.memory.read(512 + x).toString(16));
   }
+}
+
+export function convert_inst_to_string(inst: u16): string {
+  let nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
+  let n = u8(inst & 0x000f); //gets last 4 instruction bits (0 through 3)
+  let x = u8((inst >> 8) & 0x000f); //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
+  let y = u8((inst >> 4) & 0x000f); //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
+  let kk = u8(inst & 0x00ff); //gets last 8 instruction bits (0 through 7)
+  let i = u8((inst >> 12) & 0x000f); // gets first 4 bits of instruction
+
+  if (inst == 0) {
+    return "no op";
+  }
+
+  if (i == 0x0) {
+    if (nnn == 0x0e0) {
+      return "clearing";
+    }
+    if (nnn == 0x0ee) {
+      return "returning";
+    } else {
+      return "syscall";
+    }
+  } else if (i == 0x1) {
+    return "jumping to " + nnn.toString();
+  } else if (i == 0x2) {
+    return "call " + nnn.toString();
+  } else if (i == 0x3) {
+    return "sebyte " + x.toString() + " " + kk.toString();
+  } else if (i == 0x4) {
+    return "snebyte " + x.toString() + " " + kk.toString();
+  } else if (i == 0x5) {
+    return "skip " + x.toString() + " " + y.toString();
+  } else if (i == 0x6) {
+    return "ldbyte " + x.toString() + " " + kk.toString();
+  } else if (i == 0x7) {
+    return "add byte " + x.toString() + " " + kk.toString();
+  } else if (i == 0x8) {
+    if (n == 0x0) {
+      return "ld register " + x.toString() + " " + y.toString();
+    }
+    if (n == 0x1) {
+      return "or " + x.toString() + " " + y.toString();
+    }
+    if (n == 0x2) {
+      return "and " + x.toString() + " " + y.toString();
+    }
+    if (n == 0x3) {
+      return "xor " + x.toString() + " " + y.toString();
+    }
+    if (n == 0x4) {
+      return "add register " + x.toString() + " " + y.toString();
+    }
+    if (n == 0x5) {
+      return "subtract register " + x.toString() + " " + y.toString();
+    }
+    if (n == 0x6) {
+      return "shr " + x.toString() + " " + y.toString();
+    }
+    if (n == 0x7) {
+      return "subn " + x.toString() + " " + y.toString();
+    }
+    if (n == 0xe) {
+      return "shl " + x.toString() + " " + y.toString();
+    }
+
+    if (n == 0x8) {
+      return "draw pixel debug " + x.toString() + " " + y.toString();
+    }
+  } else if (i == 0x9) {
+    return "sne " + x.toString() + " " + y.toString();
+  } else if (i == 0xa) {
+    return "ld index " + nnn.toString();
+  } else if (i == 0xb) {
+    return "jp register " + nnn.toString();
+  } else if (i == 0xc) {
+    return "random " + x.toString() + " " + kk.toString();
+  } else if (i == 0xd) {
+    return (
+      "draw pixel debug " +
+      x.toString() +
+      " " +
+      y.toString() +
+      " " +
+      n.toString()
+    );
+  } else if (i == 0xe) {
+    if (kk == 0x9e) {
+      return "skip " + x.toString();
+    } else if (kk == 0xa1) {
+      return "sknp " + x.toString();
+    }
+  } else if (i == 0xf) {
+    if (kk == 0x07) {
+      return "ld ret " + x.toString();
+    } else if (kk == 0x0a) {
+      return "ld key " + x.toString();
+    } else if (kk == 0x15) {
+      return "ld ter" + x.toString();
+    } else if (kk == 0x18) {
+      return "ld ser " + x.toString();
+    } else if (kk == 0x1e) {
+      return "add index " + x.toString();
+    } else if (kk == 0x29) {
+      return "ld sprite" + x.toString();
+    } else if (kk == 0x33) {
+      return "ld br" + x.toString();
+    } else if (kk == 0x55) {
+      return "ld mem wr" + x.toString();
+    } else if (kk == 0x65) {
+      return "ld mem rd " + x.toString();
+    }
+  }
+  return "wtf";
 }
