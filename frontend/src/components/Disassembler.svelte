@@ -3,18 +3,23 @@
 
 
     export let raw_rom: Uint8Array = new Uint8Array();
-    
+    export let rom_name: string;
+
     let rom: Uint16Array;
     let page = 0;
     let display: Uint16Array;
 
-    const height = 30;
+    const height = 28;
+
+    let off_one_toggle=false;
 
     // whenever input rom changes, set page to 0 and generate a new 16bit version, store that to rom
     $: raw_rom, page=0, rom=generateu16(raw_rom)
 
+    $: off_one_toggle, rom = off_one_toggle?odd_generateu16(raw_rom):generateu16(raw_rom)
+
     // whenever page changes, update display to match page
-    $: page, display = rom.slice(page*30, (page*30)+30)
+    $: page, display = rom.slice(page*height, (page*height)+height)
 
     const generateu16 = (buff: Uint8Array) => {
         const padded_rom = new Uint8Array(buff.byteLength%2 == 0? buff.byteLength:buff.byteLength + 1);        
@@ -22,8 +27,18 @@
         return new Uint16Array(padded_rom.buffer);
     }
 
+    const odd_generateu16 = (buff: Uint8Array) => {
+        if (buff.length == 0)
+        {
+            return new Uint16Array()
+        }
+        const padded_rom = new Uint8Array(buff.byteLength%2 == 0? buff.byteLength + 2:buff.byteLength+3)
+        padded_rom.set(buff, 1);
+        return new Uint16Array(padded_rom.buffer);
+    }
+
     const inc_page = () => {
-        if (page === Math.floor(rom.length / 30) ) {
+        if (page === Math.floor(rom.length / height) ) {
             page = 0
             return
         }
@@ -32,7 +47,7 @@
 
     const dinc_page = () => {
         if (page === 0) {
-            page = Math.floor(rom.length / 30)
+            page = Math.floor(rom.length / height)
             return
         }
         page--;
@@ -46,8 +61,8 @@
 {#if rom.length === 0}
 loading rom...
 {:else}
-
 <div>
+    <button on:click={() => off_one_toggle = !off_one_toggle} >odd offset: {off_one_toggle?"ON":"OFF"}</button> viewing: {rom_name} {raw_rom.length} bytes
     <table cellspacing="0" cellpadding="0">
         <th>
             #
@@ -64,7 +79,7 @@ loading rom...
         {#each display as inst, line}
         <tr>
             <td>
-                {((30*page) + 512 + line).toString(16)}
+                {((height*page) + 512 + (line*2) - (off_one_toggle?1:0) ).toString(16)}
             </td>
             <td>
                 {chip8.convert_inst_to_string(swap_endian(inst))} 
@@ -78,8 +93,8 @@ loading rom...
         </tr>
         {/each}
 
-        {#if display.length < 30 }
-            {#each Array(30-display.length) as x}
+        {#if display.length < height }
+            {#each Array(height-display.length) as x}
                 <tr>
                     <td>
                         &nbsp;

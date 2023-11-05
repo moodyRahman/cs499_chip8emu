@@ -6,13 +6,16 @@
     export let rom_name: string
     export let rom: Uint8Array
 
+    let name: string
+
     // $: rom_name, loader();
 
     const loader = async () => {
-        console.log(`fetching http://localhost:3000/assets/roms/${rom_name}`)
-        const res = await fetch(`http://localhost:3000/assets/roms/${rom_name}`);
+        console.log(`fetching http://localhost:3000/assets/roms/${name}`)
+        const res = await fetch(`http://localhost:3000/assets/roms/${name}`);
         const buff = await res.arrayBuffer();
         rom = new Uint8Array(buff);
+        rom_name = name
         chip8.load_rom(rom);
 	}
 
@@ -24,7 +27,7 @@
     <div>
         load a rom
     </div>
-    <select bind:value={rom_name}>
+    <select bind:value={name}>
 
         <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
         <option value="Astrododge.ch8">Astrododge</option>

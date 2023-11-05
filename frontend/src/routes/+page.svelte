@@ -92,7 +92,7 @@
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
-    <Disassembler raw_rom={rom} />
+    <Disassembler raw_rom={rom} rom_name={rom_name} />
 </div>
 
 <div>
