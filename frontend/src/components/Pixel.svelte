@@ -7,7 +7,7 @@
 <span
         style:background-color={pixel === 0?"white":"black"}
 >
-<pre>  </pre>
+<pre>   </pre>
 </span>
 
 
