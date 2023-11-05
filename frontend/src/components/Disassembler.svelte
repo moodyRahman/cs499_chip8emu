@@ -7,7 +7,8 @@
     $: rom, page=0
 
     const inc_page = () => {
-        if (page === Math.ceil(rom.length / 30) ) {
+        if (page === Math.floor(rom.length / 30) ) {
+            page = 0
             return
         }
         page++;
@@ -15,6 +16,7 @@
 
     const dinc_page = () => {
         if (page === 0) {
+            page = Math.floor(rom.length / 30)
             return
         }
         page--;
@@ -26,7 +28,7 @@
 
 </script>
 
-<div>   
+<div>  {rom.length}
     <table cellspacing="0" cellpadding="0">
         <th>
             disassembled
