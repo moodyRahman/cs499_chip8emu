@@ -21,9 +21,10 @@
 
 <style>
     .display-container {
-        display: grid;
+        display: inline-grid;
         grid-template-columns: repeat(8, fit-content(12.5%));
-        gap: 0;
+        grid-gap: 0px 0px;
         width: auto;
+        height:100%;
     }
 </style>
