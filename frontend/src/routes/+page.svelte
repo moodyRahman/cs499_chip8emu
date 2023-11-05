@@ -3,6 +3,7 @@
 <script lang="ts">
 
     import * as chip8 from "$lib/chip8/debug.js";
+	import Disassembler from "../components/Disassembler.svelte";
 	import Octet from "../components/Octet.svelte";
     import { onMount } from 'svelte';
 
@@ -127,6 +128,8 @@
         <option value="SpaceInvaders.ch8">SpaceInvaders</option>
         <option value="Tetris.ch8">Tetris</option>
         <option value="TicTacToe.ch8">TicTacToe</option>
+        <option value="test_opcode.ch8">test rom</option>
+
 
     </select>
     <button on:click={loader}>
@@ -142,7 +145,8 @@
         
         {/each}
     </div>
-    <div>
+    <Disassembler rom={rom_disassem} />
+    <!-- <div>
         <table cellspacing="0" cellpadding="0">
             <th>
                 disassembled
@@ -167,7 +171,7 @@
             </tr>
             {/each}
         </table>
-    </div>
+    </div> -->
 </div>
 
 <div>
@@ -189,18 +193,6 @@
     }
     *, *:before, *:after {
     box-sizing: inherit;
-    }
-
-    table {
-        text-align: left;
-        border: none;
-    }
-    
-    table > * {
-        padding-left: 30px;
-    }
-    table > * > * {
-        padding-left: 30px;
     }
 
 
