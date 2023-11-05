@@ -9,6 +9,8 @@
     let page = 0;
     let display: Uint16Array;
 
+    let arbit = 0
+
     const height = 28;
 
     let off_one_toggle=false;
@@ -104,9 +106,15 @@ loading rom...
         {/if}
 
     </table>
-    <button on:click={dinc_page}>prev page</button>
-    {page}
-    <button on:click={inc_page}>next page</button>
+    <div>
+
+        <button on:click={dinc_page}>prev page</button>
+        {page}
+        <button on:click={inc_page}>next page</button>
+    </div>
+    <div>
+        read from rom: <input type="number" bind:value={arbit}> {chip8.read_mem(arbit).toString(16)}
+    </div>
 </div>
 {/if}
 

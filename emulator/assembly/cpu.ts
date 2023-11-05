@@ -735,6 +735,10 @@ export function load_rom(rom: Uint8Array): void {
   }
 }
 
+export function read_mem(add: u16): u8 {
+  return cpu.memory.mem[add];
+}
+
 export function convert_inst_to_string(inst: u16): string {
   let nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
   let n = u8(inst & 0x000f); //gets last 4 instruction bits (0 through 3)
