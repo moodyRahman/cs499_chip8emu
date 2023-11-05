@@ -3,8 +3,13 @@
     let page = 0;
     import * as chip8 from "$lib/chip8/debug.js";
 
+    let display: Uint16Array;
 
+    // whenever rom changes, set page to 0
     $: rom, page=0
+
+    // whenever page changes, update display to match page
+    $: page, display = rom.slice(page*30, (page*30)+30)
 
     const inc_page = () => {
         if (page === Math.floor(rom.length / 30) ) {
@@ -39,7 +44,7 @@
         <th>
             ascii
         </th>
-        {#each rom.slice(page*30, (page*30)+30) as inst}
+        {#each display as inst}
         <tr>
             <td>
                 {chip8.convert_inst_to_string(swap_endian(inst))} 
@@ -52,6 +57,17 @@
             </td>
         </tr>
         {/each}
+
+        {#if display.length < 30 }
+            {#each Array(30-display.length) as x}
+                <tr>
+                    <td>
+                        &nbsp;
+                    </td>
+                </tr>
+            {/each}
+        {/if}
+
     </table>
     <button on:click={dinc_page}>prev page</button>
     {page}
