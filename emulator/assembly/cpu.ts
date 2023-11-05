@@ -812,12 +812,7 @@ export function convert_inst_to_string(inst: u16): string {
     return "random " + x.toString(16) + " " + kk.toString(16);
   } else if (i == 0xd) {
     return (
-      "draw pixel debug " +
-      x.toString(16) +
-      " " +
-      y.toString(16) +
-      " " +
-      n.toString(16)
+      "draw " + x.toString(16) + " " + y.toString(16) + " " + n.toString(16)
     );
   } else if (i == 0xe) {
     if (kk == 0x9e) {
