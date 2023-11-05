@@ -115,6 +115,9 @@ loading rom...
     <div>
         read from rom: <input type="number" bind:value={arbit}> {chip8.read_mem(arbit).toString(16)}
     </div>
+    <div>
+        <button on:click={chip8.tick} class="tick">tick cpu</button>
+    </div>
 </div>
 {/if}
 
@@ -130,5 +133,9 @@ loading rom...
     }
     table > * > * {
         padding-left: 30px;
+    }
+
+    .tick {
+        font-size: 25px;
     }
 </style>

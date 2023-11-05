@@ -292,8 +292,7 @@ class CPU {
     if (this.i == 0x0) {
       if (this.nnn == 0x0e0) {
         this.CLS();
-      }
-      if (this.nnn == 0x0ee) {
+      } else if (this.nnn == 0x0ee) {
         this.RET();
       } else {
         this.SYS();
@@ -701,6 +700,15 @@ class CPU {
       this.V[i] = this.memory.read(this.index + i);
     }
   }
+
+  tick(): void {
+    const load =
+      (u16(this.memory.read(this.pc)) << 8) | this.memory.read(this.pc + 1);
+    console.log("pc: " + this.pc.toString(16));
+    console.log("running: " + load.toString(16));
+    this.pc += 2;
+    this.IRDecode(load);
+  }
 }
 
 /**/
@@ -736,7 +744,11 @@ export function load_rom(rom: Uint8Array): void {
 }
 
 export function read_mem(add: u16): u8 {
-  return cpu.memory.mem[add];
+  return cpu.memory.read(add);
+}
+
+export function tick(): void {
+  cpu.tick();
 }
 
 export function convert_inst_to_string(inst: u16): string {
