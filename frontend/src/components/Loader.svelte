@@ -5,7 +5,6 @@
 	import { onMount } from "svelte";
     export let rom_name: string
     export let rom: Uint8Array
-    export let rom_disassem: Uint16Array
 
     // $: rom_name, loader();
 
@@ -15,16 +14,6 @@
         const buff = await res.arrayBuffer();
         rom = new Uint8Array(buff);
         chip8.load_rom(rom);
-
-        const padded_rom = new Uint8Array(buff.byteLength%2 == 0? buff.byteLength:buff.byteLength + 1);
-
-        
-        padded_rom.set(rom, 0);
-        
-
-        rom_disassem = new Uint16Array(padded_rom.buffer);
-
-        console.log(rom_disassem.slice(0, 10))
 	}
 
     onMount(loader)

@@ -25,7 +25,6 @@
 
     let rom_name = "SpaceInvaders.ch8"
     let rom = new Uint8Array()
-    let rom_disassem = new Uint16Array();
 
     // $: rom_name, loader();
 
@@ -89,39 +88,15 @@
 </pre>
 </div>
 
-<Loader bind:rom_name={rom_name} bind:rom={rom} bind:rom_disassem={rom_disassem} />
-
-<!-- <div>
-    <div>
-        load a rom
-    </div>
-    <select bind:value={rom_name}>
-
-        <option value="Astrododge.ch8">Astrododge</option>
-        <option value="Breakout.ch8">Breakout</option>
-        <option value="Landing.ch8">Landing</option>
-        <option value="Pong.ch8">Pong</option>
-        <option value="Pong2.ch8">Pong2</option>
-        <option value="SpaceInvaders.ch8">SpaceInvaders</option>
-        <option value="Tetris.ch8">Tetris</option>
-        <option value="TicTacToe.ch8">TicTacToe</option>
-        <option value="test_opcode.ch8">test rom</option>
-
-
-    </select>
-    <button on:click={loader}>
-        load rom
-    </button>
-</div> -->
+<Loader bind:rom_name={rom_name} bind:rom={rom} />
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
-    <Disassembler rom={rom_disassem} />
+    <Disassembler raw_rom={rom} />
 </div>
 
 <div>
     <button on:click={() => { chip8.debug_set_pixel(px, py); read_display_trigger++;}} >draw pixel</button>
-    <!-- <button on:click={() => { read_display_trigger++}} >update display</button> -->
 
 </div>
 
@@ -148,13 +123,6 @@
     }
     .register {
         margin-left: 10px;
-    }
-
-    .display-container {
-        display: grid;
-        grid-template-columns: repeat(8, fit-content(12.5%));
-        gap: 0;
-        width: auto;
     }
 
     .lr-container {

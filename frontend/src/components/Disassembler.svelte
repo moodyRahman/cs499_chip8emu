@@ -1,15 +1,27 @@
 <script lang="ts">
-    export let rom: Uint16Array;
-    let page = 0;
     import * as chip8 from "$lib/chip8/debug.js";
 
+
+    export let raw_rom: Uint8Array = new Uint8Array();
+    
+    let rom: Uint16Array;
+    let page = 0;
     let display: Uint16Array;
 
-    // whenever rom changes, set page to 0
-    $: rom, page=0
+    // whenever input rom changes, set page to 0 and generate a new 16bit version, store that to rom
+    $: raw_rom, page=0, rom=generateu16(raw_rom)
 
     // whenever page changes, update display to match page
     $: page, display = rom.slice(page*30, (page*30)+30)
+
+    const generateu16 = (buff: Uint8Array) => {
+        const padded_rom = new Uint8Array(buff.byteLength%2 == 0? buff.byteLength:buff.byteLength + 1);
+        
+        padded_rom.set(buff, 0);
+
+
+        return new Uint16Array(padded_rom.buffer);
+    }
 
     const inc_page = () => {
         if (page === Math.floor(rom.length / 30) ) {
