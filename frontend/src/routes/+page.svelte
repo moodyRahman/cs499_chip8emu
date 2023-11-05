@@ -4,8 +4,9 @@
 
     import * as chip8 from "$lib/chip8/debug.js";
 	import Disassembler from "../components/Disassembler.svelte";
-	import Octet from "../components/Octet.svelte";
+	import Display from "../components/Display.svelte";
     import { onMount } from 'svelte';
+	import Loader from "../components/Loader.svelte";
 
 
     const bindFunc = (wasmfunc: CallableFunction) => {    
@@ -27,31 +28,6 @@
     let rom_disassem = new Uint16Array();
 
     // $: rom_name, loader();
-
-    const loader = async () => {
-        console.log(`fetching http://localhost:3000/assets/roms/${rom_name}`)
-        const res = await fetch(`http://localhost:3000/assets/roms/${rom_name}`);
-        const buff = await res.arrayBuffer();
-        rom = new Uint8Array(buff);
-        chip8.load_rom(rom);
-
-        const padded_rom = new Uint8Array(buff.byteLength%2 == 0? buff.byteLength:buff.byteLength + 1);
-
-        
-        padded_rom.set(rom, 0);
-        
-
-        rom_disassem = new Uint16Array(padded_rom.buffer);
-
-        console.log(rom_disassem.slice(0, 10))
-	}
-
-    onMount(loader)
-
-
-    const swap_endian = (x: number) => {
-        return ((x & 0x00ff) << 8 | (x>>8))
-    }
 
 
 
@@ -113,13 +89,14 @@
 </pre>
 </div>
 
-<div>
+<Loader bind:rom_name={rom_name} bind:rom={rom} bind:rom_disassem={rom_disassem} />
+
+<!-- <div>
     <div>
         load a rom
     </div>
     <select bind:value={rom_name}>
 
-        <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
         <option value="Astrododge.ch8">Astrododge</option>
         <option value="Breakout.ch8">Breakout</option>
         <option value="Landing.ch8">Landing</option>
@@ -135,43 +112,11 @@
     <button on:click={loader}>
         load rom
     </button>
-</div>
+</div> -->
+
 <div class="lr-container">
-    <div class="display-container">
-        
-        {#each read_display(read_display_trigger) as pixel_group }
-        
-        <Octet data={pixel_group} />
-        
-        {/each}
-    </div>
+    <Display trigger={read_display_trigger} />
     <Disassembler rom={rom_disassem} />
-    <!-- <div>
-        <table cellspacing="0" cellpadding="0">
-            <th>
-                disassembled
-            </th>
-            <th>
-                word
-            </th>
-            <th>
-                ascii
-            </th>
-            {#each rom_disassem.slice(0, 30) as inst}
-            <tr>
-                <td>
-                    {chip8.convert_inst_to_string(swap_endian(inst))} 
-                </td>
-                <td>
-                    {swap_endian(inst).toString(16).padStart(4, "0")}
-                </td>
-                <td class="ascii">
-                    {String.fromCharCode(inst & 0x00ff)}{String.fromCharCode(inst >> 8)}
-                </td>
-            </tr>
-            {/each}
-        </table>
-    </div> -->
 </div>
 
 <div>
