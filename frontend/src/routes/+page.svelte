@@ -20,13 +20,16 @@
     let arbitrary_inst = ""
     let px = 0;
     let py = 0;
-    let rom_name = ""
-    let rom = new Uint8Array()
 
+    let rom_name = "SpaceInvaders.ch8"
+    let rom = new Uint8Array()
     let rom_disassem = new Uint16Array();
 
-    (async () => {
-        const res = await fetch("http://localhost:3000/assets/roms/SpaceInvaders.ch8");
+    // $: rom_name, loader();
+
+    const loader = async () => {
+        console.log(`fetching http://localhost:3000/assets/roms/${rom_name}`)
+        const res = await fetch(`http://localhost:3000/assets/roms/${rom_name}`);
         const buff = await res.arrayBuffer();
         rom = new Uint8Array(buff);
         chip8.load_rom(rom);
@@ -40,11 +43,13 @@
         rom_disassem = new Uint16Array(padded_rom.buffer);
 
         console.log(rom_disassem.slice(0, 10))
-	})()
+	}
+
+    onMount(loader)
 
 
     const swap_endian = (x: number) => {
-
+        return ((x & 0x00ff) << 8 | (x>>8))
     }
 
 
@@ -124,6 +129,9 @@
         <option value="TicTacToe.ch8">TicTacToe</option>
 
     </select>
+    <button on:click={loader}>
+        load rom
+    </button>
 </div>
 <div class="lr-container">
     <div class="display-container">
@@ -135,11 +143,30 @@
         {/each}
     </div>
     <div>
-        {#each rom_disassem.slice(0, 30) as inst}
-        <!-- {((inst>>8) | (inst<<8))} aa {chip8.convert_inst_to_string(((inst>>8) | (inst<<8)))} <br>  -->
-            {chip8.convert_inst_to_string((inst & 0x00ff) << 8 | (inst>>8))}<br> 
-
-        {/each}
+        <table cellspacing="0" cellpadding="0">
+            <th>
+                disassembled
+            </th>
+            <th>
+                word
+            </th>
+            <th>
+                ascii
+            </th>
+            {#each rom_disassem.slice(0, 30) as inst}
+            <tr>
+                <td>
+                    {chip8.convert_inst_to_string(swap_endian(inst))} 
+                </td>
+                <td>
+                    {swap_endian(inst).toString(16).padStart(4, "0")}
+                </td>
+                <td class="ascii">
+                    {String.fromCharCode(inst & 0x00ff)}{String.fromCharCode(inst >> 8)}
+                </td>
+            </tr>
+            {/each}
+        </table>
     </div>
 </div>
 
@@ -164,6 +191,18 @@
     box-sizing: inherit;
     }
 
+    table {
+        text-align: left;
+        border: none;
+    }
+    
+    table > * {
+        padding-left: 30px;
+    }
+    table > * > * {
+        padding-left: 30px;
+    }
+
 
     .registers {
         width: 50%;
@@ -179,11 +218,6 @@
         grid-template-columns: repeat(8, fit-content(12.5%));
         gap: 0;
         width: auto;
-    }
-
-    .octet {
-        width: auto;
-        margin-left: 0px;
     }
 
     .lr-container {
