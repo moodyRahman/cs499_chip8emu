@@ -757,93 +757,93 @@ export function convert_inst_to_string(inst: u16): string {
       return "syscall";
     }
   } else if (i == 0x1) {
-    return "jumping to " + nnn.toString();
+    return "jumping to " + nnn.toString(16);
   } else if (i == 0x2) {
-    return "call " + nnn.toString();
+    return "call " + nnn.toString(16);
   } else if (i == 0x3) {
-    return "sebyte " + x.toString() + " " + kk.toString();
+    return "sebyte " + x.toString(16) + " " + kk.toString(16);
   } else if (i == 0x4) {
-    return "snebyte " + x.toString() + " " + kk.toString();
+    return "snebyte " + x.toString(16) + " " + kk.toString(16);
   } else if (i == 0x5) {
-    return "skip " + x.toString() + " " + y.toString();
+    return "skip " + x.toString(16) + " " + y.toString(16);
   } else if (i == 0x6) {
-    return "ldbyte " + x.toString() + " " + kk.toString();
+    return "ldbyte " + x.toString(16) + " " + kk.toString(16);
   } else if (i == 0x7) {
-    return "add byte " + x.toString() + " " + kk.toString();
+    return "add byte " + x.toString(16) + " " + kk.toString(16);
   } else if (i == 0x8) {
     if (n == 0x0) {
-      return "ld register " + x.toString() + " " + y.toString();
+      return "ld register " + x.toString(16) + " " + y.toString(16);
     }
     if (n == 0x1) {
-      return "or " + x.toString() + " " + y.toString();
+      return "or " + x.toString(16) + " " + y.toString(16);
     }
     if (n == 0x2) {
-      return "and " + x.toString() + " " + y.toString();
+      return "and " + x.toString(16) + " " + y.toString(16);
     }
     if (n == 0x3) {
-      return "xor " + x.toString() + " " + y.toString();
+      return "xor " + x.toString(16) + " " + y.toString(16);
     }
     if (n == 0x4) {
-      return "add register " + x.toString() + " " + y.toString();
+      return "add register " + x.toString(16) + " " + y.toString(16);
     }
     if (n == 0x5) {
-      return "subtract register " + x.toString() + " " + y.toString();
+      return "subtract register " + x.toString(16) + " " + y.toString(16);
     }
     if (n == 0x6) {
-      return "shr " + x.toString() + " " + y.toString();
+      return "shr " + x.toString(16) + " " + y.toString(16);
     }
     if (n == 0x7) {
-      return "subn " + x.toString() + " " + y.toString();
+      return "subn " + x.toString(16) + " " + y.toString(16);
     }
     if (n == 0xe) {
-      return "shl " + x.toString() + " " + y.toString();
+      return "shl " + x.toString(16) + " " + y.toString(16);
     }
 
     if (n == 0x8) {
-      return "draw pixel debug " + x.toString() + " " + y.toString();
+      return "draw pixel debug " + x.toString(16) + " " + y.toString(16);
     }
   } else if (i == 0x9) {
-    return "sne " + x.toString() + " " + y.toString();
+    return "sne " + x.toString(16) + " " + y.toString(16);
   } else if (i == 0xa) {
-    return "ld index " + nnn.toString();
+    return "ld index " + nnn.toString(16);
   } else if (i == 0xb) {
-    return "jp register " + nnn.toString();
+    return "jp register " + nnn.toString(16);
   } else if (i == 0xc) {
-    return "random " + x.toString() + " " + kk.toString();
+    return "random " + x.toString(16) + " " + kk.toString(16);
   } else if (i == 0xd) {
     return (
       "draw pixel debug " +
-      x.toString() +
+      x.toString(16) +
       " " +
-      y.toString() +
+      y.toString(16) +
       " " +
-      n.toString()
+      n.toString(16)
     );
   } else if (i == 0xe) {
     if (kk == 0x9e) {
-      return "skip " + x.toString();
+      return "skip " + x.toString(16);
     } else if (kk == 0xa1) {
-      return "sknp " + x.toString();
+      return "sknp " + x.toString(16);
     }
   } else if (i == 0xf) {
     if (kk == 0x07) {
-      return "ld ret " + x.toString();
+      return "ld ret " + x.toString(16);
     } else if (kk == 0x0a) {
-      return "ld key " + x.toString();
+      return "ld key " + x.toString(16);
     } else if (kk == 0x15) {
-      return "ld ter" + x.toString();
+      return "ld ter" + x.toString(16);
     } else if (kk == 0x18) {
-      return "ld ser " + x.toString();
+      return "ld ser " + x.toString(16);
     } else if (kk == 0x1e) {
-      return "add index " + x.toString();
+      return "add index " + x.toString(16);
     } else if (kk == 0x29) {
-      return "ld sprite" + x.toString();
+      return "ld sprite" + x.toString(16);
     } else if (kk == 0x33) {
-      return "ld br" + x.toString();
+      return "ld br" + x.toString(16);
     } else if (kk == 0x55) {
-      return "ld mem wr" + x.toString();
+      return "ld mem wr" + x.toString(16);
     } else if (kk == 0x65) {
-      return "ld mem rd " + x.toString();
+      return "ld mem rd " + x.toString(16);
     }
   }
   return "wtf";

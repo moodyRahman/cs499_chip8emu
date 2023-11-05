@@ -8,6 +8,8 @@
     let page = 0;
     let display: Uint16Array;
 
+    const height = 30;
+
     // whenever input rom changes, set page to 0 and generate a new 16bit version, store that to rom
     $: raw_rom, page=0, rom=generateu16(raw_rom)
 
@@ -15,11 +17,8 @@
     $: page, display = rom.slice(page*30, (page*30)+30)
 
     const generateu16 = (buff: Uint8Array) => {
-        const padded_rom = new Uint8Array(buff.byteLength%2 == 0? buff.byteLength:buff.byteLength + 1);
-        
+        const padded_rom = new Uint8Array(buff.byteLength%2 == 0? buff.byteLength:buff.byteLength + 1);        
         padded_rom.set(buff, 0);
-
-
         return new Uint16Array(padded_rom.buffer);
     }
 
@@ -51,6 +50,9 @@ loading rom...
 <div>
     <table cellspacing="0" cellpadding="0">
         <th>
+            #
+        </th>
+        <th>
             disassembled
         </th>
         <th>
@@ -59,8 +61,11 @@ loading rom...
         <th>
             ascii
         </th>
-        {#each display as inst}
+        {#each display as inst, line}
         <tr>
+            <td>
+                {((30*page) + 512 + line).toString(16)}
+            </td>
             <td>
                 {chip8.convert_inst_to_string(swap_endian(inst))} 
             </td>
