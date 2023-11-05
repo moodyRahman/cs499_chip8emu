@@ -44,8 +44,11 @@
     }
 
 </script>
+{#if rom.length === 0}
+loading rom...
+{:else}
 
-<div>  {rom.length}
+<div>
     <table cellspacing="0" cellpadding="0">
         <th>
             disassembled
@@ -85,6 +88,7 @@
     {page}
     <button on:click={inc_page}>next page</button>
 </div>
+{/if}
 
 
 <style>
