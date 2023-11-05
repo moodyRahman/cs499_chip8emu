@@ -7,6 +7,7 @@
 	import Display from "../components/Display.svelte";
     import { onMount } from 'svelte';
 	import Loader from "../components/Loader.svelte";
+	import RomDump from "../components/RomDump.svelte";
 
 
     const bindFunc = (wasmfunc: CallableFunction) => {    
@@ -95,7 +96,8 @@
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
-    <Disassembler raw_rom={rom} rom_name={rom_name} />
+    <!-- <Disassembler raw_rom={rom} rom_name={rom_name} /> -->
+    <RomDump raw_rom={rom} rom_name={rom_name} />
 </div>
 
 <div>
@@ -124,6 +126,12 @@
         font-family: 'Roboto', sans-serif;
     }
 
+    :global(body) {
+        margin-left: 200px;
+        margin-right: 200px;
+
+    }
+
 
     .registers {
         width: 50%;
@@ -142,6 +150,7 @@
     .run-info {
         display: flex;
         height: auto;
+        margin-bottom: 20px;
     }
 
     .container {
@@ -149,7 +158,7 @@
     }
 
     .run_one {
-        align-self: center;
+        align-self:self-end;
     }
 </style>
 

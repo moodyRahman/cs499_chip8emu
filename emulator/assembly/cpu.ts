@@ -704,8 +704,6 @@ class CPU {
   tick(): void {
     const load =
       (u16(this.memory.read(this.pc)) << 8) | this.memory.read(this.pc + 1);
-    console.log("pc: " + this.pc.toString(16));
-    console.log("running: " + load.toString(16));
     this.pc += 2;
     this.IRDecode(load);
   }
@@ -747,8 +745,9 @@ export function read_mem(add: u16): u8 {
   return cpu.memory.read(add);
 }
 
-export function tick(): void {
+export function tick(): u16 {
   cpu.tick();
+  return cpu.pc;
 }
 
 export function convert_inst_to_string(inst: u16): string {
