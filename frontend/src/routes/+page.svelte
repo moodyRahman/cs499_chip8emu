@@ -45,50 +45,53 @@
     
 </script>
 
-
-
-<div>
-    <div class="registers">
-    {#each read_all_registers(read_all_registers_trigger) as register, i}
-        <span class="register">V{i},{register.toString(16)}  </span>
-    {/each}
+<div class="run-info">
+    <div class="run_one">
+        <div>
+            <input type="text" placeholder="enter instruction here" bind:value={arbitrary_inst}>
+        </div>
+        
+        <div>
+            <button on:click={() => { read_instruction_trigger++; read_display_trigger++; console.log(chip8.convert_inst_to_string(Number(arbitrary_inst)))}}>run the instruction</button>
+        </div>
+    </div>
+    <div>
+        <pre>
+            a good instruction to run is:
+            0x
+            6  opcode for LD, puts values kk into register Vx
+            1  x, the register we'll put kk into
+            20 kk, the value we'll put into register Vx
+            
+            (read as 0x6120, it's been split up to accomodate annotations)
+        </pre>
+        
+        <pre>
+        
+            draw pixel at (0 to 16, 0 to 16):
+            0x
+            8  opcode for a bunch of different things
+            0  x, x-coordinate 
+            0  y, y-coordinate
+            8  n, further opcode for a temporary debug draw pixel function
+            
+            (read as 0x8008)
+        </pre>
     </div>
 </div>
 
-<div>
-    <input type="text" placeholder="enter instruction here" bind:value={arbitrary_inst}>
-</div>
 
-<div>
-    <button on:click={() => { read_instruction_trigger++; read_display_trigger++; console.log(chip8.convert_inst_to_string(Number(arbitrary_inst)))}}>run the instruction</button>
-</div>
-
-<div>
-    
-<pre>
-    a good instruction to run is:
-    0x
-    6  opcode for LD, puts values kk into register Vx
-    1  x, the register we'll put kk into
-    20 kk, the value we'll put into register Vx
-    
-    (read as 0x6120, it's been split up to accomodate annotations)
-</pre>
-
-<pre>
-
-    draw pixel at (0 to 16, 0 to 16):
-    0x
-    8  opcode for a bunch of different things
-    0  x, x-coordinate 
-    0  y, y-coordinate
-    8  n, further opcode for a temporary debug draw pixel function
-    
-    (read as 0x8008)
-</pre>
-</div>
 
 <Loader bind:rom_name={rom_name} bind:rom={rom} />
+
+<div class="container">
+    registers
+    <div class="registers">
+    {#each read_all_registers(read_all_registers_trigger) as register, i}
+        <span class="register">V{i.toString(16)} {register.toString(16)}  </span>
+    {/each}
+    </div>
+</div>
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
@@ -133,9 +136,21 @@
 
     .lr-container {
         display: flex;
-        
+        height: auto;
     }
 
+    .run-info {
+        display: flex;
+        height: auto;
+    }
+
+    .container {
+        margin-top: 10px;
+    }
+
+    .run_one {
+        align-self: center;
+    }
 </style>
 
 
