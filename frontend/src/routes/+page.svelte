@@ -33,14 +33,19 @@
 
     let {func: read_instruction, trigger: read_instruction_trigger} = bindFunc(() => {
         const out = chip8.read_instruction(Number(arbitrary_inst)); 
-        read_all_registers_trigger++; 
+        registers_trigger++;
         return out
     })    
     $: read_instruction(read_instruction_trigger)
 
 
-    let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
-    $: read_all_registers(read_all_registers_trigger)
+    // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
+    // $: read_all_registers(read_all_registers_trigger)
+
+    let registers: Uint8Array
+    let registers_trigger = 0
+
+    $: registers_trigger, registers = chip8.read_all_registers()
 
     let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.display);
     
@@ -88,7 +93,7 @@
 <div class="container">
     registers
     <div class="registers">
-    {#each read_all_registers(read_all_registers_trigger) as register, i}
+    {#each registers as register, i}
         <span class="register">V{i.toString(16)} {register.toString(16)}  </span>
     {/each}
     </div>
@@ -97,7 +102,7 @@
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
     <!-- <Disassembler raw_rom={rom} rom_name={rom_name} /> -->
-    <RomDump raw_rom={rom} rom_name={rom_name} />
+    <RomDump raw_rom={rom} rom_name={rom_name} bind:registers_trigger={registers_trigger} bind:read_display_trigger={read_display_trigger} />
 </div>
 
 <div>

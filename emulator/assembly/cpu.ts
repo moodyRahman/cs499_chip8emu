@@ -750,6 +750,10 @@ export function tick(): u16 {
   return cpu.pc;
 }
 
+export function reset(): void {
+  cpu.reset();
+}
+
 export function convert_inst_to_string(inst: u16): string {
   let nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
   let n = u8(inst & 0x000f); //gets last 4 instruction bits (0 through 3)

@@ -3,21 +3,43 @@
     
     export let raw_rom: Uint8Array = new Uint8Array();
     export let rom_name: string;
+    export let registers_trigger: number;
+    export let read_display_trigger: number;
 
-    let pc = 0;
+    let pc = 512;
     let page = 0;
+
+    // id of the setinterval that's ticking the cpu, set to 0 when cpu should stop ticking
+    let ticker = 0;
+
+
+
+    $: curr_inst = (raw_rom?(raw_rom[pc - 512] << 8 | raw_rom[pc - 512 + 1]):0)
+    $: raw_rom, pc = 512, page = 0
+
+    const generate_css_str = (page: number, i: number, pc: number) => {
+        return `background-color:${((page * 352 + 512 + i) === pc || (page * 352 + 512 + i) === pc+1)?"black":"" };` + 
+        `color:${((page * 352 + 512 + i) === pc || (page * 352 + 512 + i) === pc+1)?"white":"" };`
+    }
+
+    
+    // setInterval(() => {pc = chip8.tick(); registers_trigger++}, 100)
+
 
 </script>
 <div class="container">
+
+    {#if raw_rom.length > 0}
+
     <div>
         {rom_name} {raw_rom.length} bytes
     </div>
     <div class="dump">
         {#each raw_rom.slice(page * 352, page*352 + 352) as cell, i}
             {#if i%16 == 0}
-            <div>{(i / 16).toString(16).padStart(8, "0")}</div>
+                <div>{ ((page*22) + (i / 16)).toString(16).padStart(8, "0")}</div>
             {/if}
-            <div id={i.toString()}>{cell.toString(16).padStart(2, "0")}</div>
+            <div id={(page * 352 + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
         {/each}
 
     </div>
@@ -28,11 +50,44 @@
             <button on:click={() => page === Math.floor(raw_rom.length/352) ? page:page++}>next</button>
         </div>
         <div>
-            <button class="tick">
-                tick cpu
+            <div>
+
+                <button class="tick" on:click={() => {pc = chip8.tick(); registers_trigger++}}>
+                    tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
+                </button>
+            </div>
+            <div>
+
+
+            <button class="tick" on:click={() => {
+                if (ticker === 0) {
+                    ticker = setInterval(() => {pc = chip8.tick(); registers_trigger++; read_display_trigger++}, 100)
+                }
+                else  {
+                    clearInterval(ticker)
+                    ticker = 0;
+                }
+                }}>
+                run cpu
+            </button>
+            <button class="tick" on:click={() => {
+                chip8.reset();
+                registers_trigger++;
+                read_display_trigger++;
+                pc = 512;
+            }}>
+                reset cpu
             </button>
         </div>
+        </div>
     </div>
+
+    {:else}
+    <div>
+        loading...
+    </div>
+    {/if}
+
 </div>
 
 

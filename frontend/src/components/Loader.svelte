@@ -17,6 +17,7 @@
         rom = new Uint8Array(buff);
         rom_name = name
         chip8.load_rom(rom);
+        chip8.reset();
 	}
 
     onMount(loader)
