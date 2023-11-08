@@ -6,7 +6,8 @@
     export let rom_name: string
     export let rom: Uint8Array
 
-    let name: string
+    let name: string = "test_opcode.ch8"
+    let all_roms: string[] = []
 
     // $: rom_name, loader();
 
@@ -21,6 +22,14 @@
 	}
 
     onMount(loader)
+
+    const get_rom_names = async () => {
+        const res = await fetch("http://localhost:3000/assets_data")
+        const data: string[] = await res.json()
+        all_roms = data.filter((x) => x.includes(".ch8"))
+    }
+
+    onMount(get_rom_names)
 </script>
 
 
@@ -31,17 +40,9 @@
     <select bind:value={name}>
 
         <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
-        <option value="Astrododge.ch8">Astrododge</option>
-        <option value="Breakout.ch8">Breakout</option>
-        <option value="Landing.ch8">Landing</option>
-        <option value="Pong.ch8">Pong</option>
-        <option value="Pong2.ch8">Pong2</option>
-        <option value="SpaceInvaders.ch8">SpaceInvaders</option>
-        <option value="Tetris.ch8">Tetris</option>
-        <option value="TicTacToe.ch8">TicTacToe</option>
-        <option value="test_opcode.ch8">test rom</option>
-
-
+        {#each all_roms as option }
+            <option value={option}>{option.slice(0, option.indexOf(".ch8"))}</option>
+        {/each}
     </select>
     <button on:click={loader}>
         load rom
