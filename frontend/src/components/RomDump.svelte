@@ -68,14 +68,14 @@
 
             <button class="tick" on:click={() => {
                 if (ticker === 0) {
-                    ticker = setInterval(tick, 100)
+                    ticker = setInterval(tick, 5)
                 }
                 else  {
                     clearInterval(ticker)
                     ticker = 0;
                 }
                 }}>
-                run cpu
+                run cpu {ticker==0?"false":"true"}
             </button>
             <button class="tick" on:click={() => {
                 chip8.reset();
