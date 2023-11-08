@@ -721,8 +721,28 @@ export function read_instruction(inp: u16): void {
   cpu.IRDecode(inp);
 }
 
-export function read_all_registers(): Uint8Array {
-  return cpu.V;
+export function read_all_registers(): Uint16Array {
+  let out: Uint16Array = new Uint16Array(36);
+  for (let x = 0; x < cpu.V.length; x++) {
+    out[x] = cpu.V[x];
+  }
+
+  for (let x = 0; x < cpu.V.length; x++) {
+    out[x + 16] = cpu.Stack[x];
+  }
+  out[32] = cpu.pc;
+  out[33] = cpu.sp;
+  out[34] = cpu.index;
+  out[35] = cpu.dt;
+  return out;
+}
+
+export function ram_around_address(
+  left: u16,
+  right: u16,
+  address: u16
+): Uint8Array {
+  return cpu.memory.mem.slice(address - left, address + right + 1);
 }
 
 // if we can get some way to trigger a callback in javascript when the display gets updated, that would be ideal
