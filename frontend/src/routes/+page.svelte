@@ -139,10 +139,6 @@
         margin-bottom: 20px;
     }
 
-    .container {
-        margin-top: 10px;
-    }
-
     .run_one {
         align-self:self-end;
     }
