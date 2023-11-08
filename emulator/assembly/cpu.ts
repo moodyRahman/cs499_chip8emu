@@ -221,6 +221,8 @@ class CPU {
     //Instantiate values with the reset function
     this.reset();
 
+    this.display.loadMemRef(this.memory);
+
     //Call starter functions
     // this.loadMemory(memToLoad);
     // this.loadDisplay(displayOutput);
