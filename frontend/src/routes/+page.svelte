@@ -8,6 +8,7 @@
     import { onMount } from 'svelte';
 	import Loader from "../components/Loader.svelte";
 	import RomDump from "../components/RomDump.svelte";
+	import Registers from "../components/Registers.svelte";
 
 
     const bindFunc = (wasmfunc: CallableFunction) => {    
@@ -42,10 +43,7 @@
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     // $: read_all_registers(read_all_registers_trigger)
 
-    let registers: Uint8Array
     let registers_trigger = 0
-
-    $: registers_trigger, registers = chip8.read_all_registers()
 
     let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.display);
     
@@ -90,14 +88,7 @@
 
 <Loader bind:rom_name={rom_name} bind:rom={rom} />
 
-<div class="container">
-    registers
-    <div class="registers">
-    {#each registers as register, i}
-        <span class="register">V{i.toString(16)} {register.toString(16)}  </span>
-    {/each}
-    </div>
-</div>
+<Registers bind:registers_trigger={registers_trigger} />
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
@@ -135,16 +126,6 @@
         margin-left: 200px;
         margin-right: 200px;
 
-    }
-
-
-    .registers {
-        width: 50%;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-    .register {
-        margin-left: 10px;
     }
 
     .lr-container {
