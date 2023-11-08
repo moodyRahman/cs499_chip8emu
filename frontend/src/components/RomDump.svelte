@@ -22,6 +22,13 @@
         `color:${((page * 352 + 512 + i) === pc || (page * 352 + 512 + i) === pc+1)?"white":"" };`
     }
 
+
+    const tick = () => {
+        pc = chip8.tick(); 
+        registers_trigger++; 
+        read_display_trigger++
+    }
+
     
     // setInterval(() => {pc = chip8.tick(); registers_trigger++}, 100)
 
@@ -52,7 +59,7 @@
         <div>
             <div>
 
-                <button class="tick" on:click={() => {pc = chip8.tick(); registers_trigger++}}>
+                <button class="tick" on:click={tick}>
                     tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
                 </button>
             </div>
@@ -61,7 +68,7 @@
 
             <button class="tick" on:click={() => {
                 if (ticker === 0) {
-                    ticker = setInterval(() => {pc = chip8.tick(); registers_trigger++; read_display_trigger++}, 100)
+                    ticker = setInterval(tick, 100)
                 }
                 else  {
                     clearInterval(ticker)
