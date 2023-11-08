@@ -5,7 +5,7 @@
     export let trigger: number;
     let buffer: Uint8Array
 
-    $: trigger, buffer=chip8.display()
+    $: trigger, buffer=chip8.display(), console.log("recieved diplay update request")
 
 
 </script>

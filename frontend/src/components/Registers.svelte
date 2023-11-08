@@ -1,12 +1,15 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
 
+    import config from "../cpu_configs";
+
     export let registers_trigger: number;
 
     let registers: Uint16Array;
     $: registers_trigger, registers = chip8.read_all_registers();
 
-    let pc_highlight_index = 5;
+    // controls how many bytes of memory adjacent to the program counter to display
+    let pc_highlight_index = config.ram_adjacent_to_pc;
 </script>
 
 <div>

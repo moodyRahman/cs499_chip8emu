@@ -1,16 +1,25 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
+
+    import config from "../cpu_configs";
     
     export let raw_rom: Uint8Array = new Uint8Array();
     export let rom_name: string;
     export let registers_trigger: number;
     export let read_display_trigger: number;
 
+    
+
     let pc = 512;
     let page = 0;
 
     // id of the setinterval that's ticking the cpu, set to 0 when cpu should stop ticking
     let ticker = 0;
+
+    // set the cpu cycles per second
+    let hertz = config.hertz;
+
+    let rows = config.rom_dump_display_rows;
 
 
 
@@ -42,11 +51,11 @@
         {rom_name} {raw_rom.length} bytes
     </div>
     <div class="dump">
-        {#each raw_rom.slice(page * 352, page*352 + 352) as cell, i}
+        {#each raw_rom.slice(page * rows * 16, page*rows*16 + (rows * 16)) as cell, i}
             {#if i%16 == 0}
-                <div>{ ((page*22) + (i / 16)).toString(16).padStart(8, "0")}</div>
+                <div class="sidebar">{ ((page*rows) + (i / 16)).toString(16).padStart(8, "0")}</div>
             {/if}
-            <div id={(page * 352 + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
+            <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
         {/each}
 
     </div>
@@ -54,7 +63,7 @@
         <div>
             <button on:click={() => page === 0 ?page:page--}>previous</button>
             {page}
-            <button on:click={() => page === Math.floor(raw_rom.length/352) ? page:page++}>next</button>
+            <button on:click={() => page === Math.floor(raw_rom.length/(rows*16)) ? page:page++}>next</button>
         </div>
         <div>
             <div>
@@ -68,7 +77,7 @@
 
             <button class="tick" on:click={() => {
                 if (ticker === 0) {
-                    ticker = setInterval(tick, 5)
+                    ticker = setInterval(tick, 1/ hertz)
                 }
                 else  {
                     clearInterval(ticker)
@@ -109,6 +118,10 @@
 
     .buttons {
         align-self:flex-start;
+    }
+
+    .sidebar {
+        background-color: lightblue;
     }
 
     .dump {
