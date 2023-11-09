@@ -35,7 +35,7 @@
     const tick = () => {
         pc = chip8.tick(); 
         registers_trigger++; 
-        read_display_trigger++
+        read_display_trigger++;
     }
 
     
@@ -77,7 +77,7 @@
 
             <button class="tick" on:click={() => {
                 if (ticker === 0) {
-                    ticker = setInterval(tick, 1/ hertz)
+                    ticker = setInterval(tick, (1/ hertz) * 1000)
                 }
                 else  {
                     clearInterval(ticker)
