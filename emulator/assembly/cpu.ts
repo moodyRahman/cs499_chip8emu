@@ -22,6 +22,7 @@ class Memory {
   read(address: u16): u8 {
     //get the entry stored in Memory at address provided
     //ensure that the address does not overflow by only taking in the last 12 bits of the address parameter
+    // console.log("reading memory: " + (address & 0xfff).toString(16));
     return this.mem[address & 0xfff];
   }
 
@@ -774,6 +775,10 @@ export function tick(): u16 {
 
 export function reset(): void {
   cpu.reset();
+}
+
+export function ram_dump(): Uint8Array {
+  return cpu.memory.mem;
 }
 
 export function convert_inst_to_string(inst: u16): string {
