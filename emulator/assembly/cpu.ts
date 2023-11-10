@@ -22,6 +22,7 @@ class Memory {
   read(address: u16): u8 {
     //get the entry stored in Memory at address provided
     //ensure that the address does not overflow by only taking in the last 12 bits of the address parameter
+    // console.log("reading memory: " + (address & 0xfff).toString(16));
     return this.mem[address & 0xfff];
   }
 
@@ -33,6 +34,7 @@ class Memory {
   }
 
   //Font function should implement by Thursday
+  // prettier-ignore
   static ogFontTable: StaticArray<u8> = [
 		0xF0, 0x90, 0x90, 0x90, 0xF0, //0
 		0x20, 0x60, 0x20, 0x20, 0x70, //1
@@ -52,36 +54,28 @@ class Memory {
 		0xF0, 0x80, 0xF0, 0x80, 0x80  //F
 	]
 
-  loadFonts(): void{
+  loadFonts(): void {
     //Load fonts into the first 80 bytes of memory
-		for (let i: u8 = 0; i < 80; i++) {
-			this.mem[i] = Memory.ogFontTable[i];
-		}
+    for (let i: u8 = 0; i < 80; i++) {
+      this.mem[i] = Memory.ogFontTable[i];
+    }
   }
 
   //Load ROM function
-  loadROM(romToLoad: Uint8Array): boolean{
-    if(romToLoad.length > 0xE00){
+  loadROM(romToLoad: Uint8Array): boolean {
+    if (romToLoad.length > 0xe00) {
       return false; //If file byte length is greater than 3584 bytes, file is too big and cannot execute (it doesnt go past RAM limit)
     }
 
     for (let i = 0; i < romToLoad.length; i++) {
-			this.mem[i + 512] = romToLoad[i]; //Store ROM bytes into memory starting from address 512 and on
-                                       //remember, addresses 0-512 are reserved for interpreter
-		}
+      this.mem[i + 512] = romToLoad[i]; //Store ROM bytes into memory starting from address 512 and on
+      //remember, addresses 0-512 are reserved for interpreter
+    }
 
     this.loadFonts();
     return true; //If loadROM function sucessfully executed, return true;
   }
 }
-
-
-
-
-
-
-
-
 
 class Display {
   //We only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
@@ -91,38 +85,38 @@ class Display {
   //Reference to Chip-8 Memory
   memory: Memory = new Memory();
 
-  loadMemRef(memToLoad: Memory):void{
+  loadMemRef(memToLoad: Memory): void {
     this.memory = memToLoad;
   }
 
-  getCollisionValue(): u8{
-    if(this.collision){
+  getCollisionValue(): u8 {
+    if (this.collision) {
       return 1;
-    }else{
+    } else {
       return 0;
     }
   }
 
-
-
-  clearDisplay(): void { //Set all pixels to 0 in mem
+  clearDisplay(): void {
+    //Set all pixels to 0 in mem
     for (let i: u16 = 0; i < 256; i++) {
       this.display[i] = 0;
     }
   }
-  
-  drawSprite(x: u8, y: u8, address: u16, length: u8): void{
+
+  drawSprite(x: u8, y: u8, address: u16, length: u8): void {
     //Check if x and y do not go past display boundry
-    if(x > 63){
+    if (x > 63) {
       return;
     }
-    if(y > 31){
+    if (y > 31) {
       return;
     }
 
     //Check if we draw past screen
     let edgeCase: boolean = false;
-    if(x > 56){ //if x > 56 then we will be drawing past the display edge
+    if (x > 56) {
+      //if x > 56 then we will be drawing past the display edge
       edgeCase = true;
     }
 
@@ -132,34 +126,40 @@ class Display {
     //For every length of the sprite
     for (let i: u16 = 0; i < length; i++) {
       //Getting address of byte we start drawing in
-      let drawAddr: u16 = xByteLoc + ((y+i) << 3); //(x / 8) + (ylocation * 8)
+      let drawAddr: u16 = xByteLoc + ((y + i) << 3); //(x / 8) + (ylocation * 8)
 
       //Check for collision:
       //We compare the current displayed byte with the new display byte using AND and if the value is anything other than 0
       //then a collision occured.
       //We only care about the bits we draw into hence the right shift by xBitLoc many bits.
-      if((this.display[drawAddr] & (this.memory.read(address+i) >> xBitLoc)) != 0){
+      if (
+        (this.display[drawAddr] & (this.memory.read(address + i) >> xBitLoc)) !=
+        0
+      ) {
         this.collision = true;
       }
 
       //Draw pixels on screen (uses XOR)
-      this.display[drawAddr] ^= (this.memory.read(address+i) >> xBitLoc);
+      this.display[drawAddr] ^= this.memory.read(address + i) >> xBitLoc;
       //If we are not drawing past the edge of display, then continue drawing in next byte
-      if(!edgeCase){
+      if (!edgeCase) {
         //Check for collisions first:
         //Comparing current display of next byte with new byte using AND
         //however we only want to check the bits we are drawing into hence the shifting to the left
         //by 8-xBitLoc many bits
-        if((this.display[drawAddr+1] & (this.memory.read(address+i) << (8-xBitLoc))) != 0){
+        if (
+          (this.display[drawAddr + 1] &
+            (this.memory.read(address + i) << (8 - xBitLoc))) !=
+          0
+        ) {
           this.collision = true;
         }
-        
+
         //Continue drawing
-        this.display[drawAddr+1] ^= ((this.memory.read(address+i) << (8-xBitLoc)));
+        this.display[drawAddr + 1] ^=
+          this.memory.read(address + i) << (8 - xBitLoc);
       }
-
     }
-
   }
 
   draw_pixel(x: u16, y: u16): void {
@@ -221,6 +221,8 @@ class CPU {
   constructor(memToLoad: number, displayOutput: number, handleSound: number) {
     //Instantiate values with the reset function
     this.reset();
+
+    this.display.loadMemRef(this.memory);
 
     //Call starter functions
     // this.loadMemory(memToLoad);
@@ -293,8 +295,7 @@ class CPU {
     if (this.i == 0x0) {
       if (this.nnn == 0x0e0) {
         this.CLS();
-      }
-      if (this.nnn == 0x0ee) {
+      } else if (this.nnn == 0x0ee) {
         this.RET();
       } else {
         this.SYS();
@@ -342,12 +343,14 @@ class CPU {
         this.SHL();
       }
 
-      // if (this.n == 0x8) {
-      //   console.log("here");
-      //   this.DRAW_PIXEL();
-      // }
-    } else if (this.i == 0xa) {
+      if (this.n == 0x8) {
+        console.log("here");
+        this.DRAW_PIXEL();
+      }
+    } else if (this.i == 0x9) {
       this.SNEregister();
+    } else if (this.i == 0xa) {
+      this.LDindex();
     } else if (this.i == 0xb) {
       this.JPregister();
     } else if (this.i == 0xc) {
@@ -474,13 +477,13 @@ class CPU {
     this.pc = this.nnn;
   }
 
-  // DRAW_PIXEL(): void {
-  //   //The interpreter sets the program counter to nnn.
-  //   console.log(this.x.toString());
-  //   console.log(this.y.toString());
+  DRAW_PIXEL(): void {
+    //The interpreter sets the program counter to nnn.
+    console.log(this.x.toString());
+    console.log(this.y.toString());
 
-  //   this.display.draw_pixel(this.x, this.y);
-  // }
+    this.display.draw_pixel(this.x, this.y);
+  }
 
   CALL(): void {
     //The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
@@ -700,6 +703,13 @@ class CPU {
       this.V[i] = this.memory.read(this.index + i);
     }
   }
+
+  tick(): void {
+    const load =
+      (u16(this.memory.read(this.pc)) << 8) | this.memory.read(this.pc + 1);
+    this.pc += 2;
+    this.IRDecode(load);
+  }
 }
 
 /**/
@@ -712,8 +722,28 @@ export function read_instruction(inp: u16): void {
   cpu.IRDecode(inp);
 }
 
-export function read_all_registers(): Uint8Array {
-  return cpu.V;
+export function read_all_registers(): Uint16Array {
+  let out: Uint16Array = new Uint16Array(36);
+  for (let x = 0; x < cpu.V.length; x++) {
+    out[x] = cpu.V[x];
+  }
+
+  for (let x = 0; x < cpu.V.length; x++) {
+    out[x + 16] = cpu.Stack[x];
+  }
+  out[32] = cpu.pc;
+  out[33] = cpu.sp;
+  out[34] = cpu.index;
+  out[35] = cpu.dt;
+  return out;
+}
+
+export function ram_around_address(
+  left: u16,
+  right: u16,
+  address: u16
+): Uint8Array {
+  return cpu.memory.mem.slice(address - left, address + right + 1);
 }
 
 // if we can get some way to trigger a callback in javascript when the display gets updated, that would be ideal
@@ -724,4 +754,138 @@ export function display(): Uint8Array {
 
 export function debug_set_pixel(x: u8, y: u8): void {
   cpu.display.draw_pixel(x, y);
+}
+
+export function load_rom(rom: Uint8Array): void {
+  cpu.memory.loadROM(rom);
+
+  for (let x: u16 = 0; x < 5; x++) {
+    console.log(cpu.memory.read(512 + x).toString(16));
+  }
+}
+
+export function read_mem(add: u16): u8 {
+  return cpu.memory.read(add);
+}
+
+export function tick(): u16 {
+  cpu.tick();
+  return cpu.pc;
+}
+
+export function reset(): void {
+  cpu.reset();
+}
+
+export function ram_dump(): Uint8Array {
+  return cpu.memory.mem;
+}
+
+export function convert_inst_to_string(inst: u16): string {
+  let nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
+  let n = u8(inst & 0x000f); //gets last 4 instruction bits (0 through 3)
+  let x = u8((inst >> 8) & 0x000f); //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
+  let y = u8((inst >> 4) & 0x000f); //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
+  let kk = u8(inst & 0x00ff); //gets last 8 instruction bits (0 through 7)
+  let i = u8((inst >> 12) & 0x000f); // gets first 4 bits of instruction
+
+  if (inst == 0) {
+    return "no op";
+  }
+
+  if (i == 0x0) {
+    if (nnn == 0x0e0) {
+      return "clearing";
+    }
+    if (nnn == 0x0ee) {
+      return "returning";
+    } else {
+      return "syscall";
+    }
+  } else if (i == 0x1) {
+    return "jumping to " + nnn.toString(16);
+  } else if (i == 0x2) {
+    return "call " + nnn.toString(16);
+  } else if (i == 0x3) {
+    return "sebyte " + x.toString(16) + " " + kk.toString(16);
+  } else if (i == 0x4) {
+    return "snebyte " + x.toString(16) + " " + kk.toString(16);
+  } else if (i == 0x5) {
+    return "skip " + x.toString(16) + " " + y.toString(16);
+  } else if (i == 0x6) {
+    return "ldbyte " + x.toString(16) + " " + kk.toString(16);
+  } else if (i == 0x7) {
+    return "add byte " + x.toString(16) + " " + kk.toString(16);
+  } else if (i == 0x8) {
+    if (n == 0x0) {
+      return "ld register " + x.toString(16) + " " + y.toString(16);
+    }
+    if (n == 0x1) {
+      return "or " + x.toString(16) + " " + y.toString(16);
+    }
+    if (n == 0x2) {
+      return "and " + x.toString(16) + " " + y.toString(16);
+    }
+    if (n == 0x3) {
+      return "xor " + x.toString(16) + " " + y.toString(16);
+    }
+    if (n == 0x4) {
+      return "add register " + x.toString(16) + " " + y.toString(16);
+    }
+    if (n == 0x5) {
+      return "subtract register " + x.toString(16) + " " + y.toString(16);
+    }
+    if (n == 0x6) {
+      return "shr " + x.toString(16) + " " + y.toString(16);
+    }
+    if (n == 0x7) {
+      return "subn " + x.toString(16) + " " + y.toString(16);
+    }
+    if (n == 0xe) {
+      return "shl " + x.toString(16) + " " + y.toString(16);
+    }
+
+    if (n == 0x8) {
+      return "draw pixel debug " + x.toString(16) + " " + y.toString(16);
+    }
+  } else if (i == 0x9) {
+    return "sne " + x.toString(16) + " " + y.toString(16);
+  } else if (i == 0xa) {
+    return "ld index " + nnn.toString(16);
+  } else if (i == 0xb) {
+    return "jp register " + nnn.toString(16);
+  } else if (i == 0xc) {
+    return "random " + x.toString(16) + " " + kk.toString(16);
+  } else if (i == 0xd) {
+    return (
+      "draw " + x.toString(16) + " " + y.toString(16) + " " + n.toString(16)
+    );
+  } else if (i == 0xe) {
+    if (kk == 0x9e) {
+      return "skip " + x.toString(16);
+    } else if (kk == 0xa1) {
+      return "sknp " + x.toString(16);
+    }
+  } else if (i == 0xf) {
+    if (kk == 0x07) {
+      return "ld ret " + x.toString(16);
+    } else if (kk == 0x0a) {
+      return "ld key " + x.toString(16);
+    } else if (kk == 0x15) {
+      return "ld ter" + x.toString(16);
+    } else if (kk == 0x18) {
+      return "ld ser " + x.toString(16);
+    } else if (kk == 0x1e) {
+      return "add index " + x.toString(16);
+    } else if (kk == 0x29) {
+      return "ld sprite" + x.toString(16);
+    } else if (kk == 0x33) {
+      return "ld br" + x.toString(16);
+    } else if (kk == 0x55) {
+      return "ld mem wr" + x.toString(16);
+    } else if (kk == 0x65) {
+      return "ld mem rd " + x.toString(16);
+    }
+  }
+  return "wtf";
 }

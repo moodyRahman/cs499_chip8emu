@@ -3,7 +3,13 @@
 <script lang="ts">
 
     import * as chip8 from "$lib/chip8/debug.js";
-	import Octet from "../components/Octet.svelte";
+	import Disassembler from "../components/Disassembler.svelte";
+	import Display from "../components/Display.svelte";
+    import { onMount } from 'svelte';
+	import Loader from "../components/Loader.svelte";
+	import RomDump from "../components/RomDump.svelte";
+	import Registers from "../components/Registers.svelte";
+
 
     const bindFunc = (wasmfunc: CallableFunction) => {    
         return {
@@ -13,83 +19,85 @@
             trigger: 0
         }
     }
+
     
-    
-    let input = ""
+    let arbitrary_inst = ""
     let px = 0;
     let py = 0;
-    let register = 0
+
+    let rom_name = "SpaceInvaders.ch8"
+    let rom = new Uint8Array()
+
+    // $: rom_name, loader();
+
+
 
     let {func: read_instruction, trigger: read_instruction_trigger} = bindFunc(() => {
-        const out = chip8.read_instruction(Number(input)); 
-        read_all_registers_trigger++; 
+        const out = chip8.read_instruction(Number(arbitrary_inst)); 
+        registers_trigger++;
         return out
     })    
     $: read_instruction(read_instruction_trigger)
 
 
-    let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
-    $: read_all_registers(read_all_registers_trigger)
+    // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
+    // $: read_all_registers(read_all_registers_trigger)
+
+    let registers_trigger = 0
 
     let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.display);
     
 </script>
 
-
-
-<div>
-    <div class="registers">
-    {#each read_all_registers(read_all_registers_trigger) as register, i}
-        <span class="register">V{i},{register.toString(16)}  </span>
-    {/each}
+<div class="run-info">
+    <div class="run_one">
+        <div>
+            <input type="text" placeholder="enter instruction here" bind:value={arbitrary_inst}>
+        </div>
+        
+        <div>
+            <button on:click={() => { read_instruction_trigger++; read_display_trigger++; console.log(chip8.convert_inst_to_string(Number(arbitrary_inst)))}}>run the instruction</button>
+        </div>
+    </div>
+    <div>
+        <pre>
+            a good instruction to run is:
+            0x
+            6  opcode for LD, puts values kk into register Vx
+            1  x, the register we'll put kk into
+            20 kk, the value we'll put into register Vx
+            
+            (read as 0x6120, it's been split up to accomodate annotations)
+        </pre>
+        
+        <pre>
+        
+            draw pixel at (0 to 16, 0 to 16):
+            0x
+            8  opcode for a bunch of different things
+            0  x, x-coordinate 
+            0  y, y-coordinate
+            8  n, further opcode for a temporary debug draw pixel function
+            
+            (read as 0x8008)
+        </pre>
     </div>
 </div>
 
-<div>
-    <input type="text" placeholder="enter instruction here" bind:value={input}>
+
+
+<Loader bind:rom_name={rom_name} bind:rom={rom} />
+
+<Registers bind:registers_trigger={registers_trigger} />
+
+<div class="lr-container">
+    <Display trigger={read_display_trigger} />
+    <!-- <Disassembler raw_rom={rom} rom_name={rom_name} /> -->
+    <RomDump raw_rom={rom} rom_name={rom_name} bind:registers_trigger={registers_trigger} bind:read_display_trigger={read_display_trigger} />
 </div>
 
 <div>
-    <button on:click={() => { read_instruction_trigger++; read_display_trigger++}}>run the instruction</button>
-</div>
-
-<div>
-    
-<pre>
-    a good instruction to run is:
-    0x
-    6  opcode for LD, puts values kk into register Vx
-    1  x, the register we'll put kk into
-    20 kk, the value we'll put into register Vx
-    
-    (read as 0x6120, it's been split up to accomodate annotations)
-</pre>
-
-<pre>
-
-    draw pixel at (0 to 16, 0 to 16):
-    0x
-    8  opcode for a bunch of different things
-    0  x, x-coordinate 
-    0  y, y-coordinate
-    8  n, further opcode for a temporary debug draw pixel function
-    
-    (read as 0x8008)
-</pre>
-</div>
-
-<div class="display-container">
-    
-    {#each read_display(read_display_trigger) as pixel_group }
-    
-        <Octet data={pixel_group} />
-    
-    {/each}
-</div>
-
-<div>
-    <button on:click={() => { chip8.debug_set_pixel(px, py); read_display_trigger++}} >draw pixel</button>
-    <!-- <button on:click={() => { read_display_trigger++}} >update display</button> -->
+    <button on:click={() => { chip8.debug_set_pixel(px, py); read_display_trigger++;}} >draw pixel</button>
 
 </div>
 
@@ -101,6 +109,8 @@
 
 <style>
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
     :global(html) {
     box-sizing: border-box;
     }
@@ -108,28 +118,30 @@
     box-sizing: inherit;
     }
 
-
-    .registers {
-        width: 50%;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-    .register {
-        margin-left: 10px;
+    :global(*) {
+        font-family: 'Roboto', sans-serif;
     }
 
-    .display-container {
-        display: grid;
-        grid-template-columns: repeat(8, fit-content(12.5%));
-        gap: 0;
-        width: auto;
+    :global(body) {
+        margin-left: 200px;
+        margin-right: 200px;
+
     }
 
-    .octet {
-        width: auto;
-        margin-left: 0px;
+    .lr-container {
+        display: flex;
+        height: auto;
     }
 
+    .run-info {
+        display: flex;
+        height: auto;
+        margin-bottom: 20px;
+    }
+
+    .run_one {
+        align-self:self-end;
+    }
 </style>
 
 
