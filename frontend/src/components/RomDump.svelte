@@ -16,7 +16,7 @@
     let ticker = 0;
 
     // set the cpu cycles per second
-    let hertz = config.hertz;
+    let {ticks_per_interval, time_between_intervals_ms} = config.hertz;
 
     let rows = config.rom_dump_display_rows;
 
@@ -39,6 +39,13 @@
         {
             console.log(registers_trigger)
             read_display_trigger++;
+        }
+    }
+
+    const n_tick = (n: number) => {
+        for (let x = 0; x < n; x++)
+        {
+            tick();
         }
     }
 
@@ -92,7 +99,7 @@
 
             <button class="tick" on:click={() => {
                 if (ticker === 0) {
-                    ticker = setInterval(tick, 1/hertz*1000)
+                    ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))
                 }
                 else  {
                     clearInterval(ticker)

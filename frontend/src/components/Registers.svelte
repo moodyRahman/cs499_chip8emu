@@ -30,6 +30,7 @@
         <span class="register">index: {registers[34]}</span>
         <span class="register">dt: {registers[35]}</span>
     </div>
+    data adjacent to PC
     <div>
         {#each chip8.ram_around_address(pc_highlight_index, pc_highlight_index, registers[32]) as mem, i}
             {#if i == pc_highlight_index}
