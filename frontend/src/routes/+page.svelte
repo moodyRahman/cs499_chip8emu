@@ -28,7 +28,7 @@
     let rom_name = "SpaceInvaders.ch8"
     let rom = new Uint8Array()
 
-    // $: rom_name, loader();
+    let registers_trigger = 0
 
 
 
@@ -36,14 +36,12 @@
         const out = chip8.read_instruction(Number(arbitrary_inst)); 
         registers_trigger++;
         return out
-    })    
+    })
     $: read_instruction(read_instruction_trigger)
 
 
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     // $: read_all_registers(read_all_registers_trigger)
-
-    let registers_trigger = 0
 
     let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.display);
     
@@ -88,7 +86,7 @@
 
 <Loader bind:rom_name={rom_name} bind:rom={rom} />
 
-<Registers bind:registers_trigger={registers_trigger} />
+<!-- <Registers bind:registers_trigger={registers_trigger} /> -->
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
