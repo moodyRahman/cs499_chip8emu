@@ -47,7 +47,6 @@
         </div>
         <div>
             {chip8.convert_inst_to_string(((chip8.ram_around_address(pc_highlight_index, pc_highlight_index, registers[32])[pc_highlight_index] << 8) | chip8.ram_around_address(pc_highlight_index, pc_highlight_index, registers[32])[pc_highlight_index+1]))}
-            
         </div>
     </div>
 

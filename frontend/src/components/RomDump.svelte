@@ -7,7 +7,7 @@
     export let rom_name: string;
     export let registers_trigger: number;
     export let read_display_trigger: number;
-    
+    export let debug: boolean = false;
 
     let pc = 512;
     let page = 0;
@@ -54,27 +54,36 @@
     <div>
         {rom_name} {raw_rom.length} bytes
     </div>
-    <!-- <div class="dump">
+{#if debug}
+    <div class="dump">
         {#each raw_rom.slice(page * rows * 16, page*rows*16 + (rows * 16)) as cell, i}
-            {#if i%16 == 0}
-                <div class="sidebar">{ ((page*rows) + (i / 16)).toString(16).padStart(8, "0")}</div>
-            {/if}
-            <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
+        {#if i%16 == 0}
+        <div class="sidebar">{ ((page*rows) + (i / 16)).toString(16).padStart(8, "0")}</div>
+        {/if}
+        <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
         {/each}
-
-    </div> -->
+        
+    </div>
+    {/if}
     <div class="buttons">
+        {#if debug}
         <div>
             <button on:click={() => page === 0 ?page:page--}>previous</button>
             {page}
             <button on:click={() => page === Math.floor(raw_rom.length/(rows*16)) ? page:page++}>next</button>
         </div>
+        {/if}
         
         <div>
             <div>
 
+                {#if debug}
                 <button class="tick" on:click={tick}>
-                    <!-- tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)} -->
+                    tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
+                </button>
+                {/if}
+
+                <button class="tick" on:click={tick}>
                     tick cpu
                 </button>
             </div>
@@ -83,7 +92,7 @@
 
             <button class="tick" on:click={() => {
                 if (ticker === 0) {
-                    ticker = setInterval(tick, (1/ hertz) * 1000)
+                    ticker = setInterval(tick, 1/hertz*1000)
                 }
                 else  {
                     clearInterval(ticker)

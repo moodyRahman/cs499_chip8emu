@@ -29,6 +29,9 @@
     let rom = new Uint8Array()
 
     let registers_trigger = 0
+    let read_display_trigger = 0;
+
+    let debug = false;
 
 
 
@@ -43,7 +46,6 @@
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     // $: read_all_registers(read_all_registers_trigger)
 
-    let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.display);
     
 </script>
 
@@ -82,16 +84,24 @@
     </div>
 </div>
 
-
+<div>
+    <button on:click={() => debug = !debug}>
+        toggle debug
+    </button>
+</div>
 
 <Loader bind:rom_name={rom_name} bind:rom={rom} />
 
-<!-- <Registers bind:registers_trigger={registers_trigger} /> -->
+{#if debug}
+    <Registers bind:registers_trigger={registers_trigger} />
+{/if}
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
-    <!-- <Disassembler raw_rom={rom} rom_name={rom_name} /> -->
-    <RomDump raw_rom={rom} rom_name={rom_name} bind:registers_trigger={registers_trigger} bind:read_display_trigger={read_display_trigger} />
+    {#if debug}
+        <Disassembler raw_rom={rom} rom_name={rom_name} />
+    {/if}
+    <RomDump raw_rom={rom} rom_name={rom_name} bind:registers_trigger={registers_trigger} bind:read_display_trigger={read_display_trigger} bind:debug={debug} />
 </div>
 
 <div>
