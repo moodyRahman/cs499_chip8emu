@@ -469,7 +469,7 @@ class CPU {
     } else {
       console.log("Error: tried to decrement SP below 0");
     }
-    this.pc = this.sp;
+    this.pc = this.Stack[this.sp];
   }
 
   JPimm(): void {
