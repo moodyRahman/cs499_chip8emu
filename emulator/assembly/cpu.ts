@@ -142,7 +142,7 @@ class Display {
       //Draw pixels on screen (uses XOR)
       this.display[drawAddr] ^= this.memory.read(address + i) >> xBitLoc;
       //If we are not drawing past the edge of display, then continue drawing in next byte
-      if (!edgeCase) {
+      if (!edgeCase && xBitLoc != 0) {
         //Check for collisions first:
         //Comparing current display of next byte with new byte using AND
         //however we only want to check the bits we are drawing into hence the shifting to the left
