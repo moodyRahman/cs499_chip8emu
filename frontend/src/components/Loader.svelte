@@ -6,7 +6,7 @@
     export let rom_name: string
     export let rom: Uint8Array
 
-    let name: string = "test_opcode.ch8"
+    let name: string = "SpaceInvaders.ch8"
     let all_roms: string[] = []
 
     // $: rom_name, loader();

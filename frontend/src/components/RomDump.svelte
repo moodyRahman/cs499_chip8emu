@@ -7,8 +7,7 @@
     export let rom_name: string;
     export let registers_trigger: number;
     export let read_display_trigger: number;
-
-    
+    export let debug: boolean = false;
 
     let pc = 512;
     let page = 0;
@@ -17,7 +16,7 @@
     let ticker = 0;
 
     // set the cpu cycles per second
-    let hertz = config.hertz;
+    let {ticks_per_interval, time_between_intervals_ms} = config.hertz;
 
     let rows = config.rom_dump_display_rows;
 
@@ -33,9 +32,21 @@
 
 
     const tick = () => {
+        // console.log("#", read_display_trigger, ", ", chip8.convert_inst_to_string(curr_inst))
         pc = chip8.tick(); 
-        registers_trigger++; 
-        read_display_trigger++;
+        registers_trigger++;
+        if (registers_trigger % 50 == 0 || debug)
+        {
+            console.log(registers_trigger)
+            read_display_trigger++;
+        }
+    }
+
+    const n_tick = (n: number) => {
+        for (let x = 0; x < n; x++)
+        {
+            tick();
+        }
     }
 
     
@@ -50,26 +61,37 @@
     <div>
         {rom_name} {raw_rom.length} bytes
     </div>
+{#if debug}
     <div class="dump">
         {#each raw_rom.slice(page * rows * 16, page*rows*16 + (rows * 16)) as cell, i}
-            {#if i%16 == 0}
-                <div class="sidebar">{ ((page*rows) + (i / 16)).toString(16).padStart(8, "0")}</div>
-            {/if}
-            <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
+        {#if i%16 == 0}
+        <div class="sidebar">{ ((page*rows) + (i / 16)).toString(16).padStart(8, "0")}</div>
+        {/if}
+        <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
         {/each}
-
+        
     </div>
+    {/if}
     <div class="buttons">
+        {#if debug}
         <div>
             <button on:click={() => page === 0 ?page:page--}>previous</button>
             {page}
             <button on:click={() => page === Math.floor(raw_rom.length/(rows*16)) ? page:page++}>next</button>
         </div>
+        {/if}
+        
         <div>
             <div>
 
+                {#if debug}
                 <button class="tick" on:click={tick}>
                     tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
+                </button>
+                {/if}
+
+                <button class="tick" on:click={tick}>
+                    tick cpu
                 </button>
             </div>
             <div>
@@ -77,7 +99,7 @@
 
             <button class="tick" on:click={() => {
                 if (ticker === 0) {
-                    ticker = setInterval(tick, (1/ hertz) * 1000)
+                    ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))
                 }
                 else  {
                     clearInterval(ticker)
@@ -88,8 +110,8 @@
             </button>
             <button class="tick" on:click={() => {
                 chip8.reset();
-                registers_trigger++;
-                read_display_trigger++;
+                registers_trigger = 0;
+                read_display_trigger = 0;
                 pc = 512;
             }}>
                 reset cpu

@@ -28,7 +28,10 @@
     let rom_name = "SpaceInvaders.ch8"
     let rom = new Uint8Array()
 
-    // $: rom_name, loader();
+    let registers_trigger = 0
+    let read_display_trigger = 0;
+
+    let debug = false;
 
 
 
@@ -36,16 +39,13 @@
         const out = chip8.read_instruction(Number(arbitrary_inst)); 
         registers_trigger++;
         return out
-    })    
+    })
     $: read_instruction(read_instruction_trigger)
 
 
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     // $: read_all_registers(read_all_registers_trigger)
 
-    let registers_trigger = 0
-
-    let {func: read_display, trigger: read_display_trigger} = bindFunc(chip8.display);
     
 </script>
 
@@ -84,16 +84,21 @@
     </div>
 </div>
 
-
+<div>
+    <button on:click={() => debug = !debug}>
+        toggle debug
+    </button>
+</div>
 
 <Loader bind:rom_name={rom_name} bind:rom={rom} />
 
-<Registers bind:registers_trigger={registers_trigger} />
+{#if debug}
+    <Registers bind:registers_trigger={registers_trigger} />
+{/if}
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
-    <!-- <Disassembler raw_rom={rom} rom_name={rom_name} /> -->
-    <RomDump raw_rom={rom} rom_name={rom_name} bind:registers_trigger={registers_trigger} bind:read_display_trigger={read_display_trigger} />
+    <RomDump raw_rom={rom} rom_name={rom_name} bind:registers_trigger={registers_trigger} bind:read_display_trigger={read_display_trigger} bind:debug={debug} />
 </div>
 
 <div>
@@ -123,8 +128,8 @@
     }
 
     :global(body) {
-        margin-left: 200px;
-        margin-right: 200px;
+        margin: 7%;
+        padding: 3.5%;
 
     }
 
