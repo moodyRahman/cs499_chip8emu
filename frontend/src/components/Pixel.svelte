@@ -17,6 +17,12 @@
         width: 10px;
     }
 
+    @media only screen and (max-width: 800px) {
+        pre {
+            width: 20px;
+        }
+    }
+
     span {
         width: 10px;
     }

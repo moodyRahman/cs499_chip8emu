@@ -35,7 +35,7 @@
         // console.log("#", read_display_trigger, ", ", chip8.convert_inst_to_string(curr_inst))
         pc = chip8.tick(); 
         registers_trigger++;
-        if (registers_trigger % 50 == 0)
+        if (registers_trigger % 50 == 0 || debug)
         {
             console.log(registers_trigger)
             read_display_trigger++;

@@ -129,6 +129,7 @@
 
     :global(body) {
         margin: 7%;
+        padding: 3.5%;
 
     }
 

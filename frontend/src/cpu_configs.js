@@ -1,7 +1,7 @@
 const config = {
     hertz: {
-        ticks_per_interval: 6,
-        time_between_intervals_ms: 10
+        ticks_per_interval: 1,
+        time_between_intervals_ms: 20
     },
     ram_adjacent_to_pc: 10,
     rom_dump_display_rows: 22
