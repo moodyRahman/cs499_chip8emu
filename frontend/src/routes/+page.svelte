@@ -98,9 +98,6 @@
 
 <div class="lr-container">
     <Display trigger={read_display_trigger} />
-    {#if debug}
-    <!-- <Disassembler raw_rom={rom} rom_name={rom_name} /> -->
-    {/if}
     <RomDump raw_rom={rom} rom_name={rom_name} bind:registers_trigger={registers_trigger} bind:read_display_trigger={read_display_trigger} bind:debug={debug} />
 </div>
 
@@ -131,8 +128,7 @@
     }
 
     :global(body) {
-        margin-left: 200px;
-        margin-right: 200px;
+        margin: 7%;
 
     }
 
