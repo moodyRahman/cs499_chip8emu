@@ -21,8 +21,8 @@
         const buff = await res.arrayBuffer();
         rom_store.set(new Uint8Array(buff));
         rom_name_store.set(name)
-        chip8.load_rom(rom);
         chip8.reset();
+        chip8.load_rom(rom);
 	}
 
     onMount(loader)
