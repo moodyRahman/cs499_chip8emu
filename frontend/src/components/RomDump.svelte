@@ -16,7 +16,12 @@
     let ticker = 0;
 
     // set the cpu cycles per second
-    let {ticks_per_interval, time_between_intervals_ms} = config.hertz;
+    let {ticks_per_interval, time_between_intervals_ms, display_rerender_threshold} = debug ? 
+            {
+                ticks_per_interval:1, 
+                time_between_intervals_ms:50,
+                display_rerender_threshold:1
+            } : config.hertz;
 
     let rows = config.rom_dump_display_rows;
 
@@ -35,7 +40,7 @@
         // console.log("#", read_display_trigger, ", ", chip8.convert_inst_to_string(curr_inst))
         pc = chip8.tick(); 
         registers_trigger++;
-        if (registers_trigger % 50 == 0 || debug)
+        if (registers_trigger % display_rerender_threshold == 0)
         {
             console.log(registers_trigger)
             read_display_trigger++;

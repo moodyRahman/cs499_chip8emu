@@ -1,10 +1,12 @@
 const config = {
     hertz: {
         ticks_per_interval: 1,
-        time_between_intervals_ms: 20
+        time_between_intervals_ms: 20,
+        display_rerender_threshold: 50   // amount of cpu ticks before re-rendering the display
     },
     ram_adjacent_to_pc: 10,
-    rom_dump_display_rows: 22
+    rom_dump_display_rows: 22,
+    backend_url: "http://localhost:3000"
 }
 
 export default config

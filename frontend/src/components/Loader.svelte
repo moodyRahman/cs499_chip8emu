@@ -3,8 +3,10 @@
 
     import * as chip8 from "$lib/chip8/debug.js";
 	import { onMount } from "svelte";
+    import config from "../cpu_configs";
     export let rom_name: string
     export let rom: Uint8Array
+
 
     let name: string = "SpaceInvaders.ch8"
     let all_roms: string[] = []
@@ -12,8 +14,8 @@
     // $: rom_name, loader();
 
     const loader = async () => {
-        console.log(`fetching http://localhost:3000/assets/roms/${name}`)
-        const res = await fetch(`http://localhost:3000/assets/roms/${name}`);
+        console.log(`fetching ${config.backend_url}/assets/roms/${name}`)
+        const res = await fetch(`${config.backend_url}/assets/roms/${name}`);
         const buff = await res.arrayBuffer();
         rom = new Uint8Array(buff);
         rom_name = name
@@ -24,7 +26,7 @@
     onMount(loader)
 
     const get_rom_names = async () => {
-        const res = await fetch("http://localhost:3000/assets_data")
+        const res = await fetch(`${config.backend_url}/assets_data`)
         const data: string[] = await res.json()
         all_roms = data.filter((x) => x.includes(".ch8"))
     }
