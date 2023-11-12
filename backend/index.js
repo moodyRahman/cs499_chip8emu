@@ -2,11 +2,11 @@
 import express from "express";
 import { router } from "./routes/index.js";
 import cors from "cors";
-
 import { readdir } from "fs/promises"
+import 'dotenv/config'
 
 const app = express()
-const port = 3000
+const port = process.env.PORT
 app.use(cors())
 
 // http://localhost:3000/assets/roms/a.png
@@ -26,5 +26,5 @@ app.use(router)
 
 
 app.listen(port, () => {
-    console.log(`app online at http://localhost:3000`)
+    console.log(`app online at http://localhost:${port}`)
 })
