@@ -32,7 +32,7 @@
     $: ({ticks_per_interval, time_between_intervals_ms, display_rerender_threshold} = debug ? 
             {
                 ticks_per_interval:1, 
-                time_between_intervals_ms:50,
+                time_between_intervals_ms:100,
                 display_rerender_threshold:1
             } : config.hertz);
 
@@ -55,7 +55,7 @@
         registers_trigger.update((n) => n+1);
         if (cpu_ticks % display_rerender_threshold === 0)
         {
-            console.log(registers_trigger)
+            console.log(cpu_ticks)
             display_trigger.update((n) => n+1)
         }
     }
