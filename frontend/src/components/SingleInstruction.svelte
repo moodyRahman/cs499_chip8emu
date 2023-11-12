@@ -4,6 +4,11 @@
 
     let arbitrary_inst: string = "";
 
+    
+    let px = 0;
+    let py = 0;
+
+
     let display_help = false;
 
 </script>
@@ -17,6 +22,15 @@
         <div>
             <button on:click={() => { chip8.read_instruction(Number(arbitrary_inst)); registers_trigger.update((n) => n+1); display_trigger.update((n) => n+1); console.log(chip8.convert_inst_to_string(Number(arbitrary_inst)))}}>run the instruction</button>
             <button on:click={()=> display_help = !display_help}>toggle help</button>
+        </div>
+        <div>
+            <div>    
+                draw pixels: <input type="number" bind:value={px} placeholder="x"> <input type="number" bind:value={py} placeholder="y">
+            </div>
+            <div>
+                <button on:click={() => { chip8.debug_set_pixel(px, py); display_trigger.update((n) => n+1);}} >draw pixel</button>
+            
+            </div>
         </div>
     </div>
 

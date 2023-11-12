@@ -9,6 +9,7 @@
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
 	import { display_trigger } from "$lib/stores/cpu_state";
+	import Header from "../components/Header.svelte";
 
 
     const bindFunc = (wasmfunc: CallableFunction) => {    
@@ -20,24 +21,12 @@
         }
     }
 
-    
-    let arbitrary_inst = ""
-    let px = 0;
-    let py = 0;
-
-    let registers_trigger = 0
-    let read_display_trigger = 0;
-
     let debug = false;
 
 
+    const generate_spacing_css = () => {
 
-    let {func: read_instruction, trigger: read_instruction_trigger} = bindFunc(() => {
-        const out = chip8.read_instruction(Number(arbitrary_inst)); 
-        registers_trigger++;
-        return out
-    })
-    $: read_instruction(read_instruction_trigger)
+    }
 
 
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
@@ -47,6 +36,7 @@
 </script>
 
 <div>
+    <Header />
     <button on:click={() => debug = !debug}>
         toggle debug
     </button>
@@ -64,26 +54,16 @@
     <RomDump bind:debug={debug} />
 </div>
 
-<div>
-    <button on:click={() => { chip8.debug_set_pixel(px, py); display_trigger.update((n) => n+1);}} >draw pixel</button>
-
-</div>
-
-
-<div>
-    draw pixels: <input type="number" bind:value={px} placeholder="x"> <input type="number" bind:value={py} placeholder="y">
-</div>
-
 
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
     :global(html) {
-    box-sizing: border-box;
+        box-sizing: border-box;
     }
-    *, *:before, *:after {
-    box-sizing: inherit;
+    :global(*, *:before, *:after) {
+        box-sizing: inherit;
     }
 
     :global(*) {
@@ -95,8 +75,6 @@
         margin-right: 10%;
         margin-top: 3%;
         margin-top: 3%;
-
-
     }
 
     .lr-container {
