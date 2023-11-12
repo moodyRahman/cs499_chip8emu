@@ -3,12 +3,11 @@
 <script lang="ts">
 
     import * as chip8 from "$lib/chip8/debug.js";
-	import Disassembler from "../components/Disassembler.svelte";
 	import Display from "../components/Display.svelte";
-    import { onMount } from 'svelte';
 	import Loader from "../components/Loader.svelte";
 	import RomDump from "../components/RomDump.svelte";
 	import Registers from "../components/Registers.svelte";
+	import SingleInstruction from "../components/SingleInstruction.svelte";
 	import { display_trigger } from "$lib/stores/cpu_state";
 
 
@@ -33,46 +32,19 @@
 
 
 
+    let {func: read_instruction, trigger: read_instruction_trigger} = bindFunc(() => {
+        const out = chip8.read_instruction(Number(arbitrary_inst)); 
+        registers_trigger++;
+        return out
+    })
+    $: read_instruction(read_instruction_trigger)
+
+
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     // $: read_all_registers(read_all_registers_trigger)
 
     
 </script>
-
-<div class="run-info">
-    <div class="run_one">
-        <div>
-            <input type="text" placeholder="enter instruction here" bind:value={arbitrary_inst}>
-        </div>
-        
-        <div>
-            <button on:click={() => { read_instruction_trigger++; read_display_trigger++; console.log(chip8.convert_inst_to_string(Number(arbitrary_inst)))}}>run the instruction</button>
-        </div>
-    </div>
-    <div>
-        <pre>
-            a good instruction to run is:
-            0x
-            6  opcode for LD, puts values kk into register Vx
-            1  x, the register we'll put kk into
-            20 kk, the value we'll put into register Vx
-            
-            (read as 0x6120, it's been split up to accomodate annotations)
-        </pre>
-        
-        <pre>
-        
-            draw pixel at (0 to 16, 0 to 16):
-            0x
-            8  opcode for a bunch of different things
-            0  x, x-coordinate 
-            0  y, y-coordinate
-            8  n, further opcode for a temporary debug draw pixel function
-            
-            (read as 0x8008)
-        </pre>
-    </div>
-</div>
 
 <div>
     <button on:click={() => debug = !debug}>
@@ -83,6 +55,7 @@
 <Loader />
 
 {#if debug}
+    <SingleInstruction />
     <Registers />
 {/if}
 
@@ -118,8 +91,11 @@
     }
 
     :global(body) {
-        margin: 7%;
-        padding: 3.5%;
+        margin-left: 10%;
+        margin-right: 10%;
+        margin-top: 3%;
+        margin-top: 3%;
+
 
     }
 
@@ -128,15 +104,7 @@
         height: auto;
     }
 
-    .run-info {
-        display: flex;
-        height: auto;
-        margin-bottom: 20px;
-    }
 
-    .run_one {
-        align-self:self-end;
-    }
 </style>
 
 
