@@ -9,6 +9,7 @@
 	import Loader from "../components/Loader.svelte";
 	import RomDump from "../components/RomDump.svelte";
 	import Registers from "../components/Registers.svelte";
+	import { display_trigger } from "$lib/stores/cpu_state";
 
 
     const bindFunc = (wasmfunc: CallableFunction) => {    
@@ -25,22 +26,11 @@
     let px = 0;
     let py = 0;
 
-    let rom_name = "SpaceInvaders.ch8"
-    let rom = new Uint8Array()
-
     let registers_trigger = 0
     let read_display_trigger = 0;
 
     let debug = false;
 
-
-
-    let {func: read_instruction, trigger: read_instruction_trigger} = bindFunc(() => {
-        const out = chip8.read_instruction(Number(arbitrary_inst)); 
-        registers_trigger++;
-        return out
-    })
-    $: read_instruction(read_instruction_trigger)
 
 
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
@@ -90,19 +80,19 @@
     </button>
 </div>
 
-<Loader bind:rom_name={rom_name} bind:rom={rom} />
+<Loader />
 
 {#if debug}
-    <Registers bind:registers_trigger={registers_trigger} />
+    <Registers />
 {/if}
 
 <div class="lr-container">
-    <Display trigger={read_display_trigger} />
-    <RomDump raw_rom={rom} rom_name={rom_name} bind:registers_trigger={registers_trigger} bind:read_display_trigger={read_display_trigger} bind:debug={debug} />
+    <Display />
+    <RomDump bind:debug={debug} />
 </div>
 
 <div>
-    <button on:click={() => { chip8.debug_set_pixel(px, py); read_display_trigger++;}} >draw pixel</button>
+    <button on:click={() => { chip8.debug_set_pixel(px, py); display_trigger.update((n) => n+1);}} >draw pixel</button>
 
 </div>
 

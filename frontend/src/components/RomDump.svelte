@@ -1,13 +1,26 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
+	import { display_trigger, registers_trigger, rom, rom_name as rom_name_store } from "$lib/stores/cpu_state";
 
     import config from "../cpu_configs";
     
-    export let raw_rom: Uint8Array = new Uint8Array();
-    export let rom_name: string;
-    export let registers_trigger: number;
-    export let read_display_trigger: number;
+    let raw_rom: Uint8Array = new Uint8Array();
+
+    rom.subscribe((n) => {
+        raw_rom = n;
+    })
+
+    let rom_name: string;
+    rom_name_store.subscribe((n) => rom_name = n)
+
+    // export let registers_trigger: number;
     export let debug: boolean = false;
+
+    let cpu_ticks = 0;
+
+    registers_trigger.subscribe((n) => {
+        cpu_ticks = n;
+    })
 
     let pc = 512;
     let page = 0;
@@ -16,12 +29,12 @@
     let ticker = 0;
 
     // set the cpu cycles per second
-    let {ticks_per_interval, time_between_intervals_ms, display_rerender_threshold} = debug ? 
+    $: ({ticks_per_interval, time_between_intervals_ms, display_rerender_threshold} = debug ? 
             {
                 ticks_per_interval:1, 
                 time_between_intervals_ms:50,
                 display_rerender_threshold:1
-            } : config.hertz;
+            } : config.hertz);
 
     let rows = config.rom_dump_display_rows;
 
@@ -39,11 +52,11 @@
     const tick = () => {
         // console.log("#", read_display_trigger, ", ", chip8.convert_inst_to_string(curr_inst))
         pc = chip8.tick(); 
-        registers_trigger++;
-        if (registers_trigger % display_rerender_threshold == 0)
+        registers_trigger.update((n) => n+1);
+        if (cpu_ticks % display_rerender_threshold === 0)
         {
             console.log(registers_trigger)
-            read_display_trigger++;
+            display_trigger.update((n) => n+1)
         }
     }
 
@@ -93,11 +106,13 @@
                 <button class="tick" on:click={tick}>
                     tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
                 </button>
-                {/if}
-
+                
+                {:else}
                 <button class="tick" on:click={tick}>
                     tick cpu
                 </button>
+                {/if}
+
             </div>
             <div>
 
@@ -115,8 +130,8 @@
             </button>
             <button class="tick" on:click={() => {
                 chip8.reset();
-                registers_trigger = 0;
-                read_display_trigger = 0;
+                registers_trigger.set(0);
+                display_trigger.set(0)
                 pc = 512;
             }}>
                 reset cpu

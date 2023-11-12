@@ -4,8 +4,10 @@
     import * as chip8 from "$lib/chip8/debug.js";
 	import { onMount } from "svelte";
     import config from "../cpu_configs";
-    export let rom_name: string
-    export let rom: Uint8Array
+    import { rom_name as rom_name_store, rom as rom_store } from "$lib/stores/cpu_state";
+
+    let rom: Uint8Array
+    rom_store.subscribe((n) => rom = n)
 
 
     let name: string = "SpaceInvaders.ch8"
@@ -17,8 +19,8 @@
         console.log(`fetching ${config.backend_url}/assets/roms/${name}`)
         const res = await fetch(`${config.backend_url}/assets/roms/${name}`);
         const buff = await res.arrayBuffer();
-        rom = new Uint8Array(buff);
-        rom_name = name
+        rom_store.set(new Uint8Array(buff));
+        rom_name_store.set(name)
         chip8.load_rom(rom);
         chip8.reset();
 	}
