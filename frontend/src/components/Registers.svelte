@@ -30,10 +30,10 @@
         {/each}
     </div>
     <div>
-        <span class="register">pc: {registers[32]}</span>
-        <span class="register">sp: {registers[33]}</span>
-        <span class="register">index: {registers[34]}</span>
-        <span class="register">dt: {registers[35]}</span>
+        <span class="register">pc: {(registers[32]).toString(16)}</span>
+        <span class="register">sp: {registers[33].toString(16)}</span>
+        <span class="register">index: {registers[34].toString(16)}</span>
+        <span class="register">dt: {registers[35].toString(16)}</span>
     </div>
     data adjacent to PC
     <div>
