@@ -96,11 +96,20 @@
 
 
         {#each raw_rom.slice(page * rows * 16, page*rows*16 + (rows * 16)) as cell, i}
-            {#if i%16 == 0}
+        {#if i%16 == 0}
             <div class="sidebar">{ (32+((page*rows) + ((i / 16)))).toString(16).padStart(7, "0").padEnd(8, "*")}</div>
-            {/if}
+        {/if}
+        
         <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(base).padStart(2, "0")}</div>
+
         {/each}
+        {#if page === Math.floor(raw_rom.length/(rows*16))}
+            {#each Array((((page+1)*(rows*16)) - raw_rom.length) + Math.floor((((page+1)*(rows*16)) - raw_rom.length)/16 ) ) as x }
+                <div>
+                    &nbsp;
+                </div>
+            {/each}
+        {/if}
         
     </div>
     {/if}
