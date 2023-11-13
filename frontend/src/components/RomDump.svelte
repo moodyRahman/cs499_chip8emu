@@ -54,7 +54,11 @@
 
     const tick = () => {
         // console.log("#", read_display_trigger, ", ", chip8.convert_inst_to_string(curr_inst))
-        pc = chip8.tick(); 
+        pc = chip8.tick();
+        
+
+        page = Math.floor((pc - 512)/(rows*16));
+
         registers_trigger.update((n) => n+1);
         if (cpu_ticks % display_rerender_threshold === 0)
         {
@@ -84,8 +88,8 @@
     </div>
 {#if debug}
     <div class="dump">
-        {#each ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as x, i}
-        <div class={x === ""?"":"offset"}>
+        {#each ["address/offset", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"] as x, i}
+        <div class="offset">
             {x}
         </div>
         {/each}
@@ -143,6 +147,7 @@
                 registers_trigger.set(0);
                 display_trigger.set(0)
                 pc = 512;
+                page = 0;
             }}>
                 reset cpu
             </button>

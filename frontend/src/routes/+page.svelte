@@ -19,7 +19,7 @@
 
 <div>
     <button on:click={() => debug = !debug}>
-        toggle debug
+        toggle debug menu
     </button>
 </div>
 
