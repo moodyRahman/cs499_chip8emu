@@ -1,8 +1,15 @@
 <script lang="ts">
 
     import * as chip8 from "$lib/chip8/debug.js";
+	import { display_trigger } from "$lib/stores/cpu_state";
 	import Octet from "./Octet.svelte";
-    export let trigger: number;
+    
+    let trigger: number;
+
+    display_trigger.subscribe((n) => {
+        trigger = n;
+    })
+
     let buffer: Uint8Array
 
     $: trigger, buffer=chip8.display(), console.log("recieved diplay update request")
