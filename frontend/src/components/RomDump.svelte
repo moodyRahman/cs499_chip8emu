@@ -180,6 +180,8 @@
 
     .dump > div {
         margin: 2.5px;
+        text-align: center;
+
     }
 
     .tick {
@@ -188,6 +190,8 @@
 
     .offset {
         background-color: lightcoral;
+        padding: 3px;
+
     }
 </style>
 
