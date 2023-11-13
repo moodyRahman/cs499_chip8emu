@@ -81,10 +81,17 @@
     </div>
 {#if debug}
     <div class="dump">
+        {#each ["", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as x, i}
+        <div class={x === ""?"":"offset"}>
+            {x}
+        </div>
+        {/each}
+
+
         {#each raw_rom.slice(page * rows * 16, page*rows*16 + (rows * 16)) as cell, i}
-        {#if i%16 == 0}
-        <div class="sidebar">{ ((page*rows) + (i / 16)).toString(16).padStart(8, "0")}</div>
-        {/if}
+            {#if i%16 == 0}
+            <div class="sidebar">{ (32+((page*rows) + ((i / 16)))).toString(16).padStart(7, "0").padEnd(8, "*")}</div>
+            {/if}
         <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
         {/each}
         
@@ -177,6 +184,10 @@
 
     .tick {
         font-size: 20px;
+    }
+
+    .offset {
+        background-color: lightcoral;
     }
 </style>
 
