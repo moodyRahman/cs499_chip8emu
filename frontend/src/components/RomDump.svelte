@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
-	import { display_trigger, registers_trigger, rom, rom_name as rom_name_store } from "$lib/stores/cpu_state";
+	import { base_store, display_trigger, registers_trigger, rom, rom_name as rom_name_store } from "$lib/stores/cpu_state";
 
     import config from "../cpu_configs";
     
@@ -37,6 +37,9 @@
             } : config.hertz);
 
     let rows = config.rom_dump_display_rows;
+
+    let base: number;
+    base_store.subscribe((n) => base = n);
 
 
 
@@ -92,7 +95,7 @@
             {#if i%16 == 0}
             <div class="sidebar">{ (32+((page*rows) + ((i / 16)))).toString(16).padStart(7, "0").padEnd(8, "*")}</div>
             {/if}
-        <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(16).padStart(2, "0")}</div>
+        <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(base).padStart(2, "0")}</div>
         {/each}
         
     </div>
