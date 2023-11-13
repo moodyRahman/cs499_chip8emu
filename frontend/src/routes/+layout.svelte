@@ -3,11 +3,12 @@
 
 </script>
 
-
-<Header />
-
-<div class="main-content">
-
+<div class="page">
+    
+    <Header />
+    
+    <div class="main-content">
+        
     <slot>
         
     </slot>
@@ -16,6 +17,8 @@
 
 <footer>
 
+    <hr />
+    
     <div>
         CSCI 499 Capstone Project
     </div>
@@ -24,6 +27,8 @@
     </div>
     
 </footer>
+
+</div>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
@@ -45,12 +50,25 @@
         margin-top: 3%;
     }
 
+    hr {
+        border: 1px solid lightblue;
+        width: 85%;
+        margin-bottom: 2rem;
+    }
+
     footer {
-        margin-top: 10%;
+        margin-bottom: 1rem;
     }
 
     .main-content {
         margin-top: 2%;
+        height: 105vh;
+    }
+
+    .page {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
     }
 
 </style>
