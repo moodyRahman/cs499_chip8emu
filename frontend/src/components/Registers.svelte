@@ -25,7 +25,7 @@
         {/each}
     </div>
     <div>
-        {#each registers.slice(0, 16) as register, i}
+        {#each registers.slice(16, 32) as register, i}
             <span class="register">S{i.toString(16)} {register.toString(16)}  </span>
         {/each}
     </div>
