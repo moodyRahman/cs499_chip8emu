@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
-	import { base_store, debug_mode_store, display_trigger, registers_trigger, rom, rom_name as rom_name_store } from "$lib/stores/cpu_state";
+	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store } from "$lib/stores/cpu_state";
 
     import config from "../cpu_configs";
     
@@ -45,6 +45,8 @@
     base_store.subscribe((n) => base = n);
 
 
+    let keypress: string;
+    keypress_store.subscribe((n) => keypress = n)
 
     $: curr_inst = (raw_rom?(raw_rom[pc - 512] << 8 | raw_rom[pc - 512 + 1]):0)
     $: raw_rom, pc = 512, page = 0
@@ -54,9 +56,41 @@
         `color:${((page * 352 + 512 + i) === pc || (page * 352 + 512 + i) === pc+1)?"white":"" };`
     }
 
+    const wait_until_keypress = () => {
+        console.log("in the function")
+        if (chip8.get_key() == "")
+        {
+            "im waiting..."
+            setTimeout(wait_until_keypress, 50)
+            return;
+        }
+    }
 
-    const tick = () => {
+    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+    const tick = async () => {
         // console.log("#", read_display_trigger, ", ", chip8.convert_inst_to_string(curr_inst))
+        /**
+        WARNING: THIS CODE RELIES ON CHIP8 ROM'S NOT EDITING THEMSELVES, AS IT REFERS 
+        TO A COPY OF THE ROM STORED ON THE FRONTEND- NOT THE ACTUAL DATA IN RAM
+        */
+        if ((raw_rom[pc-512] << 8 | raw_rom[pc-512 + 1]).toString(16).match(/f[a-f0-9]0a/))
+        {
+            clearInterval(ticker)
+            while (true)
+            {
+                console.log(keypress)
+                await sleep(100)
+                if (keypress !== "")
+                {
+                    break;
+                }
+            }
+            if (ticker !== 0) // if the cpu was in a running state
+            {
+                ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))  // restart the cpu timer
+            }
+        }
         pc = chip8.tick();
         cpu_ticks++;
         

@@ -7,7 +7,7 @@
 	import RomDump from "../components/RomDump.svelte";
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
-	import { debug_mode_store, registers_trigger } from "$lib/stores/cpu_state";
+	import { debug_mode_store, keypress_store, registers_trigger } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
     
     import "$lib/css/main.css"
@@ -74,6 +74,7 @@
         if (e.repeat) return;
         if (e.key.length > 1) return;
         chip8.set_key(e.key);
+        keypress_store.set(e.key)
         active_keys = [...active_keys, e.key]
 
         registers_trigger.update((n) => n+1)
@@ -84,6 +85,7 @@
         if (e.repeat) return true
         active_keys = active_keys.filter((x) => x != e.key)
         chip8.set_key(active_keys.at(-1)!?active_keys.at(-1)!:"")
+        keypress_store.set(active_keys.at(-1)!?active_keys.at(-1)!:"")
         registers_trigger.update((n) => n+1)
 
     }

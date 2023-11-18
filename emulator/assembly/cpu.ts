@@ -654,6 +654,7 @@ class CPU {
   }
 
   LDkey(): void {
+    this.V[this.x] = this.key.length > 0 ? this.key.charCodeAt(0) : 0;
     //All execution stops until a key is pressed, then the value of that key is stored in Vx.
     //cant be implemented without keyboard
   }
@@ -787,6 +788,10 @@ export function ram_dump(): Uint8Array {
 
 export function set_key(key_in: string): void {
   cpu.key = key_in;
+}
+
+export function get_key(): string {
+  return cpu.key;
 }
 
 export function convert_inst_to_string(inst: u16): string {
