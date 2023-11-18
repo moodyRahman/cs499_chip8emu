@@ -82,7 +82,7 @@
             let was_running = ticker === 0? false:true;
             paused = true;
 
-            while (true)
+            while (true && paused)
             {
                 console.log(keypress)
                 await sleep(100)
@@ -204,6 +204,7 @@
                 display_trigger.set(0)
                 pc = 512;
                 page = 0;
+                paused = false;
             }}>
                 reset cpu
             </button>
