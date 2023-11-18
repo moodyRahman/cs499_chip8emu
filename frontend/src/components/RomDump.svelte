@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
-	import { base_store, display_trigger, registers_trigger, rom, rom_name as rom_name_store } from "$lib/stores/cpu_state";
+	import { base_store, debug_mode_store, display_trigger, registers_trigger, rom, rom_name as rom_name_store } from "$lib/stores/cpu_state";
 
     import config from "../cpu_configs";
     
@@ -14,7 +14,9 @@
     rom_name_store.subscribe((n) => rom_name = n)
 
     // export let registers_trigger: number;
-    export let debug: boolean = false;
+
+    let debug: boolean = false;
+    debug_mode_store.subscribe((n) => debug = n)
 
     let cpu_ticks = 0;
 
