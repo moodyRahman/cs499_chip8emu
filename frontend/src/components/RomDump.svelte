@@ -58,7 +58,7 @@
 
     const wait_until_keypress = () => {
         console.log("in the function")
-        if (chip8.get_key() == "")
+        if (chip8.get_key() == 0)
         {
             "im waiting..."
             setTimeout(wait_until_keypress, 50)

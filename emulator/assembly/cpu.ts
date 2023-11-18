@@ -194,7 +194,7 @@ class CPU {
   //If it is loaded with a value, it will decrement at a rate of 60Hz.
 
   // what the current pressed button is
-  key: string = "";
+  key: u8 = 0;
 
   //The stack is an array of 16 16-bit values, used to store the address that the interpreter
   //shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
@@ -654,7 +654,7 @@ class CPU {
   }
 
   LDkey(): void {
-    this.V[this.x] = this.key.length > 0 ? this.key.charCodeAt(0) : 0;
+    this.V[this.x] = this.key;
     //All execution stops until a key is pressed, then the value of that key is stored in Vx.
     //cant be implemented without keyboard
   }
@@ -739,7 +739,7 @@ export function read_all_registers(): Uint16Array {
   out[33] = cpu.sp;
   out[34] = cpu.index;
   out[35] = cpu.dt;
-  out[36] = cpu.key.length ? cpu.key.charCodeAt(0) : 0x0;
+  out[36] = cpu.key;
   return out;
 }
 
@@ -787,10 +787,10 @@ export function ram_dump(): Uint8Array {
 }
 
 export function set_key(key_in: string): void {
-  cpu.key = key_in;
+  cpu.key = key_in.length > 0 ? u8(key_in.charCodeAt(0)) : 0;
 }
 
-export function get_key(): string {
+export function get_key(): u8 {
   return cpu.key;
 }
 
