@@ -112,8 +112,9 @@
     <SingleInstruction />
 </div>
 
-<div>
+<div class="lr-container">
     <Registers />
+    <SpriteDesigner />
 </div>
 {/if}
 
@@ -121,12 +122,6 @@
     <Display />
     <RomDump />
 </div>
-
-{#if debug}
-<div>
-    <SpriteDesigner />
-</div>
-{/if}
 
 <svelte:window on:keydown={onKeyDown} on:keyup={resetKey} />
 

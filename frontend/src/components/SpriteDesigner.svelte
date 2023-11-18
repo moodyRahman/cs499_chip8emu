@@ -2,7 +2,7 @@
 
     let pixels: boolean[][] = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))
 
-    let binary_editor:boolean = true
+    let binary_editor:boolean = false
 
     const row_to_hex = (row: boolean[]): number => {
         let out = 0;
@@ -25,6 +25,8 @@
     
 
 </script>
+<div>
+
 <div>
     build a sprite! <button on:click={() => binary_editor = !binary_editor}>binary editor mode (wip)</button> 
     <button on:click={() => pixels = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))}>reset</button>
@@ -53,6 +55,7 @@
             </span>
         {/if}
     {/each}
+</div>
 </div>
 
 
