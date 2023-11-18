@@ -787,7 +787,6 @@ export function ram_dump(): Uint8Array {
 
 export function set_key(key_in: string): void {
   cpu.key = key_in;
-  console.log(cpu.key);
 }
 
 export function convert_inst_to_string(inst: u16): string {
