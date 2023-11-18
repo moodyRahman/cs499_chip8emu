@@ -6,15 +6,66 @@
 	import RomDump from "../components/RomDump.svelte";
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
+	import { onMount } from "svelte";
 
+    const load_wasm_binary = async () => {
+        const res = await fetch("http://localhost:3000/assets/roms/debug.wasm")
+        const wasmBinary = await res.arrayBuffer()
+        const imports = {
+            env: {
+                memoryBase: 0,
+                tableBase: 0,
+                memory: new WebAssembly.Memory({ initial: 256 }),
+                table: new WebAssembly.Table({ initial: 0, element: 'anyfunc' }),
+                abort: (msg, file, line, column) => {
+                    console.error(`Error in WebAssembly module: ${msg} at ${file}:${line}:${column}`);
+                },
+                "console.log": (message) => {
+                    console.log(message);
+                },
+                seed: () => {
+                    // Implement the seed function logic here
+                    const seed = Math.floor(Math.random() * 1000);
+                    return seed
+                },
 
-    let debug = false;
+            },
+
+        }
+
+        const { instance, module } = await WebAssembly.instantiate(wasmBinary, imports);
+        const {
+            memory,
+            read_instruction,
+            read_all_registers,
+            ram_around_address,
+            display,
+            debug_set_pixel,
+            load_rom,
+            read_mem,
+            tick,
+            reset,
+            ram_dump,
+            convert_inst_to_string,
+            draw,
+            read_display,
+            init,
+            buffer,
+            add,
+            add_internal,
+            read_internal,
+        } = instance.exports
+
+        console.log(ram_around_address(100))
+
+    }
+
+    let debug = true;
 
 
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     // $: read_all_registers(read_all_registers_trigger)
 
-    
 </script>
 
 <div>
