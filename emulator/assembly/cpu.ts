@@ -800,6 +800,15 @@ export function get_key(): u8 {
   return cpu.key;
 }
 
+export function decrement_timers(): void {
+  if (cpu.dt > 0) {
+    cpu.dt -= 1;
+  }
+  if (cpu.st > 0) {
+    cpu.st -= 1;
+  }
+}
+
 export function convert_inst_to_string(inst: u16): string {
   let nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
   let n = u8(inst & 0x000f); //gets last 4 instruction bits (0 through 3)

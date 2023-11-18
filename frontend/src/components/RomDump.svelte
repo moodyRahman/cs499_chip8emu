@@ -28,9 +28,6 @@
     let pc = 512;
     let page = 0;
 
-    // id of the setinterval that's ticking the cpu, set to 0 when cpu should stop ticking
-    let ticker = 0;
-
     // set the cpu cycles per second
     $: ({ticks_per_interval, time_between_intervals_ms, display_rerender_threshold} = debug ? 
             {
@@ -48,7 +45,11 @@
     let keypress: string;
     keypress_store.subscribe((n) => keypress = n)
 
+    // id of the setinterval that's ticking the cpu, set to 0 when cpu should stop ticking
+    let ticker = 0;
     let paused = false;
+
+    let is_running = false;
 
     $: curr_inst = (raw_rom?(raw_rom[pc - 512] << 8 | raw_rom[pc - 512 + 1]):0)
     $: raw_rom, pc = 512, page = 0
@@ -68,6 +69,10 @@
         }
     }
 
+    setInterval(() => {
+        chip8.decrement_timers()
+    }, 17)
+
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
     const tick = async () => {
@@ -77,7 +82,7 @@
         TO A COPY OF THE ROM STORED ON THE FRONTEND- NOT THE ACTUAL DATA IN RAM
         */
 
-        console.log(cpu_ticks)
+        if (paused) return
         if ((raw_rom[pc-512] << 8 | raw_rom[pc-512 + 1]).toString(16).match(/f[a-f0-9]0a/))
         {
             paused = true;
@@ -190,24 +195,31 @@
                 if (paused) return;
                 if (ticker === 0) {
                     ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))
+                    is_running = true;
                 }
                 else  {
                     clearInterval(ticker)
                     ticker = 0;
+                    is_running = false;
                 }
                 }}>
-                run cpu {ticker==0?"false":"true"}
+                run cpu {ticker==0?"false":"true"} paused:{paused}
             </button>
+
             <button class="tick" on:click={() => {
                 chip8.reset();
                 registers_trigger.set(0);
                 display_trigger.set(0)
                 pc = 512;
                 page = 0;
+                paused = true;
+                clearInterval(ticker)
+                ticker = 0
                 paused = false;
             }}>
                 reset cpu
             </button>
+            {is_running}
         </div>
         </div>
     </div>
