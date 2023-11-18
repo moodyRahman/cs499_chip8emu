@@ -76,13 +76,15 @@
         WARNING: THIS CODE RELIES ON CHIP8 ROM'S NOT EDITING THEMSELVES, AS IT REFERS 
         TO A COPY OF THE ROM STORED ON THE FRONTEND- NOT THE ACTUAL DATA IN RAM
         */
+
+        console.log(cpu_ticks)
         if ((raw_rom[pc-512] << 8 | raw_rom[pc-512 + 1]).toString(16).match(/f[a-f0-9]0a/))
         {
+            paused = true;
             clearInterval(ticker)
             let was_running = ticker === 0? false:true;
-            paused = true;
 
-            while (true && paused)
+            while (paused)
             {
                 console.log(keypress)
                 await sleep(100)
@@ -91,11 +93,9 @@
                     break;
                 }
             }
-            if (was_running) // if the cpu was in a running state
-            {
-                ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))  // restart the cpu timer
-            }
             paused = false
+            ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))  // restart the cpu timer
+
         }
         pc = chip8.tick();
         cpu_ticks++;
