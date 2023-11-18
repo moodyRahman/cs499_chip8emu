@@ -193,6 +193,9 @@ class CPU {
   dt: u8 = 0; //The CHIP-8 has a simple timer used for timing. If the timer value is zero, it stays zero.
   //If it is loaded with a value, it will decrement at a rate of 60Hz.
 
+  // what the current pressed button is
+  key: string = "";
+
   //The stack is an array of 16 16-bit values, used to store the address that the interpreter
   //shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
   Stack: Uint16Array = new Uint16Array(16);
@@ -723,7 +726,7 @@ export function read_instruction(inp: u16): void {
 }
 
 export function read_all_registers(): Uint16Array {
-  let out: Uint16Array = new Uint16Array(36);
+  let out: Uint16Array = new Uint16Array(37);
   for (let x = 0; x < cpu.V.length; x++) {
     out[x] = cpu.V[x];
   }
@@ -735,6 +738,7 @@ export function read_all_registers(): Uint16Array {
   out[33] = cpu.sp;
   out[34] = cpu.index;
   out[35] = cpu.dt;
+  out[36] = cpu.key.length ? cpu.key.charCodeAt(0) : 0x0;
   return out;
 }
 
@@ -779,6 +783,11 @@ export function reset(): void {
 
 export function ram_dump(): Uint8Array {
   return cpu.memory.mem;
+}
+
+export function set_key(key_in: string): void {
+  cpu.key = key_in;
+  console.log(cpu.key);
 }
 
 export function convert_inst_to_string(inst: u16): string {

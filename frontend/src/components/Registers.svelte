@@ -38,6 +38,8 @@
         <span class="register">sp: {registers[33].toString(base)}</span>
         <span class="register">index: {registers[34].toString(base)}</span>
         <span class="register">dt: {registers[35].toString(base)}</span>
+        <span class="register">key: {registers[36]}, {String.fromCharCode(registers[36])}</span>
+
     </div>
     data adjacent to PC
     <div>

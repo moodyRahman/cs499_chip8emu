@@ -1,13 +1,15 @@
 
 
 <script lang="ts">
+    import * as chip8 from "$lib/chip8/debug.js";
 	import Display from "../components/Display.svelte";
 	import Loader from "../components/Loader.svelte";
 	import RomDump from "../components/RomDump.svelte";
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
+	import { debug_mode_store, registers_trigger } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
-	import { debug_mode_store } from "$lib/stores/cpu_state";
+    
     import "$lib/css/main.css"
 
     const load_wasm_binary = async () => {
@@ -66,8 +68,24 @@
     debug_mode_store.subscribe((n) => debug = n)
 
 
+    let active_keys: string[] = []
+
     const onKeyDown = (e:KeyboardEvent) => {
-        console.log(e.key)
+        if (e.repeat) return;
+        if (e.key.length > 1) return;
+        chip8.set_key(e.key);
+        active_keys = [...active_keys, e.key]
+
+        registers_trigger.update((n) => n+1)
+
+    }
+
+    const resetKey = (e: KeyboardEvent) => {
+        if (e.repeat) return true
+        active_keys = active_keys.filter((x) => x != e.key)
+        chip8.set_key(active_keys.at(-1)!?active_keys.at(-1)!:"")
+        registers_trigger.update((n) => n+1)
+
     }
 
 
@@ -81,13 +99,13 @@
         toggle debug menu
     </button>
 </div>
-
 <div>
     <Loader />
 </div>
 
 {#if debug}
 <div>
+    held down keys with n-key rollover: {active_keys}
     <SingleInstruction />
 </div>
 
@@ -101,7 +119,7 @@
     <RomDump />
 </div>
 
-<svelte:window on:keydown|preventDefault={onKeyDown} />
+<svelte:window on:keydown|preventDefault={onKeyDown} on:keyup|preventDefault={resetKey} />
 
 
 <style>

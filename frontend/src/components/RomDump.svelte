@@ -19,9 +19,10 @@
     debug_mode_store.subscribe((n) => debug = n)
 
     let cpu_ticks = 0;
+    let register_ticks = 0;
 
     registers_trigger.subscribe((n) => {
-        cpu_ticks = n;
+        register_ticks = n;
     })
 
     let pc = 512;
@@ -57,6 +58,7 @@
     const tick = () => {
         // console.log("#", read_display_trigger, ", ", chip8.convert_inst_to_string(curr_inst))
         pc = chip8.tick();
+        cpu_ticks++;
         
 
         page = Math.floor((pc - 512)/(rows*16));
