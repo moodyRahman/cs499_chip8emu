@@ -48,6 +48,8 @@
     let keypress: string;
     keypress_store.subscribe((n) => keypress = n)
 
+    let paused = false;
+
     $: curr_inst = (raw_rom?(raw_rom[pc - 512] << 8 | raw_rom[pc - 512 + 1]):0)
     $: raw_rom, pc = 512, page = 0
 
@@ -77,6 +79,9 @@
         if ((raw_rom[pc-512] << 8 | raw_rom[pc-512 + 1]).toString(16).match(/f[a-f0-9]0a/))
         {
             clearInterval(ticker)
+            let was_running = ticker === 0? false:true;
+            paused = true;
+
             while (true)
             {
                 console.log(keypress)
@@ -86,10 +91,11 @@
                     break;
                 }
             }
-            if (ticker !== 0) // if the cpu was in a running state
+            if (was_running) // if the cpu was in a running state
             {
                 ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))  // restart the cpu timer
             }
+            paused = false
         }
         pc = chip8.tick();
         cpu_ticks++;
@@ -181,6 +187,7 @@
 
 
             <button class="tick" on:click={() => {
+                if (paused) return;
                 if (ticker === 0) {
                     ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))
                 }
