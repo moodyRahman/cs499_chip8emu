@@ -74,7 +74,8 @@
     const onKeyDown = (e:KeyboardEvent) => {
         if (e.repeat) return;
         if (e.key.length > 1) return;
-        chip8.set_key(e.key);
+        if (!e.key.match(/^[0-9a-fA-F]$/)) return
+        chip8.set_key(Number("0x" + e.key));
         keypress_store.set(e.key)
         active_keys = [...active_keys, e.key]
 
@@ -85,7 +86,7 @@
     const resetKey = (e: KeyboardEvent) => {
         if (e.repeat) return true
         active_keys = active_keys.filter((x) => x != e.key)
-        chip8.set_key(active_keys.at(-1)!?active_keys.at(-1)!:"")
+        chip8.set_key(Number("0x"+active_keys.at(-1)))
         keypress_store.set(active_keys.at(-1)!?active_keys.at(-1)!:"")
         registers_trigger.update((n) => n+1)
 

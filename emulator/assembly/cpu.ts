@@ -792,8 +792,8 @@ export function ram_dump(): Uint8Array {
   return cpu.memory.mem;
 }
 
-export function set_key(key_in: string): void {
-  cpu.key = key_in.length > 0 ? u8(key_in.charCodeAt(0)) : 0;
+export function set_key(key_in: u8): void {
+  cpu.key = key_in;
 }
 
 export function get_key(): u8 {
