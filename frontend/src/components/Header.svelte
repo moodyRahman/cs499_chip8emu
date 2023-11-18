@@ -7,7 +7,7 @@
         a new kind of chip8 emulation
     </div>
     <div class="h3">
-        Nobel "Ken" Prakasam,  Filip "Schmazmatazz" Trzcinka, Moududur "Moody" Rahman  
+        Nobel "Ken" Prakasam,  Filip "Shmaz_Pootaz" Trzcinka, Moududur "Moody" Rahman  
     </div>
     <div>
         <a href="/writeup">
