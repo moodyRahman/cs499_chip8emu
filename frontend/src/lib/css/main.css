@@ -1,0 +1,19 @@
+
+button {
+    background-color: lightblue;
+    color: black; 
+    border: 0;
+    text-decoration:none;
+    text-align:center;
+    margin: 4px;
+}
+
+
+button:hover {
+    background-color:lightcoral;
+    color:   #fdf0d5; 
+}
+
+body {
+    background-color: #fdf0d5;
+}

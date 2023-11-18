@@ -54,6 +54,7 @@
         border: 1px solid lightblue;
         width: 85%;
         margin-bottom: 2rem;
+        margin-top: 4rem;
     }
 
     footer {

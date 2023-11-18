@@ -7,6 +7,8 @@
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
 	import { onMount } from "svelte";
+	import { debug_mode_store } from "$lib/stores/cpu_state";
+    import "$lib/css/main.css"
 
     const load_wasm_binary = async () => {
         const res = await fetch("http://localhost:3000/assets/roms/debug.wasm")
@@ -61,6 +63,12 @@
     }
 
     let debug = true;
+    debug_mode_store.subscribe((n) => debug = n)
+
+
+    const onKeyDown = (e:KeyboardEvent) => {
+        console.log(e.key)
+    }
 
 
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
@@ -69,7 +77,7 @@
 </script>
 
 <div>
-    <button on:click={() => debug = !debug}>
+    <button on:click={() => debug_mode_store.set(!debug)}>
         toggle debug menu
     </button>
 </div>
@@ -90,8 +98,10 @@
 
 <div class="lr-container">
     <Display />
-    <RomDump bind:debug={debug} />
+    <RomDump />
 </div>
+
+<svelte:window on:keydown|preventDefault={onKeyDown} />
 
 
 <style>
