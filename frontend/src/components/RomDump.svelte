@@ -88,7 +88,9 @@
     </div>
 {#if debug}
     <div class="dump">
-        {#each ["address/offset", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"] as x, i}
+        <!-- {#each ["address/offset", (0).toString(base), (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12), (13), (14), (15)] as x, i} -->
+        {#each ["address/offset", ...([...Array(16)].map((x, i) => (i).toString(base))) ] as x, i}
+
         <div class="offset">
             {x}
         </div>
