@@ -7,11 +7,11 @@
 	import RomDump from "../components/RomDump.svelte";
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
+	import SpriteDesigner from "../components/SpriteDesigner.svelte";
 	import { debug_mode_store, keypress_store, registers_trigger } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
     
     import "$lib/css/main.css"
-	import SpriteDesigner from "../components/SpriteDesigner.svelte";
 
     const load_wasm_binary = async () => {
         const res = await fetch("http://localhost:3000/assets/roms/debug.wasm")
@@ -128,7 +128,7 @@
 </div>
 {/if}
 
-<svelte:window on:keydown|preventDefault={onKeyDown} on:keyup|preventDefault={resetKey} />
+<svelte:window on:keydown={onKeyDown} on:keyup={resetKey} />
 
 
 <style>
