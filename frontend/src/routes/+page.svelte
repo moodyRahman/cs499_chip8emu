@@ -17,10 +17,10 @@
                 tableBase: 0,
                 memory: new WebAssembly.Memory({ initial: 256 }),
                 table: new WebAssembly.Table({ initial: 0, element: 'anyfunc' }),
-                abort: (msg, file, line, column) => {
+                abort: (msg: any, file: any, line: any, column: any) => {
                     console.error(`Error in WebAssembly module: ${msg} at ${file}:${line}:${column}`);
                 },
-                "console.log": (message) => {
+                "console.log": (message: any) => {
                     console.log(message);
                 },
                 seed: () => {
@@ -56,7 +56,7 @@
             read_internal,
         } = instance.exports
 
-        console.log(ram_around_address(100))
+        // console.log(ram_around_address(100))
 
     }
 
