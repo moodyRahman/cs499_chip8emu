@@ -639,11 +639,17 @@ class CPU {
   }
 
   SKP(): void {
+    if (this.key == this.V[this.x]) {
+      this.pc += 2;
+    }
     //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
     //Still discussing how the keyboard will be implemented for this project
   }
 
   SKNP(): void {
+    if (this.key != this.V[this.x]) {
+      this.pc += 2;
+    }
     //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
     //cant be implemented without keyboard
   }
