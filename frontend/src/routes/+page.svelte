@@ -11,6 +11,7 @@
 	import { onMount } from "svelte";
     
     import "$lib/css/main.css"
+	import SpriteDesigner from "../components/SpriteDesigner.svelte";
 
     const load_wasm_binary = async () => {
         const res = await fetch("http://localhost:3000/assets/roms/debug.wasm")
@@ -120,6 +121,12 @@
     <Display />
     <RomDump />
 </div>
+
+{#if debug}
+<div>
+    <SpriteDesigner />
+</div>
+{/if}
 
 <svelte:window on:keydown|preventDefault={onKeyDown} on:keyup|preventDefault={resetKey} />
 
