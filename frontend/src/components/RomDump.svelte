@@ -4,8 +4,8 @@
 
     import config from "../cpu_configs";
     
+    // Loader is what defines the raw_rom, this component waits for that data
     let raw_rom: Uint8Array = new Uint8Array();
-
     rom.subscribe((n) => {
         raw_rom = n;
     })
@@ -13,14 +13,14 @@
     let rom_name: string;
     rom_name_store.subscribe((n) => rom_name = n)
 
-    // export let registers_trigger: number;
 
     let debug: boolean = false;
     debug_mode_store.subscribe((n) => debug = n)
 
-    let cpu_ticks = 0;
+    
+    let cpu_ticks = 0;  // keeps track of how many cpu cycles have been executed
+    
     let register_ticks = 0;
-
     registers_trigger.subscribe((n) => {
         register_ticks = n;
     })
@@ -28,7 +28,8 @@
     let pc = 512;
     let page = 0;
 
-    // set the cpu cycles per second
+    // set the cpu cycles per second, extract the data from the config
+    // if we're in debug mode, use the debug timings for the CPU
     $: ({ticks_per_interval, time_between_intervals_ms, display_rerender_threshold} = debug ? 
             {
                 ticks_per_interval:1, 
@@ -47,35 +48,32 @@
 
     // id of the setinterval that's ticking the cpu, set to 0 when cpu should stop ticking
     let ticker = 0;
-    let paused = false;
-
-    let is_running = false;
+    let paused = false;  // is the cpu waiting for input? if so
+    let is_running = false;  // is the cpu auto-running?
 
     $: curr_inst = (raw_rom?(raw_rom[pc - 512] << 8 | raw_rom[pc - 512 + 1]):0)
-    $: raw_rom, pc = 512, page = 0
+    $: raw_rom, pc = 512, page = 0  // if raw_rom changes, reset PC and page
 
+    // given the current page, row, and PC, calculate if a given cell should be highlighted or not
     const generate_css_str = (page: number, i: number, pc: number) => {
-        return `background-color:${((page * 352 + 512 + i) === pc || (page * 352 + 512 + i) === pc+1)?"black":"" };` + 
-        `color:${((page * 352 + 512 + i) === pc || (page * 352 + 512 + i) === pc+1)?"white":"" };`
+        return `background-color:${((page * (16*rows) + 512 + i) === pc || (page * (16*rows) + 512 + i) === pc+1)?"black":"" };` + 
+        `color:${((page * (16*rows) + 512 + i) === pc || (page * (16*rows) + 512 + i) === pc+1)?"white":"" };`
     }
 
-    const wait_until_keypress = () => {
-        console.log("in the function")
-        if (chip8.get_key() == 0)
-        {
-            "im waiting..."
-            setTimeout(wait_until_keypress, 50)
-            return;
-        }
-    }
 
-    // MAIN EVENT LOOP
+    // MAIN EVENT LOOPS
+
+
+    // 60 times a second, decrement the sound and delay timers
     setInterval(() => {
         chip8.decrement_timers();
     }, 17)
 
-    let main_loop_id = setInterval(() => tick(), time_between_intervals_ms)
+    // assume 
+    let main_loop_id = setInterval(() => n_tick(ticks_per_interval), time_between_intervals_ms)
 
+    // if debug mode changes, kill the main event loop and create a new one with 
+    // the desired timing
     $: debug, (() => {
         clearInterval(main_loop_id)
         if (debug)
@@ -92,15 +90,16 @@
 
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+    // logic to always execute for a tick
     const tick_raw = async () => {
         /**
         WARNING: THIS CODE RELIES ON CHIP8 ROM'S NOT EDITING THEMSELVES, AS IT REFERS 
         TO A COPY OF THE ROM STORED ON THE FRONTEND- NOT THE ACTUAL DATA IN RAM
         */
-        if (paused) return
-        if ((raw_rom[pc-512] << 8 | raw_rom[pc-512 + 1]).toString(16).match(/f[a-f0-9]0a/))
+        if (paused) return    // if we're waiting for keyboard input, DO NOT TICK
+        if ((raw_rom[pc-512] << 8 | raw_rom[pc-512 + 1]).toString(16).match(/f[a-f0-9]0a/))  // if the current instruction is one that's waiting for keyboard input
         {
-            paused = true;
+            paused = true;  // prevent any further ticks from the main event loop from firing
             while (paused)
             {
                 console.log(keypress)
@@ -110,19 +109,23 @@
                     break;
                 }
             }
-            paused = false
+            paused = false // release the lock, the next tick will succeed
         }
-        pc = chip8.tick();
+        pc = chip8.tick();  // extract the PC from the emulator itself
         cpu_ticks++;
-        page = Math.floor((pc - 512)/(rows*16));
-        registers_trigger.update((n) => n+1);
-        if (cpu_ticks % display_rerender_threshold === 0)
+        page = Math.floor((pc - 512)/(rows*16)); // calculate the page this tick is on
+        registers_trigger.update((n) => n+1); // send out an update for anything that listens to the cpu registers
+
+        if (cpu_ticks % display_rerender_threshold === 0)  // figure out on which cpu_ticks to we rerender the display
         {
             console.log(cpu_ticks)
             display_trigger.update((n) => n+1)
         }
     }
 
+
+    // this is what we're running all the time in the background, the variables 
+    // is_running and is_paused control whether or not the tick actually executes
     const tick = () => {
         if (!is_running) return
         tick_raw();
@@ -135,74 +138,91 @@
         }
     }
 
-    
-    // setInterval(() => {pc = chip8.tick(); registers_trigger++}, 100)
 
 
 </script>
 <div class="container">
 
     {#if raw_rom.length > 0}
-
     <div>
         {rom_name} {raw_rom.length} bytes
     </div>
-{#if debug}
-    <div class="dump">
-        <!-- {#each ["address/offset", (0).toString(base), (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12), (13), (14), (15)] as x, i} -->
-        {#each ["address/offset", ...([...Array(16)].map((x, i) => (i).toString(base))) ] as x, i}
+    {#if debug}
+    <!-- 
+        rendering the romdump works as follows:
+        div.dump is a css grid that's defined to have 17 columns
+                                          [max-content] [1fr] [1fr]...[1fr][1fr]
+                                         |--------------------------------------|
+                                                       17 long
+                                         |--------------------------------------|
+                                          [sidebar] [data] [data]...[data][data]
+     -->
+        <div class="dump"> 
+            <!-- first render the header (address offsets) -->
+            {#each ["address/offset", ...([...Array(16)].map((x, i) => (i).toString(base))) ] as x, i}
 
-        <div class="offset">
-            {x}
-        </div>
-        {/each}
-
-
-        {#each raw_rom.slice(page * rows * 16, page*rows*16 + (rows * 16)) as cell, i}
-        {#if i%16 == 0}
-            <div class="sidebar">{ (32+((page*rows) + ((i / 16)))).toString(16).padStart(7, "0").padEnd(8, "*")}</div>
-        {/if}
-        
-        <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(base).padStart(2, "0")}</div>
-
-        {/each}
-        {#if page === Math.floor(raw_rom.length/(rows*16))}
-            {#each Array((((page+1)*(rows*16)) - raw_rom.length) + Math.floor((((page+1)*(rows*16)) - raw_rom.length)/16 ) ) as x }
-                <div>
-                    &nbsp;
-                </div>
+            <div class="offset">
+                {x}
+            </div>
             {/each}
-        {/if}
-        
-    </div>
+
+            <!-- calculate which bytes of the rom we should be displaying and slice that -->
+            {#each raw_rom.slice(page * rows * 16, page*rows*16 + (rows * 16)) as cell, i}
+            <!-- every 17th loop should render a sidebar -->
+                {#if i%16 == 0}
+                    <div class="sidebar">{ (32+((page*rows) + ((i / 16)))).toString(16).padStart(7, "0").padEnd(8, "*")}</div>
+                {/if}
+
+                <!-- render the data in the byte, left padded and calculate if this data is the data at pc -->
+                <div id={(page * (16*rows) + 512 + i).toString()} style={generate_css_str(page, i, pc)} >{cell.toString(base).padStart(2, "0")}</div>
+
+            {/each}
+
+            <!-- 
+                render some additional blank spaces so that there's an even number of
+                cells always in display and the UI doesnt jump around
+            -->
+            {#if page === Math.floor(raw_rom.length/(rows*16))}
+                {#each Array((((page+1)*(rows*16)) - raw_rom.length) + Math.floor((((page+1)*(rows*16)) - raw_rom.length)/16 ) ) as x }
+                    <div>
+                        &nbsp;
+                    </div>
+                {/each}
+            {/if}
+            
+        </div>
     {/if}
     <div class="buttons">
+        <!-- only in debug mode do we display romdump pagination -->
         {#if debug}
-        <div>
-            <button on:click={() => page === 0 ?page:page--}>previous</button>
-            {page}
-            <button on:click={() => page === Math.floor(raw_rom.length/(rows*16)) ? page:page++}>next</button>
-        </div>
+            <div>
+                <button on:click={() => page === 0 ?page:page--}>previous</button>
+                {page}
+                <button on:click={() => page === Math.floor(raw_rom.length/(rows*16)) ? page:page++}>next</button>
+            </div>
         {/if}
         
         <div>
             <div>
-
+                <!-- debug mode single tick button should display the instruction we're about to run -->
                 {#if debug}
-                <button class="tick" on:click={tick_raw}>
-                    tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
-                </button>
+                    <button class="tick" on:click={tick_raw}>
+                        tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
+                    </button>
                 
                 {:else}
-                <button class="tick" on:click={tick_raw}>
-                    tick cpu
-                </button>
+                    <button class="tick" on:click={tick_raw}>
+                        tick cpu
+                    </button>
                 {/if}
 
             </div>
             <div>
 
-
+            <!-- 
+                change the running state so that the main event loop that's
+                constantly firing ticks will actually successfully send ticks
+            -->
             <button class="tick" on:click={() => {
                     is_running = !is_running;
                 }}>
@@ -215,7 +235,7 @@
                 display_trigger.set(0)
                 pc = 512;
                 page = 0;
-                paused = true;
+                paused = true;    //unsure if this is necessary, keeping it here just in case
                 clearInterval(ticker)
                 ticker = 0
                 paused = false;
