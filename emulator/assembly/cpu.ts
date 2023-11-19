@@ -216,7 +216,7 @@ class CPU {
   y: u8 = 0; //A 4-bit value, the upper 4 bits of the low byte of the instruction
   kk: u8 = 0; //An 8-bit value, the lowest 8 bits of the instruction
   i: u8 = 0; //the first 4 bitys of an instruction
-  st: number = 0; // sound timer register
+  st: u8 = 0; // sound timer register
 
   time: i32 = 0;
 
@@ -671,8 +671,8 @@ class CPU {
   }
 
   LDser(): void {
+    this.st = this.V[this.x];
     //ST is set equal to the value of Vx.
-    //cant be implemented without sound handler
   }
 
   ADDindex(): void {
@@ -733,7 +733,7 @@ export function read_instruction(inp: u16): void {
 }
 
 export function read_all_registers(): Uint16Array {
-  let out: Uint16Array = new Uint16Array(37);
+  let out: Uint16Array = new Uint16Array(38);
   for (let x = 0; x < cpu.V.length; x++) {
     out[x] = cpu.V[x];
   }
@@ -746,6 +746,7 @@ export function read_all_registers(): Uint16Array {
   out[34] = cpu.index;
   out[35] = cpu.dt;
   out[36] = cpu.key;
+  out[37] = cpu.st;
   return out;
 }
 

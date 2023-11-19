@@ -8,7 +8,7 @@
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
 	import SpriteDesigner from "../components/SpriteDesigner.svelte";
-	import { debug_mode_store, keypress_store, registers_trigger } from "$lib/stores/cpu_state";
+	import { audio_store, debug_mode_store, keypress_store, registers_trigger } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
     
     import "$lib/css/main.css"
@@ -93,6 +93,10 @@
     }
 
 
+    let audio = false;
+    audio_store.subscribe((n) => audio = n)
+
+
     // let {func: read_all_registers, trigger: read_all_registers_trigger} = bindFunc(() => {return chip8.read_all_registers()})
     // $: read_all_registers(read_all_registers_trigger)
 
@@ -103,6 +107,7 @@
         toggle debug menu
     </button>
 </div>
+{audio}
 <div>
     <Loader />
 </div>
@@ -112,12 +117,14 @@
     held down keys with n-key rollover: {active_keys}
     <SingleInstruction />
 </div>
+{/if}
 
 <div class="lr-container">
     <Registers />
-    <SpriteDesigner />
+    {#if debug}
+        <SpriteDesigner />
+    {/if}
 </div>
-{/if}
 
 <div class="lr-container">
     <Display />
