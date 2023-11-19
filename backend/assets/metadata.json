@@ -2,8 +2,16 @@
   "Tetris.ch8": {
     "description": "An arcade classic! Fun for the whole family :)",
     "mapping": [
-      ["a", "f"],
-      ["d", "e"]
+      {
+        "keyboard": "a",
+        "chip8_input": "f",
+        "description": "whatever"
+      },
+      {
+        "keyboard": "a",
+        "chip8_input": "f",
+        "description": "whatever"
+      }
     ],
     "timing": {
       "ticks_per_interval": 5,
@@ -14,8 +22,16 @@
   "Astrododge.ch8": {
     "description": "An arcade classic! Fun for the whole family :)",
     "mapping": [
-      ["a", "f"],
-      ["d", "e"]
+      {
+        "keyboard": "a",
+        "chip8_input": "f",
+        "description": "whatever"
+      },
+      {
+        "keyboard": "a",
+        "chip8_input": "f",
+        "description": "whatever"
+      }
     ],
     "timing": {
       "ticks_per_interval": 5,
@@ -26,8 +42,16 @@
   "Breakout.ch8": {
     "description": "An arcade classic! Fun for the whole family :)",
     "mapping": [
-      ["a", "f"],
-      ["d", "e"]
+      {
+        "keyboard": "a",
+        "chip8_input": "f",
+        "description": "whatever"
+      },
+      {
+        "keyboard": "a",
+        "chip8_input": "f",
+        "description": "whatever"
+      }
     ],
     "timing": {
       "ticks_per_interval": 5,
@@ -38,8 +62,16 @@
   "IBM_Logo.ch8": {
     "description": "An arcade classic! Fun for the whole family :)",
     "mapping": [
-      ["a", "f"],
-      ["d", "e"]
+      {
+        "keyboard": "a",
+        "chip8_input": "f",
+        "description": "whatever"
+      },
+      {
+        "keyboard": "a",
+        "chip8_input": "f",
+        "description": "whatever"
+      }
     ],
     "timing": {
       "ticks_per_interval": 5,
