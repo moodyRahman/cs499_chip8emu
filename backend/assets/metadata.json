@@ -1,0 +1,50 @@
+{
+  "Tetris.ch8": {
+    "description": "An arcade classic! Fun for the whole family :)",
+    "mapping": [
+      ["a", "f"],
+      ["d", "e"]
+    ],
+    "timing": {
+      "ticks_per_interval": 5,
+      "time_between_intervals_ms": 10,
+      "display_rerender_threshold": 1
+    }
+  },
+  "Astrododge.ch8": {
+    "description": "An arcade classic! Fun for the whole family :)",
+    "mapping": [
+      ["a", "f"],
+      ["d", "e"]
+    ],
+    "timing": {
+      "ticks_per_interval": 5,
+      "time_between_intervals_ms": 10,
+      "display_rerender_threshold": 1
+    }
+  },
+  "Breakout.ch8": {
+    "description": "An arcade classic! Fun for the whole family :)",
+    "mapping": [
+      ["a", "f"],
+      ["d", "e"]
+    ],
+    "timing": {
+      "ticks_per_interval": 5,
+      "time_between_intervals_ms": 10,
+      "display_rerender_threshold": 1
+    }
+  },
+  "IBM_Logo.ch8": {
+    "description": "An arcade classic! Fun for the whole family :)",
+    "mapping": [
+      ["a", "f"],
+      ["d", "e"]
+    ],
+    "timing": {
+      "ticks_per_interval": 5,
+      "time_between_intervals_ms": 10,
+      "display_rerender_threshold": 1
+    }
+  }
+}
