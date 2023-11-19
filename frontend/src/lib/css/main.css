@@ -1,19 +1,21 @@
-
 button {
-    background-color: lightblue;
-    color: black; 
-    border: 0;
-    text-decoration:none;
-    text-align:center;
-    margin: 4px;
+	background-color: lightblue;
+	color: black;
+	border: 0;
+	text-decoration: none;
+	text-align: center;
+	margin: 4px;
 }
 
-
 button:hover {
-    background-color:lightcoral;
-    color:   #fdf0d5; 
+	background-color: lightcoral;
+	color: #fdf0d5;
+}
+
+button:active {
+    background-color: black;
 }
 
 body {
-    background-color: #fdf0d5;
+	background-color: #fdf0d5;
 }

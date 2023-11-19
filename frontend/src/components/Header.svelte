@@ -10,11 +10,14 @@
         Nobel "Ken" Prakasam,  Filip "Shmaz_Pootaz" Trzcinka, Moududur "Moody" Rahman  
     </div>
     <div>
+        <a href="/">
+            emulator
+        </a>
         <a href="/writeup">
             technical writeup
         </a>
-        <a href="/">
-            emulator
+        <a href="/highscores">
+            highscore board
         </a>
     </div>
 </div>

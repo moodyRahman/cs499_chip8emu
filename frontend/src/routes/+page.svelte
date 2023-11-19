@@ -12,6 +12,7 @@
 	import { onMount } from "svelte";
     
     import "$lib/css/main.css"
+	import Editor from "../components/Editor.svelte";
 
     const load_wasm_binary = async () => {
         const res = await fetch("http://localhost:3000/assets/roms/debug.wasm")
@@ -120,7 +121,9 @@
 {/if}
 
 <div class="lr-container">
-    <Registers />
+    <div class="register">
+        <Registers />
+    </div>
     {#if debug}
         <SpriteDesigner />
     {/if}
@@ -131,6 +134,11 @@
     <RomDump />
 </div>
 
+{#if debug}
+
+    <Editor />
+{/if}
+
 <svelte:window on:keydown={onKeyDown} on:keyup={resetKey} />
 
 
@@ -140,6 +148,10 @@
         display: flex;
         height: auto;
         gap: 2%;
+    }
+
+    .register {
+        align-self: flex-end;
     }
 
     div {
