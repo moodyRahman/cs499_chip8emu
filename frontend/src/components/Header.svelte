@@ -10,23 +10,16 @@
         Nobel "Ken" Prakasam,  Filip "Shmaz_Pootaz" Trzcinka, Moududur "Moody" Rahman  
     </div>
     <div>
-        <button>
+        <a href="/">
+            emulator
+        </a>
 
-            <a href="/">
-                emulator
-            </a>
-        </button>
-        <button>
-
-            <a href="/writeup">
-                technical writeup
-            </a>
-        </button>
-        <button>
-            <a href="/highscores">
-                highscore board
-            </a>
-        </button>
+        <a href="/writeup">
+            technical writeup
+        </a>
+        <a href="/highscores">
+            highscore board
+        </a>
     </div>
 </div>
 
@@ -38,11 +31,20 @@
 
     .h3 {
         font-weight: 900;
+        margin-bottom: .5rem;
     }
 
     a {
         text-decoration: none;
         cursor:default;
         color: black;
+        background-color: lightblue;
+        margin-top: 1rem;
+        padding: 2px;
+        width: fit-content;
+    }
+    a:hover {
+        background-color: lightcoral;
+        color: white;
     }
 </style>
