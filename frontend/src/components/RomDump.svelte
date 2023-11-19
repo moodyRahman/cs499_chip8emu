@@ -69,26 +69,38 @@
         }
     }
 
+    // MAIN EVENT LOOP
     setInterval(() => {
-        chip8.decrement_timers()
+        chip8.decrement_timers();
     }, 17)
+
+    let main_loop_id = setInterval(() => tick(), time_between_intervals_ms)
+
+    $: debug, (() => {
+        clearInterval(main_loop_id)
+        if (debug)
+        {
+            time_between_intervals_ms = 200;
+            main_loop_id = setInterval(() => n_tick(1), time_between_intervals_ms)
+        } 
+        else 
+        {
+            time_between_intervals_ms = 4;
+            main_loop_id = setInterval(() => n_tick(ticks_per_interval), time_between_intervals_ms)
+        }
+    })()
 
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-    const tick = async () => {
-        // console.log("#", read_display_trigger, ", ", chip8.convert_inst_to_string(curr_inst))
+    const tick_raw = async () => {
         /**
         WARNING: THIS CODE RELIES ON CHIP8 ROM'S NOT EDITING THEMSELVES, AS IT REFERS 
         TO A COPY OF THE ROM STORED ON THE FRONTEND- NOT THE ACTUAL DATA IN RAM
         */
-
         if (paused) return
         if ((raw_rom[pc-512] << 8 | raw_rom[pc-512 + 1]).toString(16).match(/f[a-f0-9]0a/))
         {
             paused = true;
-            clearInterval(ticker)
-            let was_running = ticker === 0? false:true;
-
             while (paused)
             {
                 console.log(keypress)
@@ -99,21 +111,21 @@
                 }
             }
             paused = false
-            ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))  // restart the cpu timer
-
         }
         pc = chip8.tick();
         cpu_ticks++;
-        
-
         page = Math.floor((pc - 512)/(rows*16));
-
         registers_trigger.update((n) => n+1);
         if (cpu_ticks % display_rerender_threshold === 0)
         {
             console.log(cpu_ticks)
             display_trigger.update((n) => n+1)
         }
+    }
+
+    const tick = () => {
+        if (!is_running) return
+        tick_raw();
     }
 
     const n_tick = (n: number) => {
@@ -177,12 +189,12 @@
             <div>
 
                 {#if debug}
-                <button class="tick" on:click={tick}>
+                <button class="tick" on:click={tick_raw}>
                     tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
                 </button>
                 
                 {:else}
-                <button class="tick" on:click={tick}>
+                <button class="tick" on:click={tick_raw}>
                     tick cpu
                 </button>
                 {/if}
@@ -192,18 +204,9 @@
 
 
             <button class="tick" on:click={() => {
-                if (paused) return;
-                if (ticker === 0) {
-                    ticker = setInterval(() => {n_tick(ticks_per_interval)}, (time_between_intervals_ms))
-                    is_running = true;
-                }
-                else  {
-                    clearInterval(ticker)
-                    ticker = 0;
-                    is_running = false;
-                }
+                    is_running = !is_running;
                 }}>
-                run cpu {ticker==0?"false":"true"} paused:{paused}
+                run cpu running: {is_running}, paused: {paused}
             </button>
 
             <button class="tick" on:click={() => {
@@ -216,10 +219,10 @@
                 clearInterval(ticker)
                 ticker = 0
                 paused = false;
+                is_running = false;
             }}>
                 reset cpu
             </button>
-            {is_running}
         </div>
         </div>
     </div>
