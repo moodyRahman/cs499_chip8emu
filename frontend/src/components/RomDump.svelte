@@ -74,18 +74,10 @@
 
     // if debug mode changes, kill the main event loop and create a new one with 
     // the desired timing
-    $: debug, (() => {
+    $: debug, ticks_per_interval, time_between_intervals_ms, display_rerender_threshold, (() => {
         clearInterval(main_loop_id)
-        if (debug)
-        {
-            time_between_intervals_ms = 200;
-            main_loop_id = setInterval(() => n_tick(1), time_between_intervals_ms)
-        } 
-        else 
-        {
-            time_between_intervals_ms = 4;
-            main_loop_id = setInterval(() => n_tick(ticks_per_interval), time_between_intervals_ms)
-        }
+        console.log(ticks_per_interval, time_between_intervals_ms, display_rerender_threshold)
+        main_loop_id = setInterval(() => n_tick(ticks_per_interval), time_between_intervals_ms)
     })()
 
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -138,11 +130,29 @@
         }
     }
 
+    const reject_alpha = (e: KeyboardEvent) => {
+        if (e.key==="Backspace" || e.key==="ArrowLeft" || e.key==="ArrowRight" || e.key=="Tab") return
+        if (!e.key.match(/^\d+$/)) {
+            e.preventDefault()
+        }
+    }
+
 
 
 </script>
 <div class="container">
-
+    <span>
+        {cpu_ticks}
+    </span>
+    <span>
+        ticks per interval: <input type="number" bind:value={ticks_per_interval} on:keydown={reject_alpha} >
+    </span>
+    <span>
+        time between intervals in ms: <input type="number" bind:value={time_between_intervals_ms} >
+    </span>
+    <span>
+        display rerender threshold: <input type="number" bind:value={display_rerender_threshold} >
+    </span>
     {#if raw_rom.length > 0}
     <div>
         {rom_name} {raw_rom.length} bytes

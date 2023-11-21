@@ -1,6 +1,3 @@
-import { add } from "$lib/chip8/debug";
-import { error } from "@sveltejs/kit";
-
 // Table to map instruction to their respective argument check/parse function
 const argVerifyTable = {
     "CLS": noArg,
