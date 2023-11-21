@@ -15,7 +15,7 @@
 
 </div>
 
-<footer>
+<!-- <footer>
 
     <hr />
     
@@ -26,7 +26,7 @@
         made with Svelte, AssemblyScript, WASM, and a lot of bitwise math
     </div>
     
-</footer>
+</footer> -->
 
 </div>
 <style>
@@ -54,6 +54,7 @@
         border: 1px solid lightblue;
         width: 85%;
         margin-bottom: 2rem;
+        margin-top: 4rem;
     }
 
     footer {

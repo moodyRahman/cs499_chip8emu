@@ -193,6 +193,9 @@ class CPU {
   dt: u8 = 0; //The CHIP-8 has a simple timer used for timing. If the timer value is zero, it stays zero.
   //If it is loaded with a value, it will decrement at a rate of 60Hz.
 
+  // what the current pressed button is
+  key: u8 = 0;
+
   //The stack is an array of 16 16-bit values, used to store the address that the interpreter
   //shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
   Stack: Uint16Array = new Uint16Array(16);
@@ -213,7 +216,7 @@ class CPU {
   y: u8 = 0; //A 4-bit value, the upper 4 bits of the low byte of the instruction
   kk: u8 = 0; //An 8-bit value, the lowest 8 bits of the instruction
   i: u8 = 0; //the first 4 bitys of an instruction
-  st: number = 0; // sound timer register
+  st: u8 = 0; // sound timer register
 
   time: i32 = 0;
 
@@ -636,11 +639,17 @@ class CPU {
   }
 
   SKP(): void {
+    if (this.key == this.V[this.x]) {
+      this.pc += 2;
+    }
     //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
     //Still discussing how the keyboard will be implemented for this project
   }
 
   SKNP(): void {
+    if (this.key != this.V[this.x]) {
+      this.pc += 2;
+    }
     //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
     //cant be implemented without keyboard
   }
@@ -651,6 +660,7 @@ class CPU {
   }
 
   LDkey(): void {
+    this.V[this.x] = this.key;
     //All execution stops until a key is pressed, then the value of that key is stored in Vx.
     //cant be implemented without keyboard
   }
@@ -661,8 +671,8 @@ class CPU {
   }
 
   LDser(): void {
+    this.st = this.V[this.x];
     //ST is set equal to the value of Vx.
-    //cant be implemented without sound handler
   }
 
   ADDindex(): void {
@@ -723,7 +733,7 @@ export function read_instruction(inp: u16): void {
 }
 
 export function read_all_registers(): Uint16Array {
-  let out: Uint16Array = new Uint16Array(36);
+  let out: Uint16Array = new Uint16Array(38);
   for (let x = 0; x < cpu.V.length; x++) {
     out[x] = cpu.V[x];
   }
@@ -735,6 +745,8 @@ export function read_all_registers(): Uint16Array {
   out[33] = cpu.sp;
   out[34] = cpu.index;
   out[35] = cpu.dt;
+  out[36] = cpu.key;
+  out[37] = cpu.st;
   return out;
 }
 
@@ -779,6 +791,23 @@ export function reset(): void {
 
 export function ram_dump(): Uint8Array {
   return cpu.memory.mem;
+}
+
+export function set_key(key_in: u8): void {
+  cpu.key = key_in;
+}
+
+export function get_key(): u8 {
+  return cpu.key;
+}
+
+export function decrement_timers(): void {
+  if (cpu.dt > 0) {
+    cpu.dt -= 1;
+  }
+  if (cpu.st > 0) {
+    cpu.st -= 1;
+  }
 }
 
 export function convert_inst_to_string(inst: u16): string {
