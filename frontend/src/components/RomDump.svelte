@@ -250,6 +250,7 @@
                 ticker = 0
                 paused = false;
                 is_running = false;
+                cpu_ticks = 0;
             }}>
                 reset cpu
             </button>
