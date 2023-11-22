@@ -10,7 +10,7 @@
     rom_store.subscribe((n) => rom = n)
 
 
-    let name: string = "moody.ch8"
+    let name: string = "Pong.ch8"
     let all_roms: string[] = []
 
     // $: rom_name, loader();
