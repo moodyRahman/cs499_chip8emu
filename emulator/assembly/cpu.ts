@@ -105,6 +105,8 @@ class Display {
   }
 
   drawSprite(x: u8, y: u8, address: u16, length: u8): void {
+    this.collision = false;
+	  
     //Check if x and y do not go past display boundry
     if (x > 63) {
       return;
