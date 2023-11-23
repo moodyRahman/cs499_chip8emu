@@ -4,10 +4,13 @@
     import * as chip8 from "$lib/chip8/debug.js";
 	import { onMount } from "svelte";
     import config from "../cpu_configs";
-    import { rom_name as rom_name_store, rom as rom_store } from "$lib/stores/cpu_state";
+    import { rom_metadata, rom_name as rom_name_store, rom as rom_store } from "$lib/stores/cpu_state";
 
     let rom: Uint8Array
     rom_store.subscribe((n) => rom = n)
+
+
+    
 
 
     let name: string = "Pong.ch8"
@@ -16,10 +19,21 @@
     // $: rom_name, loader();
 
     const loader = async () => {
-        console.log(`fetching ${config.backend_url}/assets/roms/${name}`)
-        const res = await fetch(`${config.backend_url}/assets/roms/${name}`);
-        const buff = await res.arrayBuffer();
-        rom_store.set(new Uint8Array(buff));
+        console.log(`fetching ${config.backend_url}/meta_assets/${name}`)
+        const res = await fetch(`${config.backend_url}/meta_assets/${name}`);
+        const data = await res.json()
+        const bin_string = atob(data.rom)
+        const buff = new Uint8Array(bin_string.length);
+        for (var i = 0; i < bin_string.length; i++) {
+            buff[i] = bin_string.charCodeAt(i);
+        }
+
+        console.log(data.meta)
+
+        rom_metadata.set(data.meta)
+        console.log("set rom metadata")
+
+        rom_store.set(buff);
         rom_name_store.set(name)
         chip8.reset();
         chip8.load_rom(rom);
@@ -44,7 +58,7 @@
     <select bind:value={name}>
 
         <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
-        {#each all_roms as option }
+        {#each [...all_roms, "load ROM from editor "] as option }
             <option value={option}>{option.slice(0, option.indexOf(".ch8"))}</option>
         {/each}
     </select>
@@ -56,4 +70,7 @@
 
 <style>
 
+    select {
+        width: 20rem;
+    }
 </style>
