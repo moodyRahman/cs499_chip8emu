@@ -6,14 +6,24 @@
 
 <div>
     <div>
+        
+    {#if $rom_description}
         {$rom_description}
+    {:else}
+        no description
+    {/if}
     </div>
+
     <div>
-        {#each $rom_mappings as mappings}
-        <div>
-            {mappings?.keyboard}: {mappings?.description}
-        </div>
-        {/each}
+        {#if $rom_mappings}
+            {#each $rom_mappings as mappings}
+            <div>
+                {mappings?.keyboard}: {mappings?.description}
+            </div>
+            {/each}
+        {:else}
+            no additional metadata
+        {/if}
     </div>
 </div>
 
