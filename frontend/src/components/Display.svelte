@@ -12,7 +12,7 @@
 
     let buffer: Uint8Array
 
-    $: trigger, buffer=chip8.display(), console.log("recieved diplay update request")
+    $: trigger, buffer=chip8.display()
 
 
 </script>

@@ -8,11 +8,12 @@
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
 	import SpriteDesigner from "../components/SpriteDesigner.svelte";
-	import { audio_store, debug_mode_store, keypress_store, registers_trigger } from "$lib/stores/cpu_state";
+	import { audio_store, debug_mode_store, keypress_store, registers_trigger, rom_mappings } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
     
     import "$lib/css/main.css"
 	import Editor from "../components/Editor.svelte";
+	import MessageBoard from "../components/MessageBoard.svelte";
 
     const load_wasm_binary = async () => {
         const res = await fetch("http://localhost:3000/assets/roms/debug.wasm")
@@ -75,21 +76,48 @@
     const onKeyDown = (e:KeyboardEvent) => {
         if (e.repeat) return;
         if (e.key.length > 1) return;
-        if (!e.key.match(/^[0-9a-fA-F]$/)) return
-        chip8.set_key(Number("0x" + e.key));
-        keypress_store.set(e.key)
-        active_keys = [...active_keys, e.key]
+        if (!$rom_mappings) {
+            if (!e.key.match(/^[0-9a-fA-F]$/)) return
+            chip8.set_key(Number("0x" + e.key));
+            keypress_store.set(e.key)
+            active_keys = [...active_keys, e.key]
 
-        registers_trigger.update((n) => n+1)
+            registers_trigger.update((n) => n+1)
+            return 
+        }
+        else {
+            if (!$rom_mappings.map((x) => x.keyboard).includes(e.key)) return
+            
+            // if (!e.key.match(/^[0-9a-fA-F]$/)) return
+            
+            let chip8_in = $rom_mappings.find((x) => x.keyboard === e.key)?.chip8_input;
+            chip8.set_key(Number("0x" + chip8_in));
+            if (!chip8_in) return
+    
+            keypress_store.set(chip8_in)
+            active_keys = [...active_keys, chip8_in]
+            registers_trigger.update((n) => n+1)
+        }
 
     }
 
     const resetKey = (e: KeyboardEvent) => {
         if (e.repeat) return true
-        active_keys = active_keys.filter((x) => x != e.key)
-        chip8.set_key(Number("0x"+active_keys.at(-1)))
-        keypress_store.set(active_keys.at(-1)!?active_keys.at(-1)!:"")
-        registers_trigger.update((n) => n+1)
+        if (!$rom_mappings){
+            active_keys = active_keys.filter((x) => x != e.key)
+            chip8.set_key(Number("0x"+active_keys.at(-1)))
+            keypress_store.set(active_keys.at(-1)!?active_keys.at(-1)!:"")
+            registers_trigger.update((n) => n+1)
+        }
+        else {
+            let chip8_in = $rom_mappings.find((x) => x.keyboard === e.key)?.chip8_input;
+            active_keys = active_keys.filter((x) => x !== chip8_in)
+            chip8.set_key(Number("0x"+active_keys.at(-1)))
+            keypress_store.set(active_keys.at(-1)!?active_keys.at(-1)!:"")
+            registers_trigger.update((n) => n+1)
+            return;
+        }
+        
 
     }
 
@@ -108,9 +136,11 @@
         toggle debug menu
     </button>
 </div>
-{audio}
 <div>
     <Loader />
+</div>
+<div>
+    <MessageBoard />
 </div>
 
 {#if debug}

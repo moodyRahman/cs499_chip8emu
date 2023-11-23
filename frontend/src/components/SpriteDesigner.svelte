@@ -40,7 +40,12 @@
             <!-- <span on:click={() => pixels[yi][xi] = true} aria-pressed="mixed" on:keypress={() => {}}>
                 {yi}, {xi}
             </span> -->
-            <button on:click={() => pixels[yi][xi] = !pixels[yi][xi]} class={`${pixels[yi][xi]?"inactive":"active"} pixel`}>
+            <button 
+            on:mousedown={(e) => {
+                pixels[yi][xi] = !pixels[yi][xi]
+            }}
+
+            class={`${pixels[yi][xi]?"inactive":"active"} pixel`}>
                 
             </button>
             {/each}

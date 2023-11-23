@@ -1,4 +1,4 @@
-{
+const data = {
   "Tetris.ch8": {
     "description": "An arcade classic! Fun for the whole family :)",
     "mapping": [
@@ -59,6 +59,26 @@
       "display_rerender_threshold": 1
     }
   },
+  "Pong.ch8": {
+    "description": "An arcade classic! Fun for the whole family :)",
+    "mapping": [
+      {
+        "keyboard": "q",
+        "chip8_input": "1",
+        "description": "move your paddle up"
+      },
+      {
+        "keyboard": "a",
+        "chip8_input": "4",
+        "description": "move your paddle down"
+      }
+    ],
+    "timing": {
+      "ticks_per_interval": 5,
+      "time_between_intervals_ms": 10,
+      "display_rerender_threshold": 1
+    }
+  },
   "IBM_Logo.ch8": {
     "description": "An arcade classic! Fun for the whole family :)",
     "mapping": [
@@ -80,3 +100,6 @@
     }
   }
 }
+
+
+export default data

@@ -94,7 +94,6 @@
             paused = true;  // prevent any further ticks from the main event loop from firing
             while (paused)
             {
-                console.log(keypress)
                 await sleep(100)
                 if (keypress !== "")
                 {
@@ -103,14 +102,37 @@
             }
             paused = false // release the lock, the next tick will succeed
         }
-        pc = chip8.tick();  // extract the PC from the emulator itself
+
+
+        // delete from here
+        let old_pc = pc;
+        if (debug)
+        {
+            try {
+                pc = chip8.tick();  // extract the PC from the emulator itself
+            } catch (e: any) {
+                console.log( old_pc, chip8.convert_inst_to_string(raw_rom[old_pc - 512] << 8 | raw_rom[old_pc - 512 + 1]), cpu_ticks, e.message)
+                error = `error: pc: ${old_pc}, inst: ${chip8.convert_inst_to_string(raw_rom[old_pc - 512] << 8 | raw_rom[old_pc - 512 + 1])}, ${e.message}`
+                if (break_on_chip8_error)
+                {
+                    is_running = false;
+                }
+            }
+        }
+        else {
+            pc = chip8.tick()
+        }
+        // until here when we're done with chip8 debugging
+        // replace with
+        // pc = chip8.tick()
+
+
         cpu_ticks++;
         page = Math.floor((pc - 512)/(rows*16)); // calculate the page this tick is on
         registers_trigger.update((n) => n+1); // send out an update for anything that listens to the cpu registers
 
         if (cpu_ticks % display_rerender_threshold === 0)  // figure out on which cpu_ticks to we rerender the display
         {
-            console.log(cpu_ticks)
             display_trigger.update((n) => n+1)
         }
     }
@@ -139,10 +161,44 @@
 
 
 
+    // delete if performance issues
+    let duration = 0;
+    let reading_duration = false;
+    let hz_display = 0
+
+    setInterval(() => {
+        if (!is_running) return
+        duration += 0.2
+    }, 200)
+
+
+    // smoothes the hz number we display to update only once a second
+    setInterval(() => {
+        hz_display = cpu_ticks / duration;
+    }, 1000)
+
+
+    let break_on_chip8_error = false;
+    let error = "no emulator errors"
+
 </script>
 <div class="container">
+
+
+    <!-- delete if there are performance issues -->
+
+    {#if raw_rom.length > 0}
+    <div>
+        {rom_name} {raw_rom.length} bytes
+    </div>
     <span>
-        {cpu_ticks}
+        current hz: {(hz_display).toFixed(2)} {duration.toFixed(2)}
+    </span>
+    <span>
+        instructions ran: {cpu_ticks}
+    </span>
+    <span>
+        {error}
     </span>
     <span>
         ticks per interval: <input type="number" bind:value={ticks_per_interval} on:keydown={reject_alpha} >
@@ -153,11 +209,19 @@
     <span>
         display rerender threshold: <input type="number" bind:value={display_rerender_threshold} >
     </span>
-    {#if raw_rom.length > 0}
-    <div>
-        {rom_name} {raw_rom.length} bytes
-    </div>
     {#if debug}
+    <span>
+        <button on:click={() => break_on_chip8_error = !break_on_chip8_error}>
+            break on chip8 error: {break_on_chip8_error}
+        </button>
+        <button on:click={() => {
+            ticks_per_interval = config.hertz.ticks_per_interval
+            time_between_intervals_ms = config.hertz.time_between_intervals_ms
+            display_rerender_threshold = config.hertz.display_rerender_threshold
+        }}>
+            enable fast debugging
+        </button>
+    </span>
     <!-- 
         rendering the romdump works as follows:
         div.dump is a css grid that's defined to have 17 columns
@@ -250,6 +314,8 @@
                 ticker = 0
                 paused = false;
                 is_running = false;
+                cpu_ticks = 0;
+                duration = 0;
             }}>
                 reset cpu
             </button>
