@@ -112,6 +112,7 @@
                 pc = chip8.tick();  // extract the PC from the emulator itself
             } catch (e: any) {
                 console.log( old_pc, chip8.convert_inst_to_string(raw_rom[old_pc - 512] << 8 | raw_rom[old_pc - 512 + 1]), cpu_ticks, e.message)
+                error = `error: pc: ${old_pc}, inst: ${chip8.convert_inst_to_string(raw_rom[old_pc - 512] << 8 | raw_rom[old_pc - 512 + 1])}, ${e.message}`
                 if (break_on_chip8_error)
                 {
                     is_running = false;
@@ -166,7 +167,7 @@
     let hz_display = 0
 
     setInterval(() => {
-        if (!reading_duration) return
+        if (!is_running) return
         duration += 0.2
     }, 200)
 
@@ -178,11 +179,26 @@
 
 
     let break_on_chip8_error = false;
+    let error = "no emulator errors"
 
 </script>
 <div class="container">
+
+
+    <!-- delete if there are performance issues -->
+
+    {#if raw_rom.length > 0}
+    <div>
+        {rom_name} {raw_rom.length} bytes
+    </div>
     <span>
-        {cpu_ticks}
+        current hz: {(hz_display).toFixed(2)} {duration.toFixed(2)}
+    </span>
+    <span>
+        instructions ran: {cpu_ticks}
+    </span>
+    <span>
+        {error}
     </span>
     <span>
         ticks per interval: <input type="number" bind:value={ticks_per_interval} on:keydown={reject_alpha} >
@@ -193,19 +209,17 @@
     <span>
         display rerender threshold: <input type="number" bind:value={display_rerender_threshold} >
     </span>
-
-    <!-- delete if there are performance issues -->
-    <span>
-        current hz: {(hz_display).toFixed(2)} {duration.toFixed(2)}
-    </span>
-    {#if raw_rom.length > 0}
-    <div>
-        {rom_name} {raw_rom.length} bytes
-    </div>
     {#if debug}
     <span>
         <button on:click={() => break_on_chip8_error = !break_on_chip8_error}>
             break on chip8 error: {break_on_chip8_error}
+        </button>
+        <button on:click={() => {
+            ticks_per_interval = config.hertz.ticks_per_interval
+            time_between_intervals_ms = config.hertz.time_between_intervals_ms
+            display_rerender_threshold = config.hertz.display_rerender_threshold
+        }}>
+            enable fast debugging
         </button>
     </span>
     <!-- 
@@ -285,7 +299,6 @@
             -->
             <button class="tick" on:click={() => {
                     is_running = !is_running;
-                    reading_duration = !reading_duration;
                 }}>
                 run cpu running: {is_running}, paused: {paused}
             </button>
