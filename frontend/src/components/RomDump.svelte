@@ -102,7 +102,30 @@
             }
             paused = false // release the lock, the next tick will succeed
         }
-        pc = chip8.tick();  // extract the PC from the emulator itself
+
+
+        // delete from here
+        let old_pc = pc;
+        if (debug)
+        {
+            try {
+                pc = chip8.tick();  // extract the PC from the emulator itself
+            } catch (e: any) {
+                console.log( old_pc, chip8.convert_inst_to_string(raw_rom[old_pc - 512] << 8 | raw_rom[old_pc - 512 + 1]), cpu_ticks, e.message)
+                if (break_on_chip8_error)
+                {
+                    is_running = false;
+                }
+            }
+        }
+        else {
+            pc = chip8.tick()
+        }
+        // until here when we're done with chip8 debugging
+        // replace with
+        // pc = chip8.tick()
+
+
         cpu_ticks++;
         page = Math.floor((pc - 512)/(rows*16)); // calculate the page this tick is on
         registers_trigger.update((n) => n+1); // send out an update for anything that listens to the cpu registers
@@ -153,6 +176,9 @@
         hz_display = cpu_ticks / duration;
     }, 1000)
 
+
+    let break_on_chip8_error = false;
+
 </script>
 <div class="container">
     <span>
@@ -177,6 +203,11 @@
         {rom_name} {raw_rom.length} bytes
     </div>
     {#if debug}
+    <span>
+        <button on:click={() => break_on_chip8_error = !break_on_chip8_error}>
+            break on chip8 error: {break_on_chip8_error}
+        </button>
+    </span>
     <!-- 
         rendering the romdump works as follows:
         div.dump is a css grid that's defined to have 17 columns
