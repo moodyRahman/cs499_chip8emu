@@ -94,7 +94,6 @@
             paused = true;  // prevent any further ticks from the main event loop from firing
             while (paused)
             {
-                console.log(keypress)
                 await sleep(100)
                 if (keypress !== "")
                 {
@@ -110,7 +109,6 @@
 
         if (cpu_ticks % display_rerender_threshold === 0)  // figure out on which cpu_ticks to we rerender the display
         {
-            console.log(cpu_ticks)
             display_trigger.update((n) => n+1)
         }
     }
