@@ -1,7 +1,7 @@
 const config = {
     hertz: {
-        ticks_per_interval: 5,
-        time_between_intervals_ms: 4,
+        ticks_per_interval: 8,
+        time_between_intervals_ms: 8,
         display_rerender_threshold: 10   // amount of cpu ticks before re-rendering the display
     },
     ram_adjacent_to_pc: 10,

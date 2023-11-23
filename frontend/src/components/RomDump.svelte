@@ -137,6 +137,22 @@
 
 
 
+    // delete if performance issues
+    let duration = 0;
+    let reading_duration = false;
+    let hz_display = 0
+
+    setInterval(() => {
+        if (!reading_duration) return
+        duration += 0.2
+    }, 200)
+
+
+    // smoothes the hz number we display to update only once a second
+    setInterval(() => {
+        hz_display = cpu_ticks / duration;
+    }, 1000)
+
 </script>
 <div class="container">
     <span>
@@ -150,6 +166,11 @@
     </span>
     <span>
         display rerender threshold: <input type="number" bind:value={display_rerender_threshold} >
+    </span>
+
+    <!-- delete if there are performance issues -->
+    <span>
+        current hz: {(hz_display).toFixed(2)} {duration.toFixed(2)}
     </span>
     {#if raw_rom.length > 0}
     <div>
@@ -233,6 +254,7 @@
             -->
             <button class="tick" on:click={() => {
                     is_running = !is_running;
+                    reading_duration = !reading_duration;
                 }}>
                 run cpu running: {is_running}, paused: {paused}
             </button>
@@ -249,6 +271,7 @@
                 paused = false;
                 is_running = false;
                 cpu_ticks = 0;
+                duration = 0;
             }}>
                 reset cpu
             </button>
