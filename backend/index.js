@@ -2,15 +2,51 @@
 import express from "express";
 import { router } from "./routes/index.js";
 import cors from "cors";
-import { readdir } from "fs/promises"
+import { readdir, readFile } from "fs/promises"
 import 'dotenv/config'
+import metadata from "./assets/metadata.js";
 
 const app = express()
 const port = process.env.PORT
 app.use(cors())
+app.use((req, res, next) => {
+    console.log(`${req.method} for ${req.url}`);
+    next()
+})
 
-// http://localhost:3000/assets/roms/a.png
 app.use("/assets", express.static("./assets"))
+
+app.get("/meta_assets/:rom", async (req, res) => {
+    console.log(req.params.rom)
+    try {
+        const rom = await readFile(`./assets/roms/${req.params.rom}`)
+
+        res.send(
+            {
+                meta: {
+                    status: (metadata[req.params.rom] ? 1 : 0),
+                    data: (metadata[req.params.rom] ? metadata[req.params.rom] : {})
+
+                },
+                rom: Buffer.from(rom.buffer).toString("base64")
+            }
+        )
+    } catch (error) {
+        res.status = 404;
+        return res.send({
+            meta: {
+                status: 0,
+                data: {}
+            },
+            rom: ""
+        })
+    }
+
+    // res.send(
+    //     Object.assign(metadata[req.params.rom], { rom: Buffer.from(rom.buffer).toString("base64") })
+    // )
+
+})
 
 app.get("/assets_data", async (req, res) => {
     const data = await readdir("./assets/roms")
