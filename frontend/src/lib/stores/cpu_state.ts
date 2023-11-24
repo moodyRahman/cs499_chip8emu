@@ -34,7 +34,37 @@ export const rom_description = derived(
 	rom_metadata,
 	($rom_metadata) => $rom_metadata.data.description
 );
-export const rom_mappings = derived(rom_metadata, ($rom_metadata) => $rom_metadata.data.mapping);
+export const rom_mappings = derived(rom_metadata, ($rom_metadata) => {
+	if (!$rom_metadata.data.mapping) {
+		const mappings = [
+			'x',
+			'1',
+			'2',
+			'3',
+			'q',
+			'w',
+			'e',
+			'a',
+			's',
+			'd',
+			'z',
+			'c',
+			'4',
+			'r',
+			'f',
+			'v'
+		];
+		return [...Array(16)].map((e, i) => {
+			return {
+				keyboard: mappings[i],
+				chip8_input: i.toString(16),
+				description: `maps to ${i.toString(16)}`
+			};
+		});
+	} else {
+		return $rom_metadata.data.mapping;
+	}
+});
 
 export const base_store = writable(16);
 export const debug_mode_store = writable(true);

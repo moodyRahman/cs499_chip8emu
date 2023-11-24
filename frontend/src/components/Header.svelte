@@ -20,6 +20,9 @@
         <a href="/highscores">
             highscore board
         </a>
+        <a href="/help">
+            help
+        </a>
     </div>
 </div>
 
