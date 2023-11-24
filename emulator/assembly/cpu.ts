@@ -1,40 +1,31 @@
 import { draw } from "./display";
 
-//Memory class
 class Memory {
-  //4,096 bytes of RAM
+  // 0x000 - 0x1FF should not be used by programs
   mem: Uint8Array = new Uint8Array(4096);
-  //Locations 0x000 through 0x1FF should not be used by programs
 
-  //Constructor and Functions
   constructor() {
-    this.clear();
+    this.clearMemory();
     this.loadFonts();
   }
 
-  clear(): void {
-    //set all entries in Memory to 0
+  clearMemory(): void {
     for (let i = 0; i < 4096; i++) {
       this.mem[i] = 0;
     }
   }
 
   read(address: u16): u8 {
-    //get the entry stored in Memory at address provided
-    //ensure that the address does not overflow by only taking in the last 12 bits of the address parameter
-    // console.log("reading memory: " + (address & 0xfff).toString(16));
+    // Truncate address to 12-bits then return data it points to
     return this.mem[address & 0xfff];
   }
 
   write(address: u16, value: u8): void {
-    //store an entry in Memory at address provided
-    //ensure that the address does not overflow by only taking in the last 12 bits of the address parameter
-    //Value provided as parameter should only fit into one byte of space
+    // Truncate address to 12-bits and data to 8-bits
+    // Then write the data at this address
     this.mem[address & 0xfff] = value & 0xff;
   }
 
-  //Font function should implement by Thursday
-  // prettier-ignore
   static ogFontTable: StaticArray<u8> = [
 		0xF0, 0x90, 0x90, 0x90, 0xF0, //0
 		0x20, 0x60, 0x20, 0x20, 0x70, //1
@@ -55,30 +46,29 @@ class Memory {
 	]
 
   loadFonts(): void {
-    //Load fonts into the first 80 bytes of memory
     for (let i: u8 = 0; i < 80; i++) {
       this.mem[i] = Memory.ogFontTable[i];
     }
   }
 
-  //Load ROM function
   loadROM(romToLoad: Uint8Array): boolean {
+    // First check if ROM can fit in RAM available (~3.5k)
     if (romToLoad.length > 0xe00) {
-      return false; //If file byte length is greater than 3584 bytes, file is too big and cannot execute (it doesnt go past RAM limit)
+      return false;
     }
 
+    // If it fits, store ROM starting at the reset vector (512)
     for (let i = 0; i < romToLoad.length; i++) {
-      this.mem[i + 512] = romToLoad[i]; //Store ROM bytes into memory starting from address 512 and on
-      //remember, addresses 0-512 are reserved for interpreter
+      this.mem[i + 512] = romToLoad[i];
     }
 
+    // Reload fonts in case of corruption
     this.loadFonts();
-    return true; //If loadROM function sucessfully executed, return true;
+    return true;
   }
 }
 
 class Display {
-  //We only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
   display: Uint8Array = new Uint8Array(256);
   collision: boolean = false;
 
@@ -98,7 +88,6 @@ class Display {
   }
 
   clearDisplay(): void {
-    //Set all pixels to 0 in mem
     for (let i: u16 = 0; i < 256; i++) {
       this.display[i] = 0;
     }
@@ -107,7 +96,7 @@ class Display {
   drawSprite(x: u8, y: u8, address: u16, length: u8): void {
     this.collision = false;
 	  
-    //Check if x and y do not go past display boundry
+    // Check if x and y are within bounds
     if (x > 63) {
       return;
     }
@@ -115,10 +104,10 @@ class Display {
       return;
     }
 
-    //Check if we draw past screen
+    // Check if we draw past screen
     let edgeCase: boolean = false;
     if (x > 56) {
-      //if x > 56 then we will be drawing past the display edge
+      // If x > 56 then we will be drawing past the display edge
       edgeCase = true;
     }
 
@@ -137,7 +126,7 @@ class Display {
       }
       //Check for collision:
       //We compare the current displayed byte with the new display byte using AND and if the value is anything other than 0
-      //then a collision occured.
+      //then a collision occurred.
       //We only care about the bits we draw into hence the right shift by xBitLoc many bits.
       if (
         (this.display[drawAddr] & (this.memory.read(address + i) >> xBitLoc)) !=
@@ -185,82 +174,69 @@ class Display {
   }
 }
 
-//CPU class
 class CPU {
-  //16 8 bit registers are needed
-  //registers are labeled V(0-F)
+  // 16 general purpose 8-bit registers, labeled V0-VF
   V: Uint8Array = new Uint8Array(16);
-  //VF is never used by a program as it is reserved as a flag for some instructions
+  // Delay timer register, auto-decrements at a rate of 60hz
+  dt: u8 = 0;
+  // Sound timer control register, auto-decrements at a rate of 60hz
+  st: u8 = 0;
+  // Key input register, stores keypad state
+  key: u16 = 0;
 
-  //Special pseudo-registers not accessible to Chip-8 programs
-  pc: u16 = 0x200; //used to store the currently executing address (starts at address 0x200 which is where most chip-8 programs start)
-  sp: u8 = 0; //used to point to the topmost level of the stack
-  index: u16 = 0; //The Index Register is a special register used to store memory addresses for use in operations.
-  //It’s a 16-bit register because the maximum memory address (0xFFF) is too big for an 8-bit register.
-  dt: u8 = 0; //The CHIP-8 has a simple timer used for timing. If the timer value is zero, it stays zero.
-  //If it is loaded with a value, it will decrement at a rate of 60Hz.
+  // Pseudo-registers
+  pc: u16 = 0x200; // Program counter, 512 is the reset vector
+  sp: u8 = 0; // Stack pointer
+  index: u16 = 0; // Index register is a special register used to store memory addresses
 
-  // what the current pressed button is
-  key: u8 = 0;
-
-  //The stack is an array of 16 16-bit values, used to store the address that the interpreter
-  //shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
+  // Stack contents, the stack is stored in a separate address space
   Stack: Uint16Array = new Uint16Array(16);
 
+  // Memory, display and sound subsystems
   memory: Memory = new Memory();
-
-  //Tentatively trying out this approach, because we only need 1 bit per pixel (32x64 pixels = 2048 bits = 256 bytes)
   display: Display = new Display();
-  soundHandler: boolean = false; //This is temporary since we haven't made the SoundHandler object yet
+  soundHandler: boolean = false;
 
-  //Instruction variable to hold current instruction bits (16) for decode and execute:
+  // Instruction register
   CurrInstruction: u16 = 0;
 
-  //Variables needed for instruction decode function:
-  nnn: u16 = 0; //A 12-bit value, the lowest 12 bits of the instruction
-  n: u8 = 0; //A 4-bit value, the lowest 4 bits of the instruction
-  x: u8 = 0; //A 4-bit value, the lower 4 bits of the high byte of the instruction
-  y: u8 = 0; //A 4-bit value, the upper 4 bits of the low byte of the instruction
-  kk: u8 = 0; //An 8-bit value, the lowest 8 bits of the instruction
-  i: u8 = 0; //the first 4 bitys of an instruction
-  st: u8 = 0; // sound timer register
+  // Field decode variables
+  nnn: u16 = 0; // Lowest 12-bits
+  i: u8 = 0; // First (Highest) nibble
+  x: u8 = 0; // Second nibble
+  y: u8 = 0; // Third nibble
+  n: u8 = 0; // Fourth (Lowest) nibble
+  kk: u8 = 0; // Lowest byte
 
   time: i32 = 0;
 
-  //Constructor and Functions
   constructor(memToLoad: number, displayOutput: number, handleSound: number) {
-    //Instantiate values with the reset function
+    // Initialize values with the reset function
     this.reset();
-
     this.display.loadMemRef(this.memory);
-
-    //Call starter functions
-    // this.loadMemory(memToLoad);
-    // this.loadDisplay(displayOutput);
-    // this.loadSound(handleSound);
   }
 
   reset(): void {
-    //Clear registers:
+    // Clear registers:
     for (let i = 0; i < 16; i++) {
       this.V[i] = 0;
     }
-    //Reset Psuedo-Registers
-    this.pc = 0x200;
     this.sp = 0;
     this.index = 0;
     this.dt = 0;
     this.st = 0;
+    // Set PC to reset vector
+    this.pc = 0x200;
 
-    //Clear stack:
+    // Clear stack:
     for (let j = 0; j < 16; j++) {
       this.Stack[j] = 0;
     }
 
-    // reset display
+    // Reset display
     this.display.clearDisplay();
 
-    //reset decode variables:
+    // Reset field variables:
     this.nnn = 0;
     this.n = 0;
     this.x = 0;
@@ -281,26 +257,20 @@ class CPU {
   }
 
   IRFetch(): void {
-    //For fetching the instruction we will need to store the bits stored in memory at location PC: Mem[PC]
-    //then we will need to shift those bits to the left by 8 places (memory is 8 bits an address) since this is only half of the instruction.
-    //Then we OR equals the bits stored in PC+1 which combines the two halves of the instruction into our CurrInstruction variable.
-    //Then we need to set PC to the next instruction for execution.
+    // Load instruction register with 16 bits from PC and PC+1
     this.CurrInstruction = this.memory.read(this.pc) << 8;
     this.CurrInstruction |= this.memory.read(this.pc + 1);
+    // Increment PC to next instruction
     this.pc += 2;
   }
 
   decodeTable_func(inst: u16): void {
-    this.nnn = inst & 0x0fff; //gets last 12 instruction bits (0 through 11)
-    this.n = u8(inst & 0x000f); //gets last 4 instruction bits (0 through 3)
-    this.x = u8((inst >> 8) & 0x000f); //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
-    this.y = u8((inst >> 4) & 0x000f); //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
-    this.kk = u8(inst & 0x00ff); //gets last 8 instruction bits (0 through 7)
-    this.i = u8((inst >> 12) & 0x000f); // gets first 4 bits of instruction
-
-    if (inst == 0) {
-      return;
-    }
+    this.nnn = inst & 0x0fff; // Get last 12 bits
+    this.i = u8((inst >> 12) & 0x000f); // Get first nibble
+    this.x = u8((inst >> 8) & 0x000f); // Get second nibble
+    this.y = u8((inst >> 4) & 0x000f); // Get third nibble
+    this.n = u8(inst & 0x000f); // Get fourth nibble
+    this.kk = u8(inst & 0x00ff); // Get last byte
 
     switch (this.i) {
       case 0x0:
@@ -363,8 +333,6 @@ class CPU {
       case 0x7:
         this.V[this.x] += this.kk;
         break;
-      // WIP
-      // Turn this into a case switch block
       case 0x8:
         switch (this.n) {
           // LD reg
@@ -539,75 +507,11 @@ class CPU {
     }
   }
 
-  // decodeTable = [
-  //   { "0xe0": this.CLS, "0xee": this.RET, nibbles: 2 }, //we can't have numbers as json keys,
-  //   this.JPimm,
-  //   this.CALL,
-  //   this.SEbyte,
-  //   this.SNEbyte,
-  //   { "0": this.SEregister, nibbles: 1 },
-  //   this.LDbyte,
-  //   this.ADDbyte,
-  //   {
-  //     "0": this.LDregister,
-  //     "1": this.OR,
-  //     "2": this.AND,
-  //     "3": this.XOR,
-  //     "4": this.ADDregister,
-  //     "5": this.SUB,
-  //     "6": this.SHR,
-  //     "7": this.SUBN,
-  //     "0xe": this.SHL,
-  //     nibbles: 1,
-  //   }, //Object type for further decode
-  //   { "0": this.SNEregister, nibbles: 1 }, //Object type for further decode
-  //   this.LDindex,
-  //   this.JPregister,
-  //   this.RND,
-  //   this.DRW,
-  //   { "0x9e": this.SKP, "0xa1": this.SKNP, nibbles: 2 }, //Object type for further decode
-  //   {
-  //     "0x07": this.LDret,
-  //     "0x0a": this.LDkey,
-  //     "0x15": this.LDter,
-  //     "0x18": this.LDser,
-  //     "0x1e": this.ADDindex,
-  //     "0x29": this.LDsprite,
-  //     "0x33": this.LDbr,
-  //     "0x55": this.LDmemWr,
-  //     "0x65": this.LDmemRd,
-  //     nibbles: 2,
-  //   }, //Object type for further decode
-  // ];
-
-  IRDecode(instruction: u16): void {
-    //For now my idea is to first decode every instruction the same way using bit masks with the special decode variables I created like so:
-    // this.nnn = instruction & 0x0fff; //gets last 12 instruction bits (0 through 11)
-    // this.n = instruction & 0x000f; //gets last 4 instruction bits (0 through 3)
-    // this.x = (instruction & 0x0f00) >> 8; //gets instruction bits 8 through 11 (shifts 8 places to get them back to LSB)
-    // this.y = (instruction & 0x00f0) >> 4; //gets instruction bits 4 through 7 (shifts 4 places to get them back to LSB)
-    // this.kk = instruction & 0x00ff; //gets last 8 instruction bits (0 through 7)
-
-    //Above this I have an array of function pointers, and then based on specific op code we call that function pointer.
-
-    //Get the return value from decodeTable using the value found from instruction bits: 12 through 15
-    // let decodeOne = this.decodeTable[`${instruction & (0xf000 >> 12)}`]();
-
-    //Now we check the return type from decode table:
-    //If return type is a function, great we return and execute that function
-    //If it is not a function but an object, then we need to decode a lil further
-
-    // if (typeof decodeOne === "function") {
-    //   return decodeOne;
-    // }
-    this.decodeTable_func(instruction);
-  }
-
   tick(): void {
     const load =
       (u16(this.memory.read(this.pc)) << 8) | this.memory.read(this.pc + 1);
     this.pc += 2;
-    this.IRDecode(load);
+    this.decodeTable_func(load);
   }
 }
 
@@ -618,7 +522,7 @@ class CPU {
 const cpu = new CPU(0, 0, 0);
 
 export function read_instruction(inp: u16): void {
-  cpu.IRDecode(inp);
+  cpu.decodeTable_func(inp);
 }
 
 export function read_all_registers(): Uint16Array {
@@ -686,7 +590,7 @@ export function set_key(key_in: u8): void {
   cpu.key = key_in;
 }
 
-export function get_key(): u8 {
+export function get_key(): u16 {
   return cpu.key;
 }
 
