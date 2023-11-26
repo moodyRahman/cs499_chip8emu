@@ -10,6 +10,38 @@
 	import SpriteDesigner from "../components/SpriteDesigner.svelte";
 	import { audio_store, debug_mode_store, keypress_store, registers_trigger, rom_mappings } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
+    import highScore from "$lib/highscore.js"
+    
+    const keyToNum = {
+        "1" : 1, "2" : 2, "3" : 3, "4" : 0xC,
+        "q" : 4, "w" : 5, "e" : 6, "r" : 0xD,
+        "a" : 7, "s" : 8, "d" : 9, "f" : 0xE,
+        "z" : 0xA, "x" : 0, "c" : 0xB, "v" : 0xF
+    }
+    let keyState = 0;
+    onMount(() => {
+        function handleKeydown(event) {
+            if (event.key == "l") {
+                console.log(highScore());
+            }
+            let key = keyToNum[event.key];
+            if (key != undefined) {
+                chip8.set_key(chip8.get_key() | (1 << key));
+            }
+        }
+        function handleKeyup(event) {
+            let key = keyToNum[event.key];
+            if (key != undefined) {
+                chip8.set_key(chip8.get_key() & (~(1 << key)));
+            }
+        }
+        window.addEventListener('keydown', handleKeydown);
+        window.addEventListener('keyup', handleKeyup);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+            window.removeEventListener('keyup', handleKeyup);
+        };
+    });
     
     import "$lib/css/main.css"
 	import Editor from "../components/Editor.svelte";
@@ -62,8 +94,6 @@
             add_internal,
             read_internal,
         } = instance.exports
-
-        // console.log(ram_around_address(100))
 
     }
 

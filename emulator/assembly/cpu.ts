@@ -3,6 +3,9 @@ import { draw } from "./display";
 class Memory {
   // 0x000 - 0x1FF should not be used by programs
   mem: Uint8Array = new Uint8Array(4096);
+  // romHash to check loaded ROM
+  // hash algorithm is all bytes added together mod 2^32
+  romHash: u32 = 0;
 
   constructor() {
     this.clearMemory();
@@ -57,9 +60,11 @@ class Memory {
       return false;
     }
 
+    this.romHash = 0;
     // If it fits, store ROM starting at the reset vector (512)
     for (let i = 0; i < romToLoad.length; i++) {
       this.mem[i + 512] = romToLoad[i];
+      this.romHash += romToLoad[i];
     }
 
     // Reload fonts in case of corruption
@@ -430,13 +435,13 @@ class CPU {
       case 0xE:
         // SKP
         if (this.kk == 0x9e) {
-          if (this.key == this.V[this.x]) {
+          if ((this.key&(1<<(this.V[this.x]&0xF))) != 0) {
             this.pc += 2;
           }
         }
         // SKNP
         else if (this.kk == 0xa1) {
-          if (this.key != this.V[this.x]) {
+          if ((this.key&(1<<(this.V[this.x]&0xF))) == 0) {
             this.pc += 2;
           }
         }
@@ -458,8 +463,17 @@ class CPU {
         } 
         // LD key
         else if (this.kk == 0x0a) {
-          this.V[this.x] = this.key;
-        } 
+          if (this.key == 0) {
+            this.pc -= 2;
+          } else {
+            for (let i = 0; i < 16; i++) {
+              if (((1 << i) & this.key) != 0) {
+                this.V[this.x] = i;
+                break;
+              }
+            }
+          }
+        }
         // LD dt
         else if (this.kk == 0x15) {
           this.dt = this.V[this.x];
@@ -586,7 +600,11 @@ export function ram_dump(): Uint8Array {
   return cpu.memory.mem;
 }
 
-export function set_key(key_in: u8): void {
+export function get_hash(): u32 {
+  return cpu.memory.romHash;
+}
+
+export function set_key(key_in: u16): void {
   cpu.key = key_in;
 }
 
