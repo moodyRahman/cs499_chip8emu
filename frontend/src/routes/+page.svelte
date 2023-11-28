@@ -10,36 +10,6 @@
 	import SpriteDesigner from "../components/SpriteDesigner.svelte";
 	import { audio_store, debug_mode_store, keypress_store, registers_trigger, rom_mappings } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
-    import highScore from "$lib/highscore.js"
-    /**
-     * 
-     */
-
-    const keyToNum = {
-        "1" : 1, "2" : 2, "3" : 3, "4" : 0xC,
-        "q" : 4, "w" : 5, "e" : 6, "r" : 0xD,
-        "a" : 7, "s" : 8, "d" : 9, "f" : 0xE,
-        "z" : 0xA, "x" : 0, "c" : 0xB, "v" : 0xF
-    }
-
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key == "l") {
-            console.log(highScore());
-        }
-        // @ts-ignore comments
-        let key = keyToNum[event.key];
-        if (key != undefined) {
-            chip8.set_key(chip8.get_key() | (1 << key));
-        }
-    }
-
-    function handleKeyup(event: KeyboardEvent) {
-        // @ts-ignore comments
-        let key = keyToNum[event.key];
-        if (key != undefined) {
-            chip8.set_key(chip8.get_key() & (~(1 << key)));
-        }
-    }
 
     
     import "$lib/css/main.css"
@@ -119,13 +89,9 @@
 <div>
     <Loader />
 </div>
-<div>
-    <MessageBoard />
-</div>
 
 {#if debug}
 <div>
-    held down keys with n-key rollover: {active_keys}
     <SingleInstruction />
 </div>
 {/if}
@@ -141,14 +107,15 @@
 
 <div class="lr-container">
     <Display />
-    <RomDump />
+    <div>
+        <RomDump />
+        <MessageBoard />
+    </div>
 </div>
 
 {#if debug}
     <Editor />
 {/if}
-
-<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 
 <style>
