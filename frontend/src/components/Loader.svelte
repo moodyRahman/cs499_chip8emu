@@ -70,7 +70,4 @@
 
 <style>
 
-    select {
-        width: 20rem;
-    }
 </style>
