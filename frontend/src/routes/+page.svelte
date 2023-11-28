@@ -11,37 +11,36 @@
 	import { audio_store, debug_mode_store, keypress_store, registers_trigger, rom_mappings } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
     import highScore from "$lib/highscore.js"
-    
+    /**
+     * 
+     */
+
     const keyToNum = {
         "1" : 1, "2" : 2, "3" : 3, "4" : 0xC,
         "q" : 4, "w" : 5, "e" : 6, "r" : 0xD,
         "a" : 7, "s" : 8, "d" : 9, "f" : 0xE,
         "z" : 0xA, "x" : 0, "c" : 0xB, "v" : 0xF
     }
-    let keyState = 0;
-    onMount(() => {
-        function handleKeydown(event) {
-            if (event.key == "l") {
-                console.log(highScore());
-            }
-            let key = keyToNum[event.key];
-            if (key != undefined) {
-                chip8.set_key(chip8.get_key() | (1 << key));
-            }
+
+    function handleKeydown(event: KeyboardEvent) {
+        if (event.key == "l") {
+            console.log(highScore());
         }
-        function handleKeyup(event) {
-            let key = keyToNum[event.key];
-            if (key != undefined) {
-                chip8.set_key(chip8.get_key() & (~(1 << key)));
-            }
+        // @ts-ignore comments
+        let key = keyToNum[event.key];
+        if (key != undefined) {
+            chip8.set_key(chip8.get_key() | (1 << key));
         }
-        window.addEventListener('keydown', handleKeydown);
-        window.addEventListener('keyup', handleKeyup);
-        return () => {
-            window.removeEventListener('keydown', handleKeydown);
-            window.removeEventListener('keyup', handleKeyup);
-        };
-    });
+    }
+
+    function handleKeyup(event: KeyboardEvent) {
+        // @ts-ignore comments
+        let key = keyToNum[event.key];
+        if (key != undefined) {
+            chip8.set_key(chip8.get_key() & (~(1 << key)));
+        }
+    }
+
     
     import "$lib/css/main.css"
 	import Editor from "../components/Editor.svelte";
@@ -103,55 +102,6 @@
 
     let active_keys: string[] = []
 
-    const onKeyDown = (e:KeyboardEvent) => {
-        if (e.repeat) return;
-        if (e.key.length > 1) return;
-        if (!$rom_mappings) {
-            if (!e.key.match(/^[0-9a-fA-F]$/)) return
-            chip8.set_key(Number("0x" + e.key));
-            keypress_store.set(e.key)
-            active_keys = [...active_keys, e.key]
-
-            registers_trigger.update((n) => n+1)
-            return 
-        }
-        else {
-            if (!$rom_mappings.map((x) => x.keyboard).includes(e.key)) return
-            
-            // if (!e.key.match(/^[0-9a-fA-F]$/)) return
-            
-            let chip8_in = $rom_mappings.find((x) => x.keyboard === e.key)?.chip8_input;
-            chip8.set_key(Number("0x" + chip8_in));
-            if (!chip8_in) return
-    
-            keypress_store.set(chip8_in)
-            active_keys = [...active_keys, chip8_in]
-            registers_trigger.update((n) => n+1)
-        }
-
-    }
-
-    const resetKey = (e: KeyboardEvent) => {
-        if (e.repeat) return true
-        if (!$rom_mappings){
-            active_keys = active_keys.filter((x) => x != e.key)
-            chip8.set_key(Number("0x"+active_keys.at(-1)))
-            keypress_store.set(active_keys.at(-1)!?active_keys.at(-1)!:"")
-            registers_trigger.update((n) => n+1)
-        }
-        else {
-            let chip8_in = $rom_mappings.find((x) => x.keyboard === e.key)?.chip8_input;
-            active_keys = active_keys.filter((x) => x !== chip8_in)
-            chip8.set_key(Number("0x"+active_keys.at(-1)))
-            keypress_store.set(active_keys.at(-1)!?active_keys.at(-1)!:"")
-            registers_trigger.update((n) => n+1)
-            return;
-        }
-        
-
-    }
-
-
     let audio = false;
     audio_store.subscribe((n) => audio = n)
 
@@ -195,11 +145,10 @@
 </div>
 
 {#if debug}
-
     <Editor />
 {/if}
 
-<svelte:window on:keydown={onKeyDown} on:keyup={resetKey} />
+<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 
 <style>
