@@ -29,17 +29,17 @@
 
     })
 
-    // $: (() => {
-    //     if (registers[0] > 0){
+    $: (() => {
+        if (registers[37] > 0){
             
-    //         audio_store.set(false)
-    //         sound.play()
-    //     }
-    //     else {
-    //         audio_store.set(true)
-    //         sound.pause()
-    //     }
-    // })()
+            audio_store.set(false)
+            sound.play()
+        }
+        else {
+            audio_store.set(true)
+            sound.pause()
+        }
+    })()
 
 
     let debug = false;
@@ -65,7 +65,7 @@
         <span class="register">sp: {registers[33].toString(base)}</span>
         <span class="register">index: {registers[34].toString(base)}</span>
         <span class="register">dt: {registers[35].toString(base)}</span>
-        <span class="register">key: {registers[36].toString(base)}, {String.fromCharCode(registers[36])}</span>
+        <span class="register">key: {registers[36].toString(2).padStart(16, "0")}, {registers[36].toString(base)}</span>
         <span class="register">st: {registers[37].toString(base)}</span>
         
 
