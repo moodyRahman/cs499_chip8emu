@@ -1,9 +1,13 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
-	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store } from "$lib/stores/cpu_state";
+	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings } from "$lib/stores/cpu_state";
 
     import config from "../cpu_configs";
     
+    let rom_timing: any;
+
+    rom_timings.subscribe((n) => rom_timing = n)
+
     // Loader is what defines the raw_rom, this component waits for that data
     let raw_rom: Uint8Array = new Uint8Array();
     rom.subscribe((n) => {
@@ -30,7 +34,7 @@
 
     // set the cpu cycles per second, extract the data from the config
     // if we're in debug mode, use the debug timings for the CPU
-    $: ({ticks_per_interval, time_between_intervals_ms, display_rerender_threshold} = debug ? 
+    $: (rom_timing = debug ? 
             {
                 ticks_per_interval:1, 
                 time_between_intervals_ms:100,
@@ -70,14 +74,14 @@
     }, 17)
 
     // assume 
-    let main_loop_id = setInterval(() => n_tick(ticks_per_interval), time_between_intervals_ms)
+    let main_loop_id = setInterval(() => n_tick(rom_timing.ticks_per_interval), rom_timing.time_between_intervals_ms)
 
     // if debug mode changes, kill the main event loop and create a new one with 
     // the desired timing
-    $: debug, ticks_per_interval, time_between_intervals_ms, display_rerender_threshold, (() => {
+    $: debug, rom_timing, (() => {
         clearInterval(main_loop_id)
-        console.log(ticks_per_interval, time_between_intervals_ms, display_rerender_threshold)
-        main_loop_id = setInterval(() => n_tick(ticks_per_interval), time_between_intervals_ms)
+        console.log(rom_timing.ticks_per_interval, rom_timing.time_between_intervals_ms, rom_timing.display_rerender_threshold)
+        main_loop_id = setInterval(() => n_tick(rom_timing.ticks_per_interval), rom_timing.time_between_intervals_ms)
     })()
 
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -131,7 +135,7 @@
         page = Math.floor((pc - 512)/(rows*16)); // calculate the page this tick is on
         registers_trigger.update((n) => n+1); // send out an update for anything that listens to the cpu registers
 
-        if (cpu_ticks % display_rerender_threshold === 0)  // figure out on which cpu_ticks to we rerender the display
+        if (cpu_ticks % rom_timing.display_rerender_threshold === 0)  // figure out on which cpu_ticks to we rerender the display
         {
             display_trigger.update((n) => n+1)
         }
@@ -201,13 +205,13 @@
         {error}
     </span>
     <span>
-        ticks per interval: <input type="number" bind:value={ticks_per_interval} on:keydown={reject_alpha} >
+        ticks per interval: <input type="number" bind:value={rom_timing.ticks_per_interval} on:keydown={reject_alpha} >
     </span>
     <span>
-        time between intervals in ms: <input type="number" bind:value={time_between_intervals_ms} >
+        time between intervals in ms: <input type="number" bind:value={rom_timing.time_between_intervals_ms} >
     </span>
     <span>
-        display rerender threshold: <input type="number" bind:value={display_rerender_threshold} >
+        display rerender threshold: <input type="number" bind:value={rom_timing.display_rerender_threshold} >
     </span>
     {#if debug}
     <span>
@@ -215,9 +219,9 @@
             break on chip8 error: {break_on_chip8_error}
         </button>
         <button on:click={() => {
-            ticks_per_interval = config.hertz.ticks_per_interval
-            time_between_intervals_ms = config.hertz.time_between_intervals_ms
-            display_rerender_threshold = config.hertz.display_rerender_threshold
+            rom_timing.ticks_per_interval = config.hertz.ticks_per_interval
+            rom_timing.time_between_intervals_ms = config.hertz.time_between_intervals_ms
+            rom_timing.display_rerender_threshold = config.hertz.display_rerender_threshold
         }}>
             enable fast debugging
         </button>
