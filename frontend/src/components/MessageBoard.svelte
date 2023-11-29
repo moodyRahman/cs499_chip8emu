@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
-	import { registers_trigger } from "$lib/stores/cpu_state";
+	import { keypress_store, registers_trigger } from "$lib/stores/cpu_state";
     import highScore from "$lib/highscore.js"
 
     let data = [1, 2, 3, 0xc, 4, 5, 6, 0xd, 7, 8, 9, 0xe, 0xa, 0, 0xb, 0xf]
@@ -28,7 +28,7 @@
             if (active_keys.findIndex((x) => x === key) === -1){
                 active_keys = [...active_keys, key]
             }
-
+            $keypress_store = key;
             chip8.set_key_array(active_keys);
             registers_trigger.set($registers_trigger + 1);
         }
@@ -37,8 +37,9 @@
     function handleKeyup(event: KeyboardEvent) {
         // @ts-ignore comments
         let key = keyToNum[event.key];
-        if (key != undefined) {
-            active_keys = active_keys.filter((x) => x !== key)            
+        if (key != undefined) { 
+            active_keys = active_keys.filter((x) => x !== key)
+            $keypress_store = active_keys.length > 0? String(active_keys.at(-1)):"";
             chip8.set_key_array(active_keys);
             registers_trigger.set($registers_trigger + 1);
         }
@@ -89,14 +90,6 @@
 
 .pad > div.pressed {
     background-color: lightblue;
-}
-
-.current {
-    height: 1rem;
-}
-
-button {
-    font-size: 20px;
 }
 
 </style>
