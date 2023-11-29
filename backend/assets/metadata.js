@@ -14,9 +14,9 @@ const data = {
       }
     ],
     "timing": {
-      "ticks_per_interval": 5,
-      "time_between_intervals_ms": 10,
-      "display_rerender_threshold": 1
+      "ticks_per_interval": 12,
+      "time_between_intervals_ms": 9,
+      "display_rerender_threshold": 12
     }
   },
   "Astrododge.ch8": {
@@ -54,9 +54,9 @@ const data = {
       }
     ],
     "timing": {
-      "ticks_per_interval": 5,
+      "ticks_per_interval": 11,
       "time_between_intervals_ms": 10,
-      "display_rerender_threshold": 1
+      "display_rerender_threshold": 11
     }
   },
   "Pong.ch8": {
@@ -74,9 +74,9 @@ const data = {
       }
     ],
     "timing": {
-      "ticks_per_interval": 5,
-      "time_between_intervals_ms": 10,
-      "display_rerender_threshold": 1
+      "ticks_per_interval": 10,
+      "time_between_intervals_ms": 8,
+      "display_rerender_threshold": 10
     }
   },
   "IBM_Logo.ch8": {
