@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
-	import { audio_store, debug_mode_store, keypress_store, registers_trigger, rom_mappings } from "$lib/stores/cpu_state";
+	import { registers_trigger } from "$lib/stores/cpu_state";
     import highScore from "$lib/highscore.js"
 
     let data = [1, 2, 3, 0xc, 4, 5, 6, 0xd, 7, 8, 9, 0xe, 0xa, 0, 0xb, 0xf]
@@ -13,16 +13,24 @@
         "z" : 0xA, "x" : 0, "c" : 0xB, "v" : 0xF
     }
 
+    let active_keys: number[] = []
+
     function handleKeydown(event: KeyboardEvent) {
+        if (event.repeat) return;
         if (event.key == "l") {
             console.log(highScore());
         }
+
         // @ts-ignore comments
         let key = keyToNum[event.key];
         if (key != undefined) {
-            chip8.set_key(chip8.get_key() | (1 << key));
+            
+            if (active_keys.findIndex((x) => x === key) === -1){
+                active_keys = [...active_keys, key]
+            }
+
+            chip8.set_key_array(active_keys);
             registers_trigger.set($registers_trigger + 1);
-            keypress_store.set(event.key)
         }
     }
 
@@ -30,21 +38,19 @@
         // @ts-ignore comments
         let key = keyToNum[event.key];
         if (key != undefined) {
-            chip8.set_key(chip8.get_key() & (~(1 << key)));
+            active_keys = active_keys.filter((x) => x !== key)            
+            chip8.set_key_array(active_keys);
             registers_trigger.set($registers_trigger + 1);
-            if (chip8.get_key() === 0)
-            {
-                keypress_store.set("")
-            }
         }
     }
     
 </script>
 
+
 <div>
     <div class="pad">
         {#each data as cell, i}
-        {#if keyToNum[$keypress_store] === cell}
+        {#if active_keys.includes(cell)}
         <div class="pressed">
             {keys[i]} | {cell.toString(16)}
         </div>
@@ -56,10 +62,6 @@
 
         {/each}
 
-    </div>
-
-    <div class="current">
-        {$keypress_store}
     </div>
 
     
@@ -91,6 +93,10 @@
 
 .current {
     height: 1rem;
+}
+
+button {
+    font-size: 20px;
 }
 
 </style>
