@@ -8,7 +8,7 @@
 	import Registers from "../components/Registers.svelte";
 	import SingleInstruction from "../components/SingleInstruction.svelte";
 	import SpriteDesigner from "../components/SpriteDesigner.svelte";
-	import { audio_store, debug_mode_store, keypress_store, registers_trigger, rom_mappings } from "$lib/stores/cpu_state";
+	import { audio_store, debug_mode_store } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
 
     
