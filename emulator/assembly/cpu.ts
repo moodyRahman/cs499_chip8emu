@@ -681,6 +681,15 @@ export function get_key(): u16 {
   return cpu.key;
 }
 
+export function set_key_array(key_in: Array<u8>): void {
+  let i: u16 = 0;
+
+  for (let x = 0; x < key_in.length; x++) {
+    i |= 0x0001 << key_in[x];
+  }
+  cpu.key = i;
+}
+
 export function decrement_timers(): void {
   if (cpu.dt > 0) {
     cpu.dt -= 1;
