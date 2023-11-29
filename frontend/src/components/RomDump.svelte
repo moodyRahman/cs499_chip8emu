@@ -300,7 +300,7 @@
             <button class="tick" on:click={() => {
                     is_running = !is_running;
                 }}>
-                run cpu running: {is_running}, paused: {paused}
+                    {is_running?"pause":"run"} cpu
             </button>
 
             <button class="tick" on:click={() => {
