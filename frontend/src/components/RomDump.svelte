@@ -185,6 +185,9 @@
     let break_on_chip8_error = false;
     let error = "no emulator errors"
 
+
+    let edit_timing = false
+
 </script>
 <div class="container">
 
@@ -206,15 +209,27 @@
         {error}
     </span>
     {/if}
-    <span>
-        ticks per interval: <input type="number" bind:value={rom_timing.ticks_per_interval} on:keydown={reject_alpha} >
-    </span>
-    <span>
-        time between intervals in ms: <input type="number" bind:value={rom_timing.time_between_intervals_ms} >
-    </span>
-    <span>
-        display rerender threshold: <input type="number" bind:value={rom_timing.display_rerender_threshold} >
-    </span>
+<div>
+    <div>
+
+        {#if edit_timing}
+        <div>
+            ticks per interval: <input type="number" bind:value={rom_timing.ticks_per_interval} on:keydown={reject_alpha} >
+        </div>
+        <div>
+            time between intervals in ms: <input type="number" bind:value={rom_timing.time_between_intervals_ms} >
+        </div>
+        <div>
+            display rerender threshold: <input type="number" bind:value={rom_timing.display_rerender_threshold} >
+        </div>
+        {/if}
+    </div>
+
+    <div>
+        <button on:click={() => edit_timing = !edit_timing}>{edit_timing?"lock":"unlock"} timings</button>
+    </div>
+    
+</div>
     {#if debug}
     <span>
         <button on:click={() => break_on_chip8_error = !break_on_chip8_error}>
