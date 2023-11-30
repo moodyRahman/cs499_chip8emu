@@ -22,4 +22,8 @@
     .container {
         width: 400px;
     }
+
+    div {
+        font-size: 1.5rem;
+    }
 </style>
