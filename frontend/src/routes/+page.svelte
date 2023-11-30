@@ -14,6 +14,7 @@
     
     import "$lib/css/main.css"
 	import Editor from "../components/Editor.svelte";
+	import GamePad from "../components/GamePad.svelte";
 	import MessageBoard from "../components/MessageBoard.svelte";
 
     const load_wasm_binary = async () => {
@@ -109,7 +110,10 @@
     <Display />
     <div>
         <RomDump />
-        <MessageBoard />
+        <div>
+            <GamePad />
+            <MessageBoard />
+        </div>
     </div>
 </div>
 
