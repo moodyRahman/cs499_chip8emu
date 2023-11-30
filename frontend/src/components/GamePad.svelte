@@ -55,12 +55,12 @@
 </script>
 
 
-<div>
+<div class="container">
     <div class="pad">
         {#each data as cell, i}
         {#if active_keys.includes(cell)}
         <div class="pressed">
-            {keys[i]} | {cell.toString(16)}
+            {cell.toString(16)}
         </div>
         {:else}
         <div>
@@ -79,11 +79,14 @@
 
 <style>
 
+.container {
+    width: 100%;
+}
 
 .pad {
     display:grid;
     gap: 4px;
-    grid-template-columns: repeat(4, 25%);
+    grid-template-columns: repeat(4, 15%);
 }
 
 .pad > div {

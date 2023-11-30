@@ -4,10 +4,10 @@
 
 </script>
 
-<div>
-    <div>
+<div class="container">
+    <span>
         {$rom_description}
-    </div>
+    </span>
     <div>
         {#each $rom_mappings as mapping}
         <div>
@@ -16,3 +16,10 @@
         {/each}
     </div>
 </div>
+
+
+<style>
+    .container {
+        width: 400px;
+    }
+</style>
