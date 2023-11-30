@@ -80,7 +80,7 @@
     // the desired timing
     $: debug, rom_timing, (() => {
         clearInterval(main_loop_id)
-        console.log(rom_timing.ticks_per_interval, rom_timing.time_between_intervals_ms, rom_timing.display_rerender_threshold)
+        console.log("adjusting the timing: ", rom_timing.ticks_per_interval, rom_timing.time_between_intervals_ms, rom_timing.display_rerender_threshold)
         main_loop_id = setInterval(() => n_tick(rom_timing.ticks_per_interval), rom_timing.time_between_intervals_ms)
     })()
 
@@ -198,10 +198,10 @@
     <span>
         current hz: {(hz_display).toFixed(2)}
     </span>
-    {#if debug}
     <span>
         instructions ran: {cpu_ticks}
     </span>
+    {#if debug}
     <span>
         {error}
     </span>
@@ -289,11 +289,6 @@
                     <button class="tick" on:click={tick_raw}>
                         tick cpu {curr_inst.toString(16).padStart(4, "0")} | {chip8.convert_inst_to_string(curr_inst)}
                     </button>
-                
-                {:else}
-                    <button class="tick" on:click={tick_raw}>
-                        tick cpu
-                    </button>
                 {/if}
 
             </div>
@@ -306,7 +301,7 @@
             <button class="tick" on:click={() => {
                     is_running = !is_running;
                 }}>
-                    {is_running?"pause":"run"} cpu
+                    {is_running?"pause":"run"} game
             </button>
 
             <button class="tick" on:click={() => {
@@ -323,7 +318,7 @@
                 cpu_ticks = 0;
                 duration = 0;
             }}>
-                reset cpu
+                reset game
             </button>
         </div>
         </div>
