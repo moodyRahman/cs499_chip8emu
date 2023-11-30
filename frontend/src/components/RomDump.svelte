@@ -41,6 +41,12 @@
                 display_rerender_threshold:1
             } : config.hertz);
 
+    
+    $: debug, (() => {
+        if (debug) {
+            edit_timing = true;
+        }
+    })()
     let rows = config.rom_dump_display_rows;
 
     let base: number;
