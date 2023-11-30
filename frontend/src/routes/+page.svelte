@@ -110,10 +110,8 @@
     <Display />
     <div>
         <RomDump />
-        <div>
-            <GamePad />
-            <MessageBoard />
-        </div>
+        <MessageBoard />
+        <GamePad />
     </div>
 </div>
 
