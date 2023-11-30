@@ -196,14 +196,16 @@
         {rom_name} {raw_rom.length} bytes
     </div>
     <span>
-        current hz: {(hz_display).toFixed(2)} {duration.toFixed(2)}
+        current hz: {(hz_display).toFixed(2)}
     </span>
+    {#if debug}
     <span>
         instructions ran: {cpu_ticks}
     </span>
     <span>
         {error}
     </span>
+    {/if}
     <span>
         ticks per interval: <input type="number" bind:value={rom_timing.ticks_per_interval} on:keydown={reject_alpha} >
     </span>
