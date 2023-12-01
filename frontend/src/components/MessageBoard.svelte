@@ -5,10 +5,13 @@
 </script>
 
 <div class="container">
-    <span>
-        {$rom_description}
-    </span>
     <div>
+        {$rom_description}
+    </div>
+    <div class="controls">
+        <div class="c-header">
+            keyboard controls
+        </div>
         {#each $rom_mappings as mapping}
         <div>
             {mapping.keyboard} {mapping.description}
@@ -21,6 +24,16 @@
 <style>
     .container {
         width: 400px;
+    }
+
+    .c-header {
+        color: black;
+    }
+
+    .controls {
+        color: black;
+        padding-top: 4%;
+        padding-bottom: 4%;
     }
 
     div {
