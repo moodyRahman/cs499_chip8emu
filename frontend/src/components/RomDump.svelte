@@ -200,12 +200,6 @@
 <div class="container">
 
 
-    <!-- delete if there are performance issues -->
-
-    <pre>
-{JSON.stringify($rom_timings, null, 2)}
-    </pre>
-
     {#if raw_rom.length > 0}
     <div>
         {rom_name} {raw_rom.length} bytes
