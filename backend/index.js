@@ -30,7 +30,7 @@ app.get("/meta_assets/:rom", async (req, res) => {
                             {
                                 "keyboard": "",
                                 "chip8_input": "f",
-                                "description": "use the below keypad as reference for the controls"
+                                "description": "the keypad below maps to your keyboard"
                             }
                         ],
                         "timing": {
