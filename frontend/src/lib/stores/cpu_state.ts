@@ -46,9 +46,17 @@ export const rom_description = derived(
 export const rom_mappings = derived(rom_metadata, ($rom_metadata) => {
 	return $rom_metadata.data.mapping;
 });
-export const rom_timings = derived(rom_metadata, ($rom_metadata) => {
-	console.log($rom_metadata.data.timing);
-	return $rom_metadata.data.timing;
+
+export const rom_timings = writable({
+	ticks_per_interval: 8,
+	time_between_intervals_ms: 8,
+	display_rerender_threshold: 8
+});
+
+export const rom_timings_original = writable({
+	ticks_per_interval: 8,
+	time_between_intervals_ms: 8,
+	display_rerender_threshold: 8
 });
 
 export const base_store = writable(16);

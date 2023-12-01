@@ -1,17 +1,10 @@
 <script lang="ts">
     import * as chip8 from "$lib/chip8/debug.js";
-	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings } from "$lib/stores/cpu_state";
+	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings, rom_timings_original } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
 
     import config from "../cpu_configs";
-    
-    let local_timing: any = {
-        display_rerender_threshold: 1,
-        time_between_intervals_ms: 10,
-        ticks_per_interval: 1
-    }
 
-    $: local_timing = $rom_timings
 
 
     // Loader is what defines the raw_rom, this component waits for that data
@@ -81,14 +74,14 @@
     }, 17)
 
     // assume 
-    let main_loop_id = setInterval(() => n_tick(local_timing.ticks_per_interval), local_timing.time_between_intervals_ms)
+    let main_loop_id = setInterval(() => n_tick($rom_timings.ticks_per_interval), $rom_timings.time_between_intervals_ms)
 
     // if debug mode changes, kill the main event loop and create a new one with 
     // the desired timing
-    $: debug, local_timing.time_between_intervals_ms, local_timing.display_rerender_threshold, local_timing.ticks_per_interval, (() => {
+    $: debug, $rom_timings.time_between_intervals_ms, $rom_timings.display_rerender_threshold, $rom_timings.ticks_per_interval, (() => {
         clearInterval(main_loop_id)
-        console.log("adjusting the timing: ", local_timing.ticks_per_interval, local_timing.time_between_intervals_ms, local_timing.display_rerender_threshold)
-        main_loop_id = setInterval(() => n_tick(local_timing.ticks_per_interval), local_timing.time_between_intervals_ms)
+        console.log("adjusting the timing: ", $rom_timings.ticks_per_interval, $rom_timings.time_between_intervals_ms, $rom_timings.display_rerender_threshold)
+        main_loop_id = setInterval(() => n_tick($rom_timings.ticks_per_interval), $rom_timings.time_between_intervals_ms)
     })()
 
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -142,7 +135,7 @@
         page = Math.floor((pc - 512)/(rows*16)); // calculate the page this tick is on
         registers_trigger.update((n) => n+1); // send out an update for anything that listens to the cpu registers
 
-        if (cpu_ticks % local_timing.display_rerender_threshold === 0)  // figure out on which cpu_ticks to we rerender the display
+        if (cpu_ticks % $rom_timings.display_rerender_threshold === 0)  // figure out on which cpu_ticks to we rerender the display
         {
             display_trigger.update((n) => n+1)
         }
@@ -220,13 +213,13 @@
 
         {#if edit_timing}
         <div>
-            ticks per interval: <input type="number" bind:value={local_timing.ticks_per_interval} on:keydown={reject_alpha} >
+            ticks per interval: <input type="number" bind:value={$rom_timings.ticks_per_interval} on:keydown={reject_alpha} >
         </div>
         <div>
-            time between intervals in ms: <input type="number" bind:value={local_timing.time_between_intervals_ms} >
+            time between intervals in ms: <input type="number" bind:value={$rom_timings.time_between_intervals_ms} >
         </div>
         <div>
-            display rerender threshold: <input type="number" bind:value={local_timing.display_rerender_threshold} >
+            display rerender threshold: <input type="number" bind:value={$rom_timings.display_rerender_threshold} >
         </div>
         {/if}
     </div>
@@ -237,14 +230,17 @@
             $debug_mode_store = !$debug_mode_store
             if ($debug_mode_store) {
                 edit_timing = true;
-                local_timing.ticks_per_interval = 1;
-                local_timing.display_rerender_threshold = 1;
-                local_timing.time_between_intervals_ms = 100;
+                $rom_timings.ticks_per_interval = 1;
+                $rom_timings.display_rerender_threshold = 1;
+                $rom_timings.time_between_intervals_ms = 100;
             }
             else {
-                local_timing.ticks_per_interval = $rom_timings.ticks_per_interval
-                local_timing.display_rerender_threshold = $rom_timings.display_rerender_threshold
-                local_timing.time_between_intervals_ms = $rom_timings.time_between_intervals_ms
+                const {ticks_per_interval: tps, display_rerender_threshold: drt, time_between_intervals_ms: tbim} = $rom_timings_original
+                console.log("we're disabling the debug mode")
+                console.log("this one should not be changing: ", $rom_timings_original)
+                $rom_timings.ticks_per_interval = tps
+                $rom_timings.display_rerender_threshold = drt
+                $rom_timings.time_between_intervals_ms = tbim
             }
 
         }}>{$debug_mode_store?"disable":"enable"} debug mode</button>
@@ -257,9 +253,9 @@
             break on chip8 error: {break_on_chip8_error}
         </button>
         <button on:click={() => {
-            local_timing.ticks_per_interval = $rom_timings.ticks_per_interval
-            local_timing.time_between_intervals_ms = $rom_timings.time_between_intervals_ms
-            local_timing.display_rerender_threshold = $rom_timings.display_rerender_threshold
+            $rom_timings.ticks_per_interval = $rom_timings.ticks_per_interval
+            $rom_timings.time_between_intervals_ms = $rom_timings.time_between_intervals_ms
+            $rom_timings.display_rerender_threshold = $rom_timings.display_rerender_threshold
         }}>
             enable fast debugging
         </button>

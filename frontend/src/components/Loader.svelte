@@ -4,7 +4,7 @@
     import * as chip8 from "$lib/chip8/debug.js";
 	import { onMount } from "svelte";
     import config from "../cpu_configs";
-    import { rom_metadata, rom_name as rom_name_store, rom as rom_store } from "$lib/stores/cpu_state";
+    import { rom_metadata, rom_name as rom_name_store, rom as rom_store, rom_timings_original, rom_timings } from "$lib/stores/cpu_state";
 
     let rom: Uint8Array
     rom_store.subscribe((n) => rom = n)
@@ -30,6 +30,8 @@
 
         console.log(data)
         rom_metadata.set(data.meta)
+        $rom_timings = data.meta.data.timing
+        $rom_timings_original = JSON.parse(JSON.stringify(data.meta.data.timing))
 
         rom_store.set(buff);
         rom_name_store.set(name)
