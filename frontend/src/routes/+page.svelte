@@ -83,11 +83,6 @@
 </script>
 
 <div>
-    <button on:click={() => debug_mode_store.set(!debug)}>
-        toggle debug menu
-    </button>
-</div>
-<div>
     <Loader />
 </div>
 
