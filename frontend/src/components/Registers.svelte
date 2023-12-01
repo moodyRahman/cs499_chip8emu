@@ -27,7 +27,7 @@
             if (sound.playing()) return;
         },
         loop: true,
-        volume: .05,
+        volume: .5,
         html5: false
 
     })
