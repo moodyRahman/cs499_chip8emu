@@ -8,7 +8,6 @@ interface metadata {
 			| [
 					{
 						keyboard: string;
-						chip8_input: string;
 						description: string;
 					}
 			  ]
@@ -53,6 +52,6 @@ export const rom_timings = derived(rom_metadata, ($rom_metadata) => {
 });
 
 export const base_store = writable(16);
-export const debug_mode_store = writable(true);
+export const debug_mode_store = writable(false);
 export const keypress_store = writable('');
 export const audio_store = writable(false);
