@@ -29,22 +29,6 @@
         }
 
         console.log(data)
-
-        if (data.meta.status === 0) {
-            rom_metadata.set({
-                status: 0,
-                data: {
-                    description: 'loading...',
-                    mapping: [],
-                    timing: {
-                        ticks_per_interval: 8,
-                        time_between_intervals_ms: 8,
-                        display_rerender_threshold: 8
-                    }
-                }
-            } )
-        }
-        
         rom_metadata.set(data.meta)
 
         rom_store.set(buff);
