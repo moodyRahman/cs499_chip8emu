@@ -10,6 +10,8 @@ export const highScoreInfo = {
     //1 : ["SuperPong", 1, 2, 0x21B]
 }
 
+export const implemented_games = Object.values(highScoreInfo).map((x) => x[0])
+
 function romHash() {
     return
 }
