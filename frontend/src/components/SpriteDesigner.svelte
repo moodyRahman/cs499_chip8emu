@@ -22,45 +22,53 @@
 
         return out
     }
+
+    let name = ""
     
 
 </script>
-<div>
-
-<div>
-    build a sprite! <button on:click={() => binary_editor = !binary_editor}>binary editor mode (wip)</button> 
-    <button on:click={() => pixels = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))}>reset</button>
-</div>
-<div class="grid">
-    {#each Array(15) as y, yi }
-        <span class="row_c">
-            {(yi + 1).toString(16)}
-        </span>
-            {#each Array(8) as x, xi}
-            <!-- <span on:click={() => pixels[yi][xi] = true} aria-pressed="mixed" on:keypress={() => {}}>
-                {yi}, {xi}
-            </span> -->
-            <button 
-            on:mousedown={(e) => {
-                pixels[yi][xi] = !pixels[yi][xi]
-            }}
-
-            class={`${pixels[yi][xi]?"inactive":"active"} pixel`}>
-                
-            </button>
-            {/each}
-
-        {#if binary_editor}
-        <div class="result">
-            <input type="number" pattern="[0-1]" required>
-        </div>
-        {:else}
-            <span class="result">
-                0x{row_to_hex(pixels[yi]).toString(16)}
+<div class="container">
+    <div>
+        lalala
+    </div>
+    <div>
+    <div>
+        <input type="text" bind:value={name} placeholder="enter sprite name">
+        <button>save</button>
+        <button on:click={() => pixels = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))}>reset</button>
+    </div>
+    <div class="grid">
+        {#each Array(15) as y, yi }
+            <span class="row_c">
+                {(yi + 1).toString(16)}
             </span>
-        {/if}
-    {/each}
-</div>
+                {#each Array(8) as x, xi}
+                <!-- <span on:click={() => pixels[yi][xi] = true} aria-pressed="mixed" on:keypress={() => {}}>
+                    {yi}, {xi}
+                </span> -->
+                <button 
+                on:mousedown={(e) => {
+                    pixels[yi][xi] = !pixels[yi][xi]
+                }}
+
+                class={`${pixels[yi][xi]?"inactive":"active"} pixel`}>
+                    
+                </button>
+                {/each}
+
+            {#if binary_editor}
+            <div class="result">
+                <input type="number" pattern="[0-1]" required>
+            </div>
+            {:else}
+                <span class="result">
+                    0x{row_to_hex(pixels[yi]).toString(16)}
+                </span>
+            {/if}
+        {/each}
+    </div>
+    </div>
+
 </div>
 
 
@@ -70,6 +78,12 @@
         padding: 0;
         margin: 0;
         height: 18px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: row;
+        gap: 3rem;
     }
     .grid {
         display:inline-grid;
