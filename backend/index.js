@@ -9,6 +9,8 @@ import metadata from "./assets/metadata.js";
 const app = express()
 const port = process.env.PORT
 app.use(cors())
+app.use(express.json());
+
 app.use((req, res, next) => {
     console.log(`${req.method} for ${req.url}`);
     next()
@@ -71,7 +73,8 @@ app.get("/highscores", async (req, res) => {
 })
 
 app.post("/highscores", (req, res) => {
-    res.send("here be some data")
+    console.log(req.body)
+    res.send(req.body)
 })
 
 app.get('/', (req, res) => {
