@@ -1,10 +1,13 @@
 <script>
+	import { loading } from "$lib/stores/cpu_state";
 	import Header from "../components/Header.svelte";
 
 </script>
 
 <div class="page">
-    
+    {#if $loading}
+    loading...
+    {:else}
     <Header />
     
     <div class="main-content">
@@ -14,6 +17,8 @@
         </slot>
 
     </div>
+    {/if}
+
 
     <footer>
 
