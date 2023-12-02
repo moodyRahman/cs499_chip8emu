@@ -1,12 +1,33 @@
 <script lang="ts">
+	import highScore from "$lib/highscore";
+	import { onMount } from "svelte";
 
-const handleSubmit = (e: MouseEvent) => {
-    console.log("submittin")
-} 
+    let dialog: any;
+    let name: string = ""
+    onMount(() => {
+        dialog = document.querySelector("dialog");
+
+    })
+
+    const openModal = (e: MouseEvent) => {
+        dialog?.showModal();    
+        console.log(highScore())
+    }
 
 </script>
 
-<button on:click={handleSubmit}>
+<dialog>
+    <div>
+        enter your name: <input type="text" bind:value={name}>
+    </div>
+    <div>
+        <button on:click={() => dialog?.close()}>cancel</button>
+        <button on:click={() => dialog?.close()}>submit</button>
+
+    </div>
+</dialog>
+
+<button on:click={openModal}>
     submit highscore
 </button>
 
