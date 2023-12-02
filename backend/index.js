@@ -61,6 +61,19 @@ app.get("/assets_data", async (req, res) => {
     res.send(data)
 })
 
+
+app.get("/highscores", async (req, res) => {
+    const response = await fetch("https://strapi.moodyrahman.com/api/chip8-highscores", {
+        headers: { Authorization: `Bearer ${process.env.STRAPI_KEY}` }
+    })
+    const data = await response.json()
+    res.send(data)
+})
+
+app.post("/highscores", (req, res) => {
+    res.send("here be some data")
+})
+
 app.get('/', (req, res) => {
     res.send('backend online')
 })
