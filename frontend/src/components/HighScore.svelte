@@ -1,5 +1,5 @@
 <script lang="ts">
-	import highScore, { highScoreInfo } from "$lib/highscore";
+	import highScore, { highScoreInfo, implemented_games } from "$lib/highscore";
 	import { rom_name as rom_name_store } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
 	import config from "../cpu_configs";
@@ -12,7 +12,6 @@
     let score = 0
 
     const filter = new BadWordsFilter()
-    const implemented_games = Object.values(highScoreInfo).map((x) => x[0])
 
     $: rom_name = $rom_name_store.substring(0, $rom_name_store.length - 4)
     onMount(() => {
@@ -55,6 +54,7 @@
 
         const data = await res.json()
         console.log(data)
+        submit_dialog.close()
 
     }
 
