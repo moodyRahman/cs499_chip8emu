@@ -36,6 +36,7 @@
 	"dependencies": {
 		"@assemblyscript/loader": "^0.27.18",
 		"@types/howler": "^2.2.11",
+		"bad-words": "^3.0.4",
 		"howler": "^2.2.4",
 		"svelte-preprocess": "^5.0.4",
 		"wasm-loader": "^1.3.0"
