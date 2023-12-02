@@ -1,5 +1,7 @@
 <script lang="ts">
+    
     import * as chip8 from "$lib/chip8/debug.js";
+    import HighScore from './HighScore.svelte';
 	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings, rom_timings_original } from "$lib/stores/cpu_state";
 	import { onMount } from "svelte";
 
@@ -352,6 +354,7 @@
             }}>
                 reset game
             </button>
+            <HighScore />
         </div>
         </div>
     </div>
@@ -390,7 +393,6 @@
     .dump > div {
         margin: 2.5px;
         text-align: center;
-
     }
 
     .tick {
