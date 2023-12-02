@@ -3,7 +3,7 @@
 // @ts-nocheck
 import * as chip8 from "$lib/chip8/debug.js";
 
-const highScoreInfo = {
+export const highScoreInfo = {
     // ROM HASH : ["GAME TITLE", decodeType, numBytes, startAddr]
     26799: ["Breakout", 1, 2, 0x315],
     106009: ["Astrododge", 1, 4, 0x59C]//,
