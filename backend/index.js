@@ -5,6 +5,7 @@ import cors from "cors";
 import { readdir, readFile } from "fs/promises"
 import 'dotenv/config'
 import metadata from "./assets/metadata.js";
+import qs from "qs";
 
 const app = express()
 const port = process.env.PORT
@@ -66,15 +67,30 @@ app.get("/assets_data", async (req, res) => {
 
 app.get("/highscores", async (req, res) => {
     const response = await fetch("https://strapi.moodyrahman.com/api/chip8-highscores", {
-        headers: { Authorization: `Bearer ${process.env.STRAPI_KEY}` }
+        headers: { Authorization: `Bearer ${process.env.STRAPI_KEY}` },
     })
     const data = await response.json()
     res.send(data)
 })
 
-app.post("/highscores", (req, res) => {
+app.post("/highscores", async (req, res) => {
+
+    const response = await fetch(`https://strapi.moodyrahman.com/api/chip8-highscores`, {
+        headers: {
+            Authorization: `Bearer ${process.env.STRAPI_KEY}`,
+            Accept: 'application/json',
+            "Content-Type": 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify({ data: req.body })
+    })
     console.log(req.body)
-    res.send(req.body)
+
+    console.log(await response.text())
+
+    res.send({
+        "status": "done"
+    })
 })
 
 app.get('/', (req, res) => {
