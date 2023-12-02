@@ -26,13 +26,7 @@ app.get("/meta_assets/:rom", async (req, res) => {
                 meta: {
                     status: (metadata[req.params.rom] ? 1 : 0),
                     data: (metadata[req.params.rom] ? metadata[req.params.rom] : {
-                        "mapping": [
-                            {
-                                "keyboard": "",
-                                "chip8_input": "f",
-                                "description": "the keypad below maps to your keyboard, press the button to see what chip8 input it corresponds to"
-                            }
-                        ],
+                        "mapping": [],
                         "timing": {
                             "ticks_per_interval": 12,
                             "time_between_intervals_ms": 8,
