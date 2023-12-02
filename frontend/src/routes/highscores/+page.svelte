@@ -29,7 +29,7 @@
                 <th>score</th>
             </tr>
             
-            {#each data.filter((x) => x.game === game) as score}
+            {#each ([...data.filter((x) => x.game === game)].slice(0, 10)) as score}
             <tr>
                 <td>
                     {score.name}
@@ -50,6 +50,6 @@
     .container {
         display: flex;
         flex-direction: row;
-        justify-content: space-around;
+        gap: 3rem;
     }
 </style>
