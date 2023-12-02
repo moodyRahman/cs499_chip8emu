@@ -25,7 +25,15 @@ app.get("/meta_assets/:rom", async (req, res) => {
             {
                 meta: {
                     status: (metadata[req.params.rom] ? 1 : 0),
-                    data: (metadata[req.params.rom] ? metadata[req.params.rom] : {})
+                    data: (metadata[req.params.rom] ? metadata[req.params.rom] : {
+                        "mapping": [],
+                        "timing": {
+                            "ticks_per_interval": 12,
+                            "time_between_intervals_ms": 8,
+                            "display_rerender_threshold": 12
+                        },
+                        "description": "No description available"
+                    })
 
                 },
                 rom: Buffer.from(rom.buffer).toString("base64")

@@ -4,12 +4,12 @@
     import * as chip8 from "$lib/chip8/debug.js";
 	import { onMount } from "svelte";
     import config from "../cpu_configs";
-    import { rom_metadata, rom_name as rom_name_store, rom as rom_store } from "$lib/stores/cpu_state";
+    import { rom_metadata, rom_name as rom_name_store, rom as rom_store, rom_timings_original, rom_timings } from "$lib/stores/cpu_state";
 
     let rom: Uint8Array
     rom_store.subscribe((n) => rom = n)
 
-
+    let message = ""
     
 
 
@@ -19,6 +19,7 @@
     // $: rom_name, loader();
 
     const loader = async () => {
+        message = ""
         console.log(`fetching ${config.backend_url}/meta_assets/${name}`)
         const res = await fetch(`${config.backend_url}/meta_assets/${name}`);
         const data = await res.json()
@@ -28,10 +29,10 @@
             buff[i] = bin_string.charCodeAt(i);
         }
 
-        console.log(data.meta)
-
+        console.log(data)
         rom_metadata.set(data.meta)
-        console.log("set rom metadata")
+        $rom_timings = data.meta.data.timing
+        $rom_timings_original = JSON.parse(JSON.stringify(data.meta.data.timing))
 
         rom_store.set(buff);
         rom_name_store.set(name)
@@ -53,9 +54,9 @@
 
 <div>
     <div>
-        load a rom
+        load a rom{message === "" ? "" : ", " + message}
     </div>
-    <select bind:value={name}>
+    <select bind:value={name} on:change={() => message = "be sure to click \"load rom\" before you play the game"}>
 
         <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
         {#each [...all_roms, "load ROM from editor "] as option }
@@ -70,7 +71,4 @@
 
 <style>
 
-    select {
-        width: 20rem;
-    }
 </style>

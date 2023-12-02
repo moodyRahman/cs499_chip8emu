@@ -1,35 +1,56 @@
 <script lang="ts">
-	import { rom_description, rom_mappings, rom_status } from "$lib/stores/cpu_state";
-    import img from "../lib/Screenshot_2023-11-23_at_4.55.06_PM.png"
+	import { rom_description, rom_mappings } from "$lib/stores/cpu_state";
+
 
 </script>
 
-<div>
-    <div>
-        
-    {#if $rom_description}
-        {$rom_description}
-        {#if $rom_mappings}
-            {#each $rom_mappings as mappings}
-            <div>
-                {mappings?.keyboard}: {mappings?.description}
+<div class="container">
+    <div class="controls">
+        {#if $rom_mappings.length > 0}
+            <div class="c-header">
+                keyboard controls
             </div>
+            {#each $rom_mappings as mapping}
+                <div>
+                    press <span class="keymap">{mapping.keyboard}</span> to {mapping.description}
+                </div>
             {/each}
         {:else}
-            no additional metadata
+        no controls metadata found
         {/if}
-    {:else}
-    <div>
-        view help page to see the current mapping
-    </div>
-    {/if}
-    </div>
-
-    <div>
     </div>
 </div>
 
 
 <style>
+    .container {
+        width: 400px;
+    }
 
+    .description {
+        font-size: 1rem;
+    }
+
+    .keymap {
+        background-color: coral;
+        padding-left: 1%;
+        padding-right: 1%;
+        text-align: center;
+        font-family: monospace;
+
+    }
+
+    .c-header {
+        color: black;
+    }
+
+    .controls {
+        color: black;
+        padding-top: 4%;
+        padding-bottom: 4%;
+    }
+
+    div {
+        font-size: 1.5rem;
+    }
 </style>

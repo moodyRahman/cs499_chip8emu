@@ -1,13 +1,6 @@
-<div>
+<div class="header">
     <div class="h1">
-        PierogiWave
-    </div>
-
-    <div class="">
-        a new kind of chip8 emulation
-    </div>
-    <div class="h3">
-        Nobel "Ken" Prakasam,  Filip "Shmaz_Pootaz" Trzcinka, Moududur "Moody" Rahman  
+        Chip8 Emulator
     </div>
     <div>
         <a href="/">
@@ -28,12 +21,9 @@
 
 
 <style>
-    .h1 {
-        font-size: 2.5rem;
-    }
 
-    .h3 {
-        font-weight: 900;
+    .h1 {
+        font-size: 1.5rem;
         margin-bottom: .5rem;
     }
 
@@ -45,6 +35,8 @@
         margin-top: 1rem;
         padding: 2px;
         width: fit-content;
+        font-size: 1.25rem;
+        margin-right: .5rem;
     }
     a:hover {
         background-color: lightcoral;

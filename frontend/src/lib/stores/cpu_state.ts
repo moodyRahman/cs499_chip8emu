@@ -8,11 +8,15 @@ interface metadata {
 			| [
 					{
 						keyboard: string;
-						chip8_input: string;
 						description: string;
 					}
 			  ]
 			| [];
+		timing: {
+			ticks_per_interval: number;
+			time_between_intervals_ms: number;
+			display_rerender_threshold: number;
+		};
 	};
 }
 
@@ -25,7 +29,12 @@ export const rom_metadata = writable<metadata>({
 	status: 0,
 	data: {
 		description: 'loading...',
-		mapping: []
+		mapping: [],
+		timing: {
+			ticks_per_interval: 8,
+			time_between_intervals_ms: 8,
+			display_rerender_threshold: 8
+		}
 	}
 });
 
@@ -35,38 +44,22 @@ export const rom_description = derived(
 	($rom_metadata) => $rom_metadata.data.description
 );
 export const rom_mappings = derived(rom_metadata, ($rom_metadata) => {
-	if (!$rom_metadata.data.mapping) {
-		const mappings = [
-			'x',
-			'1',
-			'2',
-			'3',
-			'q',
-			'w',
-			'e',
-			'a',
-			's',
-			'd',
-			'z',
-			'c',
-			'4',
-			'r',
-			'f',
-			'v'
-		];
-		return [...Array(16)].map((e, i) => {
-			return {
-				keyboard: mappings[i],
-				chip8_input: i.toString(16),
-				description: `maps to ${i.toString(16)}`
-			};
-		});
-	} else {
-		return $rom_metadata.data.mapping;
-	}
+	return $rom_metadata.data.mapping;
+});
+
+export const rom_timings = writable({
+	ticks_per_interval: 8,
+	time_between_intervals_ms: 8,
+	display_rerender_threshold: 8
+});
+
+export const rom_timings_original = writable({
+	ticks_per_interval: 8,
+	time_between_intervals_ms: 8,
+	display_rerender_threshold: 8
 });
 
 export const base_store = writable(16);
-export const debug_mode_store = writable(true);
+export const debug_mode_store = writable(false);
 export const keypress_store = writable('');
 export const audio_store = writable(false);
