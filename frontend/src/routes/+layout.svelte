@@ -9,24 +9,27 @@
     
     <div class="main-content">
         
-    <slot>
+        <slot>
+            
+        </slot>
+
+    </div>
+
+    <footer>
+
+        <hr />
         
-    </slot>
-
-</div>
-
-<!-- <footer>
-
-    <hr />
-    
-    <div>
-        CSCI 499 Capstone Project
-    </div>
-    <div>
-        made with Svelte, AssemblyScript, WASM, and a lot of bitwise math
-    </div>
-    
-</footer> -->
+        <div>
+            CSCI 499 Capstone Project
+        </div>
+        <div>
+            made with Svelte, AssemblyScript, WASM, and a lot of bitwise math
+        </div>
+        <div>
+            Nobel "Ken" Prakasam,  Filip "Shmaz_Pootaz" Trzcinka, Moududur "Moody" Rahman  
+        </div>
+        
+    </footer>
 
 </div>
 <style>
@@ -59,17 +62,18 @@
 
     footer {
         margin-bottom: 1rem;
+        align-self: stretch;
     }
 
     .main-content {
         margin-top: 2%;
-        height: 105vh;
     }
 
     .page {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
     }
+
+
 
 </style>
