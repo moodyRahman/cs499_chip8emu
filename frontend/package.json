@@ -35,6 +35,7 @@
 	"type": "module",
 	"dependencies": {
 		"@assemblyscript/loader": "^0.27.18",
+		"@types/bad-words": "^3.0.3",
 		"@types/howler": "^2.2.11",
 		"bad-words": "^3.0.4",
 		"howler": "^2.2.4",
