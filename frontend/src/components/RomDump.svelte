@@ -195,7 +195,7 @@
 
     {#if raw_rom.length > 0}
     <div>
-        {rom_name} {raw_rom.length} bytes
+        currently loaded ROM: {rom_name} {raw_rom.length} bytes
     </div>
     <span>
         current hz: {(hz_display).toFixed(2)}
