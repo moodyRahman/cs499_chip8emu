@@ -96,13 +96,15 @@
     <div class="register">
         <Registers />
     </div>
-    {#if debug}
-        <SpriteDesigner />
-    {/if}
 </div>
 
 <div class="lr-container">
-    <Display />
+    <div class="display-container">
+        <Display />
+        {#if debug}
+            <SpriteDesigner />
+        {/if}
+    </div>
     <div>
         <RomDump />
         <MessageBoard />
@@ -117,6 +119,9 @@
 
 <style>
 
+    .display-container {
+        height: 100%;
+    }
     .lr-container {
         display: flex;
         height: auto;
