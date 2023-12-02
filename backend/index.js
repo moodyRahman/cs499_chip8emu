@@ -5,7 +5,8 @@ import cors from "cors";
 import { readdir, readFile } from "fs/promises"
 import 'dotenv/config'
 import metadata from "./assets/metadata.js";
-import qs from "qs";
+import { Score } from "./models/scores.js";
+
 
 const app = express()
 const port = process.env.PORT
@@ -66,27 +67,23 @@ app.get("/assets_data", async (req, res) => {
 
 
 app.get("/highscores", async (req, res) => {
-    const response = await fetch("https://strapi.moodyrahman.com/api/chip8-highscores", {
-        headers: { Authorization: `Bearer ${process.env.STRAPI_KEY}` },
-    })
-    const data = await response.json()
-    res.send(data)
+    res.send(await Score.findAll({
+        attributes: ["name", "game", "score"]
+    }))
 })
 
 app.post("/highscores", async (req, res) => {
 
-    const response = await fetch(`https://strapi.moodyrahman.com/api/chip8-highscores`, {
-        headers: {
-            Authorization: `Bearer ${process.env.STRAPI_KEY}`,
-            Accept: 'application/json',
-            "Content-Type": 'application/json'
-        },
-        method: "POST",
-        body: JSON.stringify({ data: req.body })
-    })
-    console.log(req.body)
-
-    console.log(await response.text())
+    if (await Score.findOne({ where: { name: req.body.name, game: req.body.game } })) {
+        console.log("found a matching name")
+        await Score.update({ score: req.body.score }, {
+            where: { name: req.body.name, game: req.body.game }
+        })
+    }
+    else {
+        console.log("no matching name")
+        await Score.create(req.body)
+    }
 
     res.send({
         "status": "done"
