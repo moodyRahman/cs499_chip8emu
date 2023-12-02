@@ -62,7 +62,7 @@
 
 
 <div class="container">
-    try pressing these buttons on your keyboard!
+    {show_chip8?"these are the inputs the emulator is actually recieving":"try pressing these buttons on your keyboard!"}
     <div class="pad">
         {#each data as cell, i}
         <div class={active_keys.includes(cell)?"pressed":""}>
@@ -89,7 +89,7 @@
 <style>
 
 .container {
-    width: 100%;
+    width: 400px;
 }
 
 .pad {

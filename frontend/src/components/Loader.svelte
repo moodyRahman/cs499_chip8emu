@@ -63,7 +63,13 @@
             <option value={option}>{option.slice(0, option.indexOf(".ch8"))}</option>
         {/each}
     </select>
-    <button on:click={loader}>
+    <button on:click={() => {
+        loader();
+        message = "now click on run game to start playing!"
+        setTimeout(() => {
+            message = ""
+        }, 3000)
+        }}>
         load rom
     </button>
 </div>
