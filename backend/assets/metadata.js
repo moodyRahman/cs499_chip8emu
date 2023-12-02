@@ -21,17 +21,25 @@ const data = {
     "description": "With stunning 1 bit graphics, dodge asteriods hurtling towards your ship!",
     "mapping": [
       {
-        "keyboard": "q",
-        "description": "move left"
-      },
-      {
         "keyboard": "w",
         "description": "start"
       },
       {
+        "keyboard": "q",
+        "description": "move left"
+      },
+      {
         "keyboard": "e",
         "description": "move right"
-      }
+      },
+      {
+        "keyboard": "2",
+        "description": "move up"
+      },
+      {
+        "keyboard": "s",
+        "description": "move down"
+      },
     ],
     "timing": {
       "ticks_per_interval": 12,

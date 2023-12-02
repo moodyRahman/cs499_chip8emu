@@ -15,6 +15,8 @@
 
     let active_keys: number[] = []
 
+    let show_chip8 = false;
+
     // let controller = {
     //     "1" : false, "2" : false, "3" : false, "4" : false,
     //     "q" : false, "w" : false, "e" : false, "r" : false,
@@ -64,12 +66,20 @@
     <div class="pad">
         {#each data as cell, i}
         <div class={active_keys.includes(cell)?"pressed":""}>
+            {#if show_chip8}
+            {active_keys.includes(cell)? keys[i]:cell.toString(16)}
+            {:else}
             {active_keys.includes(cell)? cell.toString(16):keys[i]}
+            {/if}
         </div>
 
         {/each}
 
     </div>
+
+    <button on:click={() => show_chip8 = !show_chip8}>
+        show {show_chip8?"keyboard":"chip8"} input
+    </button>
     
 </div>
 
