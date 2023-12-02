@@ -68,7 +68,10 @@ app.get("/assets_data", async (req, res) => {
 
 app.get("/highscores", async (req, res) => {
     res.send(await Score.findAll({
-        attributes: ["name", "game", "score"]
+        attributes: ["name", "game", "score"],
+        order: [
+            ["score", "DESC"]
+        ]
     }))
 })
 
