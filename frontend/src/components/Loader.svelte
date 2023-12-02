@@ -4,7 +4,7 @@
     import * as chip8 from "$lib/chip8/debug.js";
 	import { onMount } from "svelte";
     import config from "../cpu_configs";
-    import { rom_metadata, rom_name as rom_name_store, rom as rom_store, rom_timings_original, rom_timings } from "$lib/stores/cpu_state";
+    import { rom_metadata, rom_name as rom_name_store, rom as rom_store, rom_timings_original, rom_timings, loading } from "$lib/stores/cpu_state";
 
     let rom: Uint8Array
     rom_store.subscribe((n) => rom = n)
@@ -38,6 +38,8 @@
         rom_name_store.set(name)
         chip8.reset();
         chip8.load_rom(rom);
+        $loading = false
+        console.log("done loading")
 	}
 
     onMount(loader)

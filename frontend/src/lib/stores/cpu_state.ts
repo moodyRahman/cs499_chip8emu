@@ -63,3 +63,5 @@ export const base_store = writable(16);
 export const debug_mode_store = writable(false);
 export const keypress_store = writable('');
 export const audio_store = writable(false);
+
+export const loading = writable(false);
