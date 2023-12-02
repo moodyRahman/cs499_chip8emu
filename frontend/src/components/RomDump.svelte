@@ -269,11 +269,20 @@
             break on chip8 error: {break_on_chip8_error}
         </button>
         <button on:click={() => {
-            $rom_timings.ticks_per_interval = $rom_timings.ticks_per_interval
-            $rom_timings.time_between_intervals_ms = $rom_timings.time_between_intervals_ms
-            $rom_timings.display_rerender_threshold = $rom_timings.display_rerender_threshold
+            if (
+                $rom_timings.ticks_per_interval === $rom_timings_original.ticks_per_interval && 
+            $rom_timings.time_between_intervals_ms === $rom_timings_original.time_between_intervals_ms &&
+            $rom_timings.display_rerender_threshold === $rom_timings_original.display_rerender_threshold) {
+                $rom_timings.ticks_per_interval = 1;
+                $rom_timings.display_rerender_threshold = 1;
+                $rom_timings.time_between_intervals_ms = 100;
+                return;
+            }
+            $rom_timings.ticks_per_interval = $rom_timings_original.ticks_per_interval
+            $rom_timings.time_between_intervals_ms = $rom_timings_original.time_between_intervals_ms
+            $rom_timings.display_rerender_threshold = $rom_timings_original.display_rerender_threshold
         }}>
-            enable fast debugging
+            toggle fast debugging
         </button>
     </span>
     <!-- 
