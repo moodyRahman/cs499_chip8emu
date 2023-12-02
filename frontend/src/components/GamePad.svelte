@@ -51,22 +51,21 @@
             registers_trigger.set($registers_trigger + 1);
         }
     }
+
+    const handleClick = (e: MouseEvent) => {
+        
+    }
     
 </script>
 
 
 <div class="container">
+    try pressing these buttons on your keyboard!
     <div class="pad">
         {#each data as cell, i}
-        {#if active_keys.includes(cell)}
-        <div class="pressed">
-            {cell.toString(16)}
+        <div class={active_keys.includes(cell)?"pressed":""}>
+            {active_keys.includes(cell)? cell.toString(16):keys[i]}
         </div>
-        {:else}
-        <div>
-            {keys[i]}
-        </div>
-        {/if}
 
         {/each}
 
