@@ -5,18 +5,19 @@
 </script>
 
 <div class="container">
-    <div>
-        {$rom_description}
-    </div>
     <div class="controls">
-        <div class="c-header">
-            keyboard controls
-        </div>
-        {#each $rom_mappings as mapping}
-        <div>
-            {mapping.keyboard} {mapping.description}
-        </div>
-        {/each}
+        {#if $rom_mappings.length > 0}
+            <div class="c-header">
+                keyboard controls
+            </div>
+            {#each $rom_mappings as mapping}
+                <div>
+                    press <span class="keymap">{mapping.keyboard}</span> to {mapping.description}
+                </div>
+            {/each}
+        {:else}
+        no controls metadata found
+        {/if}
     </div>
 </div>
 
@@ -24,6 +25,19 @@
 <style>
     .container {
         width: 400px;
+    }
+
+    .description {
+        font-size: 1rem;
+    }
+
+    .keymap {
+        background-color: coral;
+        padding-left: 1%;
+        padding-right: 1%;
+        text-align: center;
+        font-family: monospace;
+
     }
 
     .c-header {
