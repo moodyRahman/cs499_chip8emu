@@ -128,7 +128,7 @@
     }
 
     div {
-        margin-bottom: 2%;
+        margin-bottom: 1%;
     }
 
 
