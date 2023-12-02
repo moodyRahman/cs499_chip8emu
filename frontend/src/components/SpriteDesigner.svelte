@@ -24,17 +24,39 @@
     }
 
     let name = ""
+
+    let sprites:{
+        name: string,
+        pixels: boolean[][]
+    }[] = []
+
+
+    const handleSave = (e:MouseEvent) => {
+        sprites = [...sprites, {
+            name:name === ""?"unnamed sprite":name,
+            pixels:JSON.parse(JSON.stringify(pixels))
+        }]
+    }
     
 
 </script>
 <div class="container">
     <div>
-        lalala
+        saved sprites
+        {#each sprites as sprite, i}
+        <div>
+            <button on:click={() => {
+                pixels = JSON.parse(JSON.stringify(sprites[i].pixels))
+            }}>
+                {sprite.name}
+            </button>
+        </div>
+            {/each}
     </div>
     <div>
     <div>
         <input type="text" bind:value={name} placeholder="enter sprite name">
-        <button>save</button>
+        <button on:click={handleSave}>save</button>
         <button on:click={() => pixels = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))}>reset</button>
     </div>
     <div class="grid">
