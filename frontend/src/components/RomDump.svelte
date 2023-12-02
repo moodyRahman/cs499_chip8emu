@@ -3,11 +3,25 @@
     import * as chip8 from "$lib/chip8/debug.js";
     import HighScore from './HighScore.svelte';
 	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings, rom_timings_original } from "$lib/stores/cpu_state";
-	import { onMount } from "svelte";
+    import { navigating } from '$app/stores';
 
     import config from "../cpu_configs";
 
 
+    $: if($navigating) (() => {
+        chip8.reset();
+        registers_trigger.set(0);
+        display_trigger.set(0)
+        pc = 512;
+        page = 0;
+        paused = true;    //unsure if this is necessary, keeping it here just in case
+        clearInterval(ticker)
+        ticker = 0
+        paused = false;
+        is_running = false;
+        cpu_ticks = 0;
+        duration = 0;
+    })()
 
     // Loader is what defines the raw_rom, this component waits for that data
     let raw_rom: Uint8Array = new Uint8Array();
