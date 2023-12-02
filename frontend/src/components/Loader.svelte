@@ -13,7 +13,7 @@
     
 
 
-    let name: string = "Pong.ch8"
+    let name: string = "Breakout.ch8"
     let all_roms: string[] = []
 
     // $: rom_name, loader();
