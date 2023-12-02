@@ -14,6 +14,7 @@
     const filter = new BadWordsFilter()
 
     $: rom_name = $rom_name_store.substring(0, $rom_name_store.length - 4)
+    $: disabled = !implemented_games.includes(rom_name)
     onMount(() => {
         submit_dialog = document.querySelector("#submit-dialog");
         error_dialog = document.querySelector("#error-dialog");
@@ -86,9 +87,13 @@
     <button on:click={() => error_dialog?.close()}>cancel</button>
 </dialog>
 
-<button on:click={openModal}>
-    submit highscore
-</button>
+<span>
+    {#if !disabled}
+    <button on:click={openModal}>
+        submit highscore
+    </button>
+    {/if}
+</span>
 
 <style>
 
