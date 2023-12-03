@@ -227,8 +227,4 @@
     box-shadow: 10px 10px 0px -1px black;
   }
 
-  code {
-    display: inline;
-    font-family: monospace;
-  }
 </style>
