@@ -94,7 +94,7 @@
 
 .pad {
     display:grid;
-    gap: 4px;
+    gap: 8px;
     grid-template-columns: repeat(4, 15%);
 }
 
@@ -104,10 +104,16 @@
     text-align: center;
     padding: 1rem;
     width: 100%;
+    border-radius: 4px;
+	box-shadow: 5px 5px 0px -1px lightblue;
 }
 
 .pad > div.pressed {
     background-color: lightblue;
+}
+
+button {
+    margin-top: 10px;
 }
 
 </style>

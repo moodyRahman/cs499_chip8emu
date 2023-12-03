@@ -11,7 +11,7 @@
                 keyboard controls
             </div>
             {#each $rom_mappings as mapping}
-                <div>
+                <div class="mapping">
                     <span class="keymap">{mapping.keyboard}</span>  {mapping.description}
                 </div>
             {/each}
@@ -27,12 +27,18 @@
         width: 400px;
     }
 
+    .mapping {
+        margin-top: 5px;
+    }
+
     .keymap {
         background-color: coral;
         padding-left: 1%;
         padding-right: 1%;
         text-align: center;
         font-family: monospace;
+        border-radius: 4px;
+    	box-shadow: 5px 5px 0px -1px lightblue;
 
     }
 
@@ -42,6 +48,8 @@
         margin-bottom: 1%;
         width: fit-content;
         padding: 1%;
+        border-radius: 4px;
+    	box-shadow: 5px 5px 0px -1px lightblue;
     }
 
     .controls {
