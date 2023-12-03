@@ -31,11 +31,25 @@
     }[] = []
 
 
+    let copy_status = "copy to clipboard"
+
     const handleSave = (e:MouseEvent) => {
         sprites = [...sprites, {
             name:name === ""?"unnamed sprite":name,
             pixels:JSON.parse(JSON.stringify(pixels))
         }]
+    }
+
+    const handleCopy = (e:MouseEvent) => {
+        let raw = pixels
+        .map((x) => row_to_hex(x))
+        .map((x) => "0x" + x.toString(16))
+        .join(", ")
+
+        navigator.clipboard.writeText(raw)
+        copy_status = "copied!"
+        setTimeout(() => copy_status = "copy to clipboard", 1000)
+        console.log(raw)
     }
     
 
@@ -62,6 +76,9 @@
         <div>
             <input type="text" bind:value={name} placeholder="enter sprite name">
             <button on:click={handleSave}>save</button>
+            <button on:click={handleCopy}>
+                {copy_status}
+            </button>
             <button on:click={() => {
                 pixels = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))
                 name=""
@@ -112,12 +129,19 @@
         height: 18px;
     }
 
+    button {
+        border: 1px solid lightcoral;
+        border-radius: 0px;
+        box-shadow: 0px 0px 0px 0px lightcoral;
+    }
+
     .header {
         font-size: 1.75rem;
     }
     .outer-container {
         display: flex;
         flex-direction: column;
+        margin-top: 3%;
     }
     .container {
         display: flex;
