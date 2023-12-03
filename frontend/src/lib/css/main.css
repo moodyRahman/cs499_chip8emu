@@ -4,16 +4,19 @@ button {
 	border: 0;
 	text-decoration: none;
 	text-align: center;
+	border: 1px solid lightcoral;
+	border-radius: 4px;
+	box-shadow: 5px 5px 0px -1px lightcoral;
 	margin: 4px;
 }
 
 button:hover {
-	background-color: lightcoral;
+	/* background-color: lightcoral; */
 	color: #fdf0d5;
 }
 
 button:active {
-    background-color: black;
+	background-color: lightcoral;
 }
 
 body {
