@@ -1,5 +1,8 @@
 <div>
 
+  <div>
+
+
   <h1>
     What is sv8?
   </h1>
@@ -29,6 +32,9 @@
     <li>a sprite editor that converts drawings to their corresponding binary representation</li>
     <li>a text editor that allows for writing, compiling, and running code all in the browser</li>
   </ul>
+</div>
+
+<div>
 
   <h1>The Technical Stack</h1>
   <p>
@@ -57,7 +63,13 @@
     (base64 encodes them and locates metadata), as well as an interface for a 
     SQLite database that handles our highscore boards. 
   </p>
+</div>
 
+
+
+
+
+<div>
   <h1>
     Frontend
   </h1>
@@ -118,7 +130,13 @@
     at my foot. It felt great to refactor massive swaths of code via a copy paste 
     and everything just working first try. 
   </p>
+</div>
 
+
+
+
+
+<div>
   <h1>
     Emulator
   </h1>
@@ -195,9 +213,18 @@
 </div>
 
 
+
+</div>
+
+
 <style>
-  div {
+  div > div {
     width: 60%;
+    padding: 1%;
+    margin-top: 2%;
+    outline: 2px solid black;
+    border-radius: 4px;
+    box-shadow: 10px 10px 0px -1px black;
   }
 
   code {
