@@ -22,7 +22,7 @@
 
     <footer>
 
-        <hr />
+        <hr/>
         
         <div>
             CSCI 499 Capstone Project
@@ -53,8 +53,6 @@
 
     :global(body) {
         margin-left: 10%;
-        margin-right: 10%;
-        margin-top: 3%;
         margin-top: 3%;
     }
 
