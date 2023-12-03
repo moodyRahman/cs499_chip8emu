@@ -12,7 +12,7 @@
             </div>
             {#each $rom_mappings as mapping}
                 <div>
-                    press <span class="keymap">{mapping.keyboard}</span> to {mapping.description}
+                    <span class="keymap">{mapping.keyboard}</span>  {mapping.description}
                 </div>
             {/each}
         {:else}
@@ -27,10 +27,6 @@
         width: 400px;
     }
 
-    .description {
-        font-size: 1rem;
-    }
-
     .keymap {
         background-color: coral;
         padding-left: 1%;
@@ -42,6 +38,10 @@
 
     .c-header {
         color: black;
+        background-color: coral;
+        margin-bottom: 1%;
+        width: fit-content;
+        padding: 1%;
     }
 
     .controls {
