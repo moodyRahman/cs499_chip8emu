@@ -639,10 +639,6 @@ let out: Uint8Array = new Uint8Array(256);
 // if we can get some way to trigger a callback in javascript when the display gets updated, that would be ideal
 // until then, we'll just have to keep polling this function and rendering it.
 export function display(): Uint8Array {
-  console.log("pre: " + pre_display.length.toString());
-  console.log("out: " + out.length.toString());
-  console.log("cpu: " + cpu.display.display.length.toString());
-
   for (let x = 0; x < 256; x++) {
     out[x] = pre_display[x] | cpu.display.display[x];
   }
