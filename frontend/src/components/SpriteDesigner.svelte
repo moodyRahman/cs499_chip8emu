@@ -25,6 +25,28 @@
 
     let name = ""
 
+    let string_to_load = "";
+
+    const loadString = () => {
+        let stripped = string_to_load
+        .replace(/ /g, '')    // remove spaces
+        .split(",")           // split on commas
+        .map((x) => Number(x).toString(2).padStart(8, "0")) // convert to a binary string
+        .map((x) => x.split("")) // convert each binary string to an array of string 0 or 1's
+        .map((x) => {
+            return x.map((bin) => bin === "1")
+        })
+
+        while (stripped.length < 16) {
+            stripped.push([false, false, false, false, false, false, false, false])
+        }
+
+        console.log(stripped)
+
+
+        pixels = structuredClone(stripped)
+    }
+
     let sprites:{
         name: string,
         pixels: boolean[][]
@@ -109,13 +131,16 @@
                 </div>
                 {:else}
                     <span class="result">
-                        0x{row_to_hex(pixels[yi]).toString(16)}
+                        0x{row_to_hex(pixels[yi]).toString(16).padStart(2, "0")}
                     </span>
                 {/if}
             {/each}
         </div>
         </div>
 
+    </div>
+    <div class="loader">
+        <input type="text" bind:value={string_to_load}> <button on:click={loadString}>load string into sprite</button>
     </div>
 </div>
 
@@ -133,6 +158,14 @@
         border: 1px solid lightcoral;
         border-radius: 0px;
         box-shadow: 0px 0px 0px 0px lightcoral;
+    }
+
+    .loader {
+        width: 100%;
+    }
+
+    .loader > input {
+        width: 50%;
     }
 
     .header {
