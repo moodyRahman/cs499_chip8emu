@@ -56,7 +56,7 @@
 
 <div>
     <div>
-        load a rom{message === "" ? "" : ", " + message}
+        Select a ROM to play{message === "" ? "" : ", " + message}
     </div>
     <select bind:value={name} on:change={() => message = "be sure to click \"load rom\" before you play the game"}>
 
