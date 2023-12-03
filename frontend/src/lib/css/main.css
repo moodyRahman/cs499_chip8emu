@@ -10,6 +10,11 @@ button {
 	margin: 4px;
 }
 
+code {
+	display: inline;
+	font-family: monospace;
+}
+
 button:hover {
 	/* background-color: lightcoral; */
 	color: #fdf0d5;

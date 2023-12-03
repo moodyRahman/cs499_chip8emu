@@ -96,5 +96,10 @@ import { implemented_games } from "$lib/highscore";
         box-shadow: 10px 10px 0px -1px black;
     }
 
+    code {
+        font-weight: bold;
+        font-style: italic;
+        font-size: 1rem;
+    }
 
 </style>
