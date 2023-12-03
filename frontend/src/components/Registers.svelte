@@ -82,9 +82,10 @@
         
 
     </div>
-    data adjacent to PC
-    <div>
-        {#each chip8.ram_around_address(pc_highlight_index, pc_highlight_index+1, registers[32]) as mem, i}
+    <div class="adjacent">
+        data adjacent to PC
+        <div>
+            {#each chip8.ram_around_address(pc_highlight_index, pc_highlight_index+1, registers[32]) as mem, i}
             {#if i == pc_highlight_index || i == pc_highlight_index + 1}
                 <span class="highlight adjacent">
                     {mem.toString(base).padStart(2, "0")}
@@ -94,7 +95,8 @@
                 {mem.toString(base).padStart(2, "0")}
             </span>
             {/if}
-        {/each}
+            {/each}
+        </div>
     </div>
         <div>
             {chip8.convert_inst_to_string(((chip8.ram_around_address(pc_highlight_index, pc_highlight_index, registers[32])[pc_highlight_index] << 8) | chip8.ram_around_address(pc_highlight_index, pc_highlight_index, registers[32])[pc_highlight_index+1]))}
@@ -108,8 +110,15 @@
         padding: 3px;
     }
 
+    .adjacent {
+        margin-top: 5px;
+    }
+
     .highlighted {
+        margin-top: 5px;
         background-color: lightcoral;
+        border-radius: 4px;
+        box-shadow: 5px 5px 0px -1px lightblue;
     }
 
     .registers {
