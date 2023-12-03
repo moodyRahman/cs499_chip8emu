@@ -40,58 +40,68 @@
     
 
 </script>
-<div class="container">
-    <div>
-        saved sprites
-        {#each sprites as sprite, i}
+<div class="outer-container">
+    <div class="header">
+        sprite editor
+    </div>
+    <div class="container">
         <div>
-            <button on:click={() => {
-                pixels = JSON.parse(JSON.stringify(sprites[i].pixels))
-            }}>
-                {sprite.name}
-            </button>
-        </div>
-            {/each}
-    </div>
-    <div>
-    <div>
-        <input type="text" bind:value={name} placeholder="enter sprite name">
-        <button on:click={handleSave}>save</button>
-        <button on:click={() => pixels = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))}>reset</button>
-    </div>
-    <div class="grid">
-        {#each Array(15) as y, yi }
-            <span class="row_c">
-                {(yi + 1).toString(16)}
-            </span>
-                {#each Array(8) as x, xi}
-                <!-- <span on:click={() => pixels[yi][xi] = true} aria-pressed="mixed" on:keypress={() => {}}>
-                    {yi}, {xi}
-                </span> -->
-                <button 
-                on:mousedown={(e) => {
-                    pixels[yi][xi] = !pixels[yi][xi]
-                }}
-
-                class={`${pixels[yi][xi]?"inactive":"active"} pixel`}>
-                    
+            saved sprites
+            {#each sprites as sprite, i}
+            <div>
+                <button on:click={() => {
+                    pixels = JSON.parse(JSON.stringify(sprites[i].pixels))
+                    name = sprites[i].name
+                }}>
+                    {sprite.name}
                 </button>
-                {/each}
-
-            {#if binary_editor}
-            <div class="result">
-                <input type="number" pattern="[0-1]" required>
             </div>
-            {:else}
-                <span class="result">
-                    0x{row_to_hex(pixels[yi]).toString(16)}
+                {/each}
+        </div>
+        <div>
+        <div>
+            <input type="text" bind:value={name} placeholder="enter sprite name">
+            <button on:click={handleSave}>save</button>
+            <button on:click={() => {
+                pixels = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))
+                name=""
+            } }>reset</button>
+        </div>
+        <div class="grid">
+            {#each Array(15) as y, yi }
+                <span class="row_c">
+                    {(yi + 1).toString(16)}
                 </span>
-            {/if}
-        {/each}
-    </div>
-    </div>
+                    {#each Array(8) as x, xi}
+                    <!-- <span on:click={() => pixels[yi][xi] = true} aria-pressed="mixed" on:keypress={() => {}}>
+                        {yi}, {xi}
+                    </span> -->
+                    <button 
+                    on:mousedown={(e) => {
+                        pixels[yi][xi] = !pixels[yi][xi]
+                    }}
 
+                    class={`${pixels[yi][xi]?"inactive":"active"} pixel`}>
+                        
+                    </button>
+                    {/each}
+
+                {#if binary_editor}
+                <div class="result">
+                    <input type="number" pattern="[0-1]" required>
+                </div>
+                {:else}
+                    <span class="result">
+                        0x{row_to_hex(pixels[yi]).toString(16)}
+                    </span>
+                {/if}
+            {/each}
+        </div>
+        </div>
+
+    </div>
 </div>
+
 
 
 <style>
@@ -102,6 +112,13 @@
         height: 18px;
     }
 
+    .header {
+        font-size: 1.75rem;
+    }
+    .outer-container {
+        display: flex;
+        flex-direction: column;
+    }
     .container {
         display: flex;
         flex-direction: row;
