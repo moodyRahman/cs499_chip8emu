@@ -35,6 +35,6 @@
         height:100%;
         border: 1px solid black;
         border-radius: 4px;
-        box-shadow: 5px 5px 0px -1px black;
+        box-shadow: 10px 10px 0px -1px black;
     }
 </style>
