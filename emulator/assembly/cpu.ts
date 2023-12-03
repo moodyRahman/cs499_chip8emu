@@ -634,10 +634,20 @@ export function ram_around_address(
   return cpu.memory.mem.slice(address - left, address + right + 1);
 }
 
+let pre_display: Uint8Array = new Uint8Array(256);
+let out: Uint8Array = new Uint8Array(256);
 // if we can get some way to trigger a callback in javascript when the display gets updated, that would be ideal
 // until then, we'll just have to keep polling this function and rendering it.
 export function display(): Uint8Array {
-  return cpu.display.display;
+  console.log("pre: " + pre_display.length.toString());
+  console.log("out: " + out.length.toString());
+  console.log("cpu: " + cpu.display.display.length.toString());
+
+  for (let x = 0; x < 256; x++) {
+    out[x] = pre_display[x] | cpu.display.display[x];
+  }
+  pre_display = cpu.display.display.slice(0, 256);
+  return out;
 }
 
 export function debug_set_pixel(x: u8, y: u8): void {
