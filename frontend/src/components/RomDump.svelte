@@ -7,8 +7,7 @@
 
     import config from "../cpu_configs";
 
-
-    $: if($navigating) (() => {
+    const reset = () => {
         chip8.reset();
         registers_trigger.set(0);
         display_trigger.set(0)
@@ -21,6 +20,11 @@
         is_running = false;
         cpu_ticks = 0;
         duration = 0;
+        $display_trigger++;
+    }
+
+    $: if($navigating) (() => {
+        reset();
     })()
 
     // Loader is what defines the raw_rom, this component waits for that data
@@ -362,18 +366,8 @@
             </button>
 
             <button class="tick" on:click={() => {
-                chip8.reset();
-                registers_trigger.set(0);
-                display_trigger.set(0)
-                pc = 512;
-                page = 0;
-                paused = true;    //unsure if this is necessary, keeping it here just in case
-                clearInterval(ticker)
-                ticker = 0
-                paused = false;
-                is_running = false;
-                cpu_ticks = 0;
-                duration = 0;
+                reset();
+                setTimeout(() => {$display_trigger++}, 50)
             }}>
                 reset game
             </button>
