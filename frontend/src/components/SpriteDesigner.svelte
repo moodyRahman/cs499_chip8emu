@@ -104,6 +104,7 @@
             <button on:click={() => {
                 pixels = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))
                 name=""
+                string_to_load = ""
             } }>reset</button>
         </div>
         <div class="grid">
@@ -156,7 +157,7 @@
 
     button {
         border: 1px solid lightcoral;
-        border-radius: 0px;
+        border-radius: 4px;
         box-shadow: 0px 0px 0px 0px lightcoral;
     }
 
@@ -174,7 +175,11 @@
     .outer-container {
         display: flex;
         flex-direction: column;
+        padding: 2%;
         margin-top: 3%;
+        background-color: lightcoral;
+        border-radius: 4px;
+
     }
     .container {
         display: flex;
