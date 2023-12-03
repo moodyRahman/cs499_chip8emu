@@ -1,6 +1,6 @@
 <div class="header">
     <div class="h1">
-        Chip8 Emulator
+        sv8: chip8 emulator
     </div>
     <div>
         <a href="/">
