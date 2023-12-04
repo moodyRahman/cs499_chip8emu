@@ -1,7 +1,7 @@
 <script>
 	import { loading } from "$lib/stores/cpu_state";
 	import Header from "../components/Header.svelte";
-
+    import "$lib/css/main.css"
 </script>
 
 <div class="page">

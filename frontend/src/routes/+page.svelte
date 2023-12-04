@@ -12,7 +12,6 @@
 	import { onMount } from "svelte";
 
     
-    import "$lib/css/main.css"
 	import Editor from "../components/Editor.svelte";
 	import GamePad from "../components/GamePad.svelte";
 	import MessageBoard from "../components/MessageBoard.svelte";
