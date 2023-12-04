@@ -21,11 +21,13 @@ $: curr_key = (numToKey[$keypress_store])
             </div>
             {#each $rom_mappings as mapping}
                 <div class="mapping {mapping.keyboard === curr_key ? "highlight":""}">
-                    <span class="keymap">{mapping.keyboard}</span>  {mapping.description}
+                    <span class="{mapping.keyboard === curr_key ? "mono":"keymap"}">{mapping.keyboard}</span>  {mapping.description}
                 </div>
             {/each}
         {:else}
-        no controls metadata found
+        <div class="c-header">
+            keyboard controls
+        </div>
         {/if}
     </div>
 </div>
@@ -37,7 +39,16 @@ $: curr_key = (numToKey[$keypress_store])
     }
 
     .highlight {
-        background-color: red;
+        background-color: coral;
+        border-radius: 4px;
+    	box-shadow: 5px 5px 0px -1px lightblue;
+    }
+
+    .mono {
+        font-family: monospace;
+        text-align: center;
+        padding-left: 1%;
+        padding-right: 1%;
     }
 
     .mapping {
@@ -46,12 +57,12 @@ $: curr_key = (numToKey[$keypress_store])
 
     .keymap {
         background-color: coral;
-        padding-left: 1%;
-        padding-right: 1%;
         text-align: center;
         font-family: monospace;
         border-radius: 4px;
     	box-shadow: 5px 5px 0px -1px lightblue;
+        padding-left: 1%;
+        padding-right: 1%;
 
     }
 
