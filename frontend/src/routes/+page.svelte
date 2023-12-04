@@ -81,10 +81,6 @@
 
 </script>
 
-<div>
-    <Loader />
-</div>
-
 {#if debug}
 <div>
     <SingleInstruction />
@@ -92,20 +88,24 @@
 {/if}
 
 <div class="lr-container">
-    <div class="register">
-        <Registers />
-    </div>
+
 </div>
 
 <div class="lr-container">
     <div class="display-container">
         <Display />
         {#if debug}
+            <Registers />
             <SpriteDesigner />
+            <!-- <SpriteDesigner /> -->
+            <!-- <div class="register">
+            </div> -->
+
         {/if}
     </div>
     <div>
         <RomDump />
+        <Loader />
         <MessageBoard />
         <GamePad />
     </div>
