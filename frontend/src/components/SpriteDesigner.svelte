@@ -33,7 +33,7 @@
         let stripped = string_to_load
         .replace(/ /g, '')    // remove spaces
         .split(",")           // split on commas
-        .map((x) => Number(x).toString(2).padStart(8, "0")) // convert to a binary string
+        .map((x) => Number(x).toString(2).padStart(8, "0").slice(0, 8)) // convert to a binary string, capped at 8 characters
         .map((x) => x.split("")) // convert each binary string to an array of string 0 or 1's
         .map((x) => {
             return x.map((bin) => bin === "1")    // essentially suppresses all bad errors, 
