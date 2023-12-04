@@ -13,7 +13,7 @@
     
 
 
-    let name: string = "Breakout.ch8"
+    let name: string = "SpaceInvaders.ch8"
     let all_roms: string[] = []
 
     // $: rom_name, loader();
@@ -59,14 +59,20 @@
     <div>
         Select a ROM to play{message === "" ? "" : ", " + message}
     </div>
-    <select bind:value={name} on:change={() => message = "be sure to click \"load rom\" before you play the game"}>
+    <select bind:value={name} on:change={() => {
+        loader();
+        setTimeout(() => {
+            message = ""
+        }, 3000)
+        message = "be sure to click \"run game\" before you play the game"
+    }}>
 
         <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
         {#each [...all_roms, "load ROM from editor "] as option }
             <option value={option}>{option.slice(0, option.indexOf(".ch8"))}</option>
         {/each}
     </select>
-    <button on:click={() => {
+    <!-- <button on:click={() => {
         loader();
         message = "now click on run game to start playing!"
         setTimeout(() => {
@@ -74,7 +80,7 @@
         }, 3000)
         }}>
         load rom
-    </button>
+    </button> -->
 </div>
 
 
