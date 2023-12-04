@@ -109,9 +109,9 @@ const data = {
       },
     ],
     "timing": {
-      "ticks_per_interval": 13,
+      "ticks_per_interval": 18,
       "time_between_intervals_ms": 8,
-      "display_rerender_threshold": 13
+      "display_rerender_threshold": 18
     }
   },
   "CONNECT4.ch8": {
