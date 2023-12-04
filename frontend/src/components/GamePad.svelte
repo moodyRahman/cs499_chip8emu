@@ -60,9 +60,9 @@
     
 </script>
 
-
-<!-- <div class="container">
-    {show_chip8?"these are the inputs the emulator is actually recieving":"try pressing these buttons on your keyboard!"}
+{#if $rom_mappings.length === 0}
+<div class="container">
+    {show_chip8?"these are the inputs the emulator is actually recieving":"no control metadata found, try pressing these buttons on your keyboard!"}
     <div class="pad">
         {#each data as cell, i}
         <div class={active_keys.includes(cell)?"pressed":""}>
@@ -81,7 +81,8 @@
         show {show_chip8?"keyboard":"chip8"} input
     </button>
     
-</div> -->
+</div>
+{/if}
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
