@@ -55,20 +55,21 @@
 </script>
 
 
-<div>
+<div class="container">
     <div>
-        Select a ROM to play{message === "" ? "" : ", " + message}
+        Select a game to play{message === "" ? "" : ", " + message}
     </div>
     <select bind:value={name} on:change={() => {
+        if (name === "load ROM from editor ") return
         loader();
-        setTimeout(() => {
-            message = ""
-        }, 3000)
-        message = "be sure to click \"run game\" before you play the game"
+        // setTimeout(() => {
+        //     message = ""
+        // }, 3000)
+        // message = "be sure to click \"run game\" before you play the game"
     }}>
 
         <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
-        {#each [...all_roms, "load ROM from editor "] as option }
+        {#each [...all_roms, "load ROM from editor"] as option }
             <option value={option}>{option.slice(0, option.indexOf(".ch8"))}</option>
         {/each}
     </select>
@@ -85,5 +86,18 @@
 
 
 <style>
+
+.container {
+    margin-top: 20px;
+    background-color: lightcoral;
+    padding: 1%;
+    border-radius: 4px;
+    box-shadow: 5px 5px 0px -1px lightblue;
+}
+
+select {
+    width: 100%;
+    font-size: 1.1rem;
+}
 
 </style>
