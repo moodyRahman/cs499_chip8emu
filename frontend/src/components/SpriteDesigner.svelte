@@ -34,15 +34,15 @@
         .map((x) => Number(x).toString(2).padStart(8, "0")) // convert to a binary string
         .map((x) => x.split("")) // convert each binary string to an array of string 0 or 1's
         .map((x) => {
-            return x.map((bin) => bin === "1")
-        })
-
+            return x.map((bin) => bin === "1")    // essentially suppresses all bad errors, 
+        })                                        // as characters in "NaN" that non-hex inputs
+                                                  // convert to, get padded to "00000Nan", and then 
+                                                  // comparing each character to "1" coerces the "Nan"
+                                                  // portion to become [... false, false, false]
+        
         while (stripped.length < 16) {
             stripped.push([false, false, false, false, false, false, false, false])
         }
-
-        console.log(stripped)
-
 
         pixels = structuredClone(stripped)
     }
@@ -192,13 +192,14 @@
         grid-template-columns: max-content repeat(8, 1fr) 40px;
     }
 
-    .pixel {
+    button.pixel {
         border: 1px solid black;
         margin: 0px;
         padding: 0px;
         display: inline;
         width: 20px;
         height: 20px;
+        border-radius: 0px;
     }
 
     .result {
