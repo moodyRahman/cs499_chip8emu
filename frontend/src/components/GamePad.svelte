@@ -61,7 +61,7 @@
 </script>
 
 
-<div class="container">
+<!-- <div class="container">
     {show_chip8?"these are the inputs the emulator is actually recieving":"try pressing these buttons on your keyboard!"}
     <div class="pad">
         {#each data as cell, i}
@@ -81,7 +81,7 @@
         show {show_chip8?"keyboard":"chip8"} input
     </button>
     
-</div>
+</div> -->
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
