@@ -7,6 +7,8 @@ import debug1 from "$lib/assets/help/debug1.png"
 import debug2 from "$lib/assets/help/debug2.png"
 import debug3 from "$lib/assets/help/debug3.png"
 import debug4 from "$lib/assets/help/debug4.png"
+import debug5 from "$lib/assets/help/debug5.png"
+import gamepad from "$lib/assets/help/gamepad.png"
 
 import { implemented_games } from "$lib/highscore";
 
@@ -29,6 +31,18 @@ import { implemented_games } from "$lib/highscore";
         <img src={loader} alt="help content">
         <p>
             Click on the dropdown box to select the ROM you want to run, then click on "load rom".
+        </p>
+    </div>
+
+    <div>
+        <h3>Game Pad</h3>
+        <img src={gamepad} alt="help content">
+        <p>
+            Describes the controls for the current game. The 4 by 4 keypad on the 
+            bottom describes how your keyboard maps to the Chip-8. The Chip-8 
+            originally was operated via a 4 by 4 hexadecimal keypad, and either 
+            pressing the button on the keyboard or by toggling "show chip8 input" 
+            will show the actual value that's being inputted into the emulator. 
         </p>
     </div>
 
@@ -72,13 +86,14 @@ import { implemented_games } from "$lib/highscore";
         <p>
             One of the things that set sv8 apart from other Chip-8 emulators is the 
             debug mode. Enabling debug mode will slow the CPU down to 10 hertz, and 
-            expose the inner workings of the CPUm, such as:
+            expose the inner workings of the CPU, such as:
         </p>
         <ul>
             <li><a href="#debug_registers">Registers</a></li>
             <li><a href="#debug_dump">ROM Dump</a></li>
             <li><a href="#debug_editor">Sprite Editor</a></li>
             <li><a href="#debug_assembler">Assembler</a></li>
+            <li><a href="#debug_legacy">Legacy Tools</a></li>
         </ul>
     </div>
 
@@ -127,7 +142,20 @@ import { implemented_games } from "$lib/highscore";
         </p>
 
         <p>The purpose of each button is as follows:</p>
-        <ul>
+        <p>
+            <code>unlock/lock timings</code>: enables or disables the CPU timing adjustment inputs. <br>
+            <code>enable/disable debug mode</code>: toggles debug mode. <br>
+            <code>break on chip8 error</code>: enables and disables if the 
+            emulator stops execution on internal error.  <br>
+            <code>toggle fast debugging</code>: swaps the current CPU timings 
+            between the intended execution speed, and the slowed down debugging speed.  <br>
+            <code>tick cpu &lt;4 digit number&gt; | &lt;instruction&gt;</code>: 
+            displays the bytes <code>pc</code> is pointing at, and their decoded 
+            instruction.  <br>
+            <code>run game</code>: run the current ROM.  <br>
+            <code>reset game</code>: resets the CPU state.  <br>
+        </p>
+        <!-- <ul>
             <li>
                 <code>unlock/lock timings</code>: enables or disables the CPU timing adjustment inputs.
             </li>
@@ -153,8 +181,49 @@ import { implemented_games } from "$lib/highscore";
             <li>
                 <code>reset game</code>: resets the CPU state.
             </li>
-        </ul>
+        </ul> -->
     </div>
+    
+    <div id="debug_editor">
+        <h3>Sprite Editor</h3>
+        <img src={debug3} alt="help content">
+        <p>
+            The sprite editor is a small tool to help programmers design sprites 
+            for the emulator. It contains a 15x8 grid of buttons you can click on 
+            to toggle a pixel. The hex number to the right of each row displays 
+            the hex value that corresponds to the row of pixels. The right number 
+            keeps track of how many pixels tall this sprite is. 
+        </p>
+        <p>
+            <code>save</code>: will take the current sprite and its name and store 
+            it under "saved sprites". Clicking a saved sprite will load it back. <br>
+            <code>copy to clipboard</code>: copies the current sprite into a comma 
+            separated string of hex numbers, ready to paste into the code editor. 
+            <code>load string into sprite</code>: given a comma separated string 
+            of hex numbers, load it as a sprite into the editor. <br>
+            <code>reset</code>: reset the pixels and the name, and preserves 
+            created sprites. 
+        </p>
+    </div>
+
+    <div id="debug_assembler">
+        <h3>Assembler</h3>
+        <img src={debug4} alt="help content">
+        <p>
+            TBD
+        </p>
+    </div>
+
+    <div id="debug_legacy">
+        <h3>Legacy Tools</h3>
+        <img src={debug5} alt="help content">
+        <p>
+            The first UI for the emulator, allows you to run arbitrary instructions 
+            at any point in the emulation. Draw pixels allows you to draw arbitrary pixels
+            to the display. 
+        </p>
+    </div>
+    
 </div>
 
 <style>
@@ -165,6 +234,10 @@ import { implemented_games } from "$lib/highscore";
         box-shadow: 5px 5px 0px -1px lightcoral;
         width:auto;
         overflow:hidden
+    }
+
+    #debug_editor > img {
+        box-shadow: 5px 5px 0px -1px lightblue;
     }
 
     div > div {
