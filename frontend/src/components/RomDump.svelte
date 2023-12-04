@@ -183,6 +183,12 @@
         }
     }
 
+    const handleEnterPause = (e: KeyboardEvent) => {
+        if (e.key !== "Enter") return
+        is_running = !is_running;
+        $run_game_animation = false;
+    }
+
 
 
     // delete if performance issues
@@ -359,10 +365,16 @@
                 change the running state so that the main event loop that's
                 constantly firing ticks will actually successfully send ticks
             -->
-            <button class="tick {$run_game_animation?"click-me":""} " on:click={() => {
+            <button class="tick {(() => {
+                if (is_running) return ""
+                return $run_game_animation?"click-me":""
+            })()} " 
+            
+            on:click={() => {
                     is_running = !is_running;
                     $run_game_animation = false
                 }}>
+
                     {is_running?"pause":"run"} game
             </button>
 
@@ -384,6 +396,9 @@
     {/if}
 
 </div>
+
+<!-- <svelte:window on:keypress={handleEnterPause} /> -->
+
 
 
 
