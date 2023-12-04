@@ -145,10 +145,6 @@ const data = {
         "description": "move your paddle left"
       },
       {
-        "keyboard": "w",
-        "description": "launch ball"
-      },
-      {
         "keyboard": "e",
         "description": "move your paddle right"
       },
@@ -165,10 +161,6 @@ const data = {
       {
         "keyboard": "q",
         "description": "move your paddle left"
-      },
-      {
-        "keyboard": "w",
-        "description": "launch ball"
       },
       {
         "keyboard": "e",
