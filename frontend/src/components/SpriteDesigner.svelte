@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    // the enemy
+    // 0x81, 0x42, 0x36, 0x00, 0x66, 0x44, 0x10, 0x0c, 0x10, 0x00, 0x7e
     let pixels: boolean[][] = [...Array(15).fill(0)].map((x) => (Array(8).fill(false)))
 
     let binary_editor:boolean = false
@@ -179,7 +181,9 @@
         margin-top: 3%;
         background-color: lightcoral;
         border-radius: 4px;
-
+        border: 1px solid lightblue;
+        border-radius: 4px;
+        box-shadow: 5px 5px 0px -1px lightblue;
     }
     .container {
         display: flex;
