@@ -65,3 +65,5 @@ export const keypress_store = writable('');
 export const audio_store = writable(false);
 
 export const loading = writable(false);
+
+export const run_game_animation = writable(false);

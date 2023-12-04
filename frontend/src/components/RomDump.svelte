@@ -2,7 +2,7 @@
     
     import * as chip8 from "$lib/chip8/debug.js";
     import HighScore from './HighScore.svelte';
-	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings, rom_timings_original } from "$lib/stores/cpu_state";
+	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings, rom_timings_original, run_game_animation } from "$lib/stores/cpu_state";
     import { navigating } from '$app/stores';
 
     import config from "../cpu_configs";
@@ -359,8 +359,9 @@
                 change the running state so that the main event loop that's
                 constantly firing ticks will actually successfully send ticks
             -->
-            <button class="tick" on:click={() => {
+            <button class="tick {$run_game_animation?"click-me":""} " on:click={() => {
                     is_running = !is_running;
+                    $run_game_animation = false
                 }}>
                     {is_running?"pause":"run"} game
             </button>
@@ -419,7 +420,48 @@
     .offset {
         background-color: lightcoral;
         padding: 3px;
+    }
+
+    .click-me {
+        animation-name: click-me-frames;
+        animation-duration: .2s;
+        animation-iteration-count: infinite;
 
     }
+
+    @keyframes click-me-frames {
+        0% {
+            box-shadow: 4px  4px  0px 0px rgb(255, 0, 0),
+                    7px 7px 0px 0px rgb(0, 255, 0),
+                    10px 10px 0px 0px rgb(0, 0, 255);
+        }
+
+        33%{
+            box-shadow: 4px  4px  0px 0px rgb(255, 0, 0),
+                    7px 7px 0px 0px rgb(0, 255, 0),
+                    10px 10px 0px 0px rgb(0, 0, 255);
+        }
+        34% {
+            box-shadow: 4px  4px  0px 0px rgb(0, 0, 255),
+                    7px 7px 0px 0px rgb(255, 0, 0),
+                    10px 10px 0px 0px rgb(0, 255, 0);
+        }
+        66% {
+            box-shadow: 4px  4px  0px 0px rgb(0, 0, 255),
+                    7px 7px 0px 0px rgb(255, 0, 0),
+                    10px 10px 0px 0px rgb(0, 255, 0);
+        }
+        67% {
+            box-shadow: 4px  4px  0px 0px rgb(0, 255, 0),
+                    7px 7px 0px 0px rgb(0, 0, 255),
+                    10px 10px 0px 0px rgb(255, 0, 0);
+        }
+        100% {
+            box-shadow: 4px  4px  0px 0px rgb(0, 255, 0),
+                    7px 7px 0px 0px rgb(0, 0, 255),
+                    10px 10px 0px 0px rgb(255, 0, 0);
+        }
+    }
+
 </style>
 
