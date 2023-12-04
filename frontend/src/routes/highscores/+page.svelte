@@ -20,27 +20,24 @@
 
 <div class="container">
     {#each implemented_games as game}
-    <div>
+    <div class="board">
+        
+        <div class="title">
+            {game}
+        </div>
 
-        {game}:
-        <table>
-            <tr>
-                <th>name</th>
-                <th>score</th>
-            </tr>
-            
+        <div class="table">
             {#each ([...data.filter((x) => x.game === game)].slice(0, 10)) as score}
-            <tr>
-                <td>
+            <div class="row">
+                <div>
                     {score.name}
-                    
-                </td>
-                <td>
+                </div>
+                <div>
                     {score.score}
-                </td>
-            </tr>
+                </div>
+            </div>
             {/each}
-        </table>
+        </div>
     </div>    
     {/each}
 </div>
@@ -50,6 +47,45 @@
     .container {
         display: flex;
         flex-direction: row;
-        gap: 3rem;
+        gap: 5rem;
+        width: 100%;
+    }
+
+    .table {
+        font-size: 1.5rem;
+    }
+
+    .table > div {
+        display: flex;
+        gap: 20px;
+    }
+
+    .title {
+        font-size: 3rem;
+        padding: 10px;
+    }
+
+    .row {
+        display: flex;
+    }
+
+    .row:nth-child(even) {
+        background-color: #c76f6f;
+    }
+
+    .board {
+        width: fit-content;
+        background-color: lightcoral;
+        border-radius: 4px;
+        box-shadow: 10px 10px 0px -1px black;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding-left: 10px;
+        padding-right: 10px;
+
     }
 </style>
