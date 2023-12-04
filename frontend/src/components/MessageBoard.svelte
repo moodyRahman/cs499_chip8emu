@@ -1,6 +1,15 @@
 <script lang="ts">
-	import { rom_description, rom_mappings } from "$lib/stores/cpu_state";
+	import { keypress_store, rom_description, rom_mappings } from "$lib/stores/cpu_state";
 
+    const numToKey: any = {
+    1: "1", 2: "2", 3: "3", 0xC: "4",
+    4: "q", 5: "w", 6: "e", 0xD: "r",
+    7: "a", 8: "s", 9: "d", 0xE: "f",
+    0xA: "z", 0: "x", 0xB: "c", 0xF: "v"
+
+};
+
+$: curr_key = (numToKey[$keypress_store])
 
 </script>
 
@@ -11,7 +20,7 @@
                 keyboard controls
             </div>
             {#each $rom_mappings as mapping}
-                <div class="mapping">
+                <div class="mapping {mapping.keyboard === curr_key ? "highlight":""}">
                     <span class="keymap">{mapping.keyboard}</span>  {mapping.description}
                 </div>
             {/each}
@@ -25,6 +34,10 @@
 <style>
     .container {
         width: 400px;
+    }
+
+    .highlight {
+        background-color: red;
     }
 
     .mapping {
