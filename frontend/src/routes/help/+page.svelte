@@ -210,7 +210,29 @@ import { implemented_games } from "$lib/highscore";
         <h3>Assembler</h3>
         <img src={debug4} alt="help content">
         <p>
-            TBD
+            Please see <a href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM">CowGod's Chip-8 Technical Reference v1.0</a> for the syntax. 
+        </p>
+        <p>We also implemented some assembler directives to aid you.</p> 
+        <p>
+
+            <code>examplelabel:</code>
+            Labels can be any alphanumeric string but CANNOT be an integer <br>
+    
+            <code>.org</code>
+            Directive to change address the follow code is mapped at <br>
+    
+            <code>.text</code>
+            Directive to indicate following text is code <br>
+    
+            <code>.data</code>
+            Directive to indicate following text is data <br>
+        </p>
+
+        <p>
+            <code>assemble</code>: assembles the source code and loads it into the emulator. <br>
+            <code>reset</code>: resets the textarea. <br>
+            <code>save</code>: stores the current code and CPU timing parameters into a file 
+
         </p>
     </div>
 
