@@ -91,6 +91,11 @@ const b64_to_state = () => {
     console.log(data)
 }
 
+const handleReset = () => {
+    name = ""
+    code = ""
+}
+
 onMount(() => {
     save_dialog = document.querySelector("#save");
     load_dialog = document.querySelector("#load");
@@ -131,14 +136,13 @@ onMount(() => {
 
     <div class="editor-ui">
         <div>
-            code editor
             <button on:click={handleAssemble}>assemble</button> 
-            <button>reset</button> 
+            <button on:click={handleReset}>reset</button> 
             <button on:click={handleSave}>save</button> 
             <button on:click={handleLoad}>load</button>
         </div>
-        <div>
-            name: <input type="text" bind:value={name}>
+        <div class="name">
+            file name <input type="text" bind:value={name}>
         </div>
         <div class="editor">
             <textarea bind:value={code} bind:this={editor_prop} />
@@ -147,7 +151,6 @@ onMount(() => {
     </div>
     <div class="message">
         {err} <br>
-        {$sprites_array}
     </div>
 </div>
 
@@ -156,6 +159,10 @@ onMount(() => {
     textarea {
         width: 85%;
         height: 500px;
+    }
+
+    .name {
+        margin-top: 5px;
     }
 
     .modal {
