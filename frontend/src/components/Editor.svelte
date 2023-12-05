@@ -1,6 +1,6 @@
 <script lang="ts">
 import assemble from "$lib/assembler/assembler";
-	import { rom, rom_metadata, rom_name, rom_timings } from "$lib/stores/cpu_state";
+	import { rom, rom_metadata, rom_name, rom_timings, sprites_array } from "$lib/stores/cpu_state";
 import { onMount } from "svelte";
 
 let code = ""
@@ -53,25 +53,52 @@ const handleAssemble = () =>{
     }
 }
 
+let save_dialog: any;
+let load_dialog: any;
+
+let out_string = ""
+let in_string = ""
 const handleSave = () => {
     
     let out = {
         timings:{...$rom_timings},
         name: name,
-        data: code
+        data: code,
+        sprites: $sprites_array
     }
     out_string = btoa(JSON.stringify(out))
     save_dialog.showModal()
 }
 
-let save_dialog: any;
-let load_dialog: any;
+const handleLoad = () => {
+    load_dialog.showModal()
+}
 
-let out_string = ""
+const b64_to_state = () => {
+    load_dialog.close()
+    let data:{
+        timings: any,
+        name: string,
+        data: string,
+        sprites: any
+    } = JSON.parse(atob(in_string))
+
+    code = data.data
+    name = data.name
+    $sprites_array = structuredClone(data.sprites)
+    $rom_timings = structuredClone(data.timings)
+
+    console.log(data)
+}
+
 onMount(() => {
     save_dialog = document.querySelector("#save");
     load_dialog = document.querySelector("#load");
 })
+
+/**
+
+*/
 
 </script>
 
@@ -91,15 +118,24 @@ onMount(() => {
     </dialog>
 
     <dialog id="load">
-
+        <div>
+            <button on:click={save_dialog.close()}>x</button>
+        </div>
+        <div>
+            paste in your save
+            <textarea bind:value={in_string}></textarea>
+        </div>
+        <button on:click={b64_to_state} >load</button>
     </dialog>
+
+
     <div class="editor-ui">
         <div>
             code editor
             <button on:click={handleAssemble}>assemble</button> 
             <button>reset</button> 
             <button on:click={handleSave}>save</button> 
-            <button>load</button>
+            <button on:click={handleLoad}>load</button>
         </div>
         <div>
             name: <input type="text" bind:value={name}>
@@ -111,7 +147,7 @@ onMount(() => {
     </div>
     <div class="message">
         {err} <br>
-
+        {$sprites_array}
     </div>
 </div>
 
@@ -127,11 +163,6 @@ onMount(() => {
         font-family: monospace;
         border: 1px solid black;
         padding: 10px;
-    }
-
-    pre {
-        font-family: monospace;
-        white-space: pre-wrap;
     }
 
     .container {

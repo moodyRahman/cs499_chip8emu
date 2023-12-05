@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { sprites_array } from "$lib/stores/cpu_state";
+
 
     // the enemy
     // 0x81, 0x42, 0x36, 0x00, 0x66, 0x44, 0x10, 0x0c, 0x10, 0x00, 0x7e
@@ -49,16 +51,18 @@
         pixels = structuredClone(stripped)
     }
 
+    
     let sprites:{
         name: string,
         pixels: boolean[][]
     }[] = []
 
+    sprites_array.subscribe((n) => {n = sprites})
 
     let copy_status = "copy to clipboard"
 
     const handleSave = (e:MouseEvent) => {
-        sprites = [...sprites, {
+        $sprites_array = [...$sprites_array, {
             name:name === ""?"unnamed sprite":name,
             pixels:JSON.parse(JSON.stringify(pixels))
         }]
@@ -85,11 +89,11 @@
     <div class="container">
         <div>
             saved sprites
-            {#each sprites as sprite, i}
+            {#each $sprites_array as sprite, i}
             <div>
                 <button on:click={() => {
-                    pixels = JSON.parse(JSON.stringify(sprites[i].pixels))
-                    name = sprites[i].name
+                    pixels = JSON.parse(JSON.stringify($sprites_array[i].pixels))
+                    name = $sprites_array[i].name
                 }}>
                     {sprite.name}
                 </button>
