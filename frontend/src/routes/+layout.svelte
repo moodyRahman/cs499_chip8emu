@@ -1,10 +1,13 @@
 <script>
+	import { loading } from "$lib/stores/cpu_state";
 	import Header from "../components/Header.svelte";
-
+    import "$lib/css/main.css"
 </script>
 
 <div class="page">
-    
+    {#if $loading}
+    loading...
+    {:else}
     <Header />
     
     <div class="main-content">
@@ -14,10 +17,12 @@
         </slot>
 
     </div>
+    {/if}
+
 
     <footer>
 
-        <hr />
+        <hr/>
         
         <div>
             CSCI 499 Capstone Project
@@ -48,8 +53,6 @@
 
     :global(body) {
         margin-left: 10%;
-        margin-right: 10%;
-        margin-top: 3%;
         margin-top: 3%;
     }
 
@@ -72,6 +75,7 @@
     .page {
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
     }
 
 

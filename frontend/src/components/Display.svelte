@@ -33,5 +33,8 @@
         grid-gap: 0px 0px;
         width: auto;
         height:100%;
+        border: 1px solid black;
+        border-radius: 4px;
+        box-shadow: 10px 10px 0px -1px black;
     }
 </style>

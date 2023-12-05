@@ -5,10 +5,14 @@ import cors from "cors";
 import { readdir, readFile } from "fs/promises"
 import 'dotenv/config'
 import metadata from "./assets/metadata.js";
+import { Score } from "./models/scores.js";
+
 
 const app = express()
 const port = process.env.PORT
 app.use(cors())
+app.use(express.json());
+
 app.use((req, res, next) => {
     console.log(`${req.method} for ${req.url}`);
     next()
@@ -59,6 +63,34 @@ app.get("/meta_assets/:rom", async (req, res) => {
 app.get("/assets_data", async (req, res) => {
     const data = await readdir("./assets/roms")
     res.send(data)
+})
+
+
+app.get("/highscores", async (req, res) => {
+    res.send(await Score.findAll({
+        attributes: ["name", "game", "score"],
+        order: [
+            ["score", "DESC"]
+        ]
+    }))
+})
+
+app.post("/highscores", async (req, res) => {
+
+    if (await Score.findOne({ where: { name: req.body.name, game: req.body.game } })) {
+        console.log("found a matching name")
+        await Score.update({ score: req.body.score }, {
+            where: { name: req.body.name, game: req.body.game }
+        })
+    }
+    else {
+        console.log("no matching name")
+        await Score.create(req.body)
+    }
+
+    res.send({
+        "status": "done"
+    })
 })
 
 app.get('/', (req, res) => {

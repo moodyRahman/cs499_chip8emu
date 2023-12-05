@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // Table to map instruction to their respective argument check/parse function
 const argVerifyTable = {
     "CLS": noArg,
@@ -25,17 +26,20 @@ const argVerifyTable = {
 // Below are the functions used to check the argument
 // validity and parse them if valid
 
+// @ts-ignore
 function noArg(words) {
     if (words.length != 1) return 0;
     return -1;
 }
 
+// @ts-ignore
 function addrArg(words) {
     if (words.length != 2) return 1;
     if (+words[1] > 4095 || +words[1] < 0) return 4;
     return -1;
 }
 
+// @ts-ignore
 function regArg(words) {
     if (words.length != 2) return 1;
     // Check if register A is in a valid format
@@ -48,6 +52,7 @@ function regArg(words) {
     return -1;
 }
 
+// @ts-ignore
 function regByteArg(words) {
     if (words.length != 3) return 2;
     // Check if register A is in a valid format
@@ -66,6 +71,7 @@ function regByteArg(words) {
     return -1;
 }
 
+// @ts-ignore
 function regRegArg(words) {
     if (words.length != 3) return 2;
     // Check if register A is in a valid format
@@ -85,6 +91,7 @@ function regRegArg(words) {
     return -1;
 }
 
+// @ts-ignore
 function regRegNibArg(words) {
     if (words.length != 4) return 3;
     // Check if register A is in a valid format
@@ -111,6 +118,7 @@ function regRegNibArg(words) {
 }
 
 // 0 stores INS, 1 stores addr, 3 stores jp type, 2 stores int/label
+// @ts-ignore
 function jpArg(words) {
     if (addrArg(words) == -1) {
         words[3] = 0;
@@ -125,6 +133,7 @@ function jpArg(words) {
     return 12;
 }
 
+// @ts-ignore
 function seArg(words) {
     if (regByteArg(words) == -1) {
         words[1] = 0x30 | words[1];
@@ -138,6 +147,7 @@ function seArg(words) {
     return 12;
 }
 
+// @ts-ignore
 function sneArg(words) {
     if (regByteArg(words) == -1) {
         words[1] = 0x40 | words[1];
@@ -151,6 +161,7 @@ function sneArg(words) {
     return 12;
 }
 
+// @ts-ignore
 function ldArg(words) {
     if (regByteArg(words) == -1) {
         words[1] = 0x60 | words[1];
@@ -217,6 +228,7 @@ function ldArg(words) {
     return 12;
 }
 
+// @ts-ignore
 function addArg(words) {
     if (regByteArg(words) == -1) {
         words[1] = 0x70 | words[1];
@@ -255,6 +267,7 @@ ARGUMENT ERROR CODES (when format is invalid)
   12: Other arg error
 */
 
+// @ts-ignore
 function argumentErrorHandler(errorCode, lineNumber) {
     switch (errorCode) {
         case (-1):
@@ -319,12 +332,16 @@ export default function assemble(ASM = "") {
     const finalRom = new Uint8Array(4096);
     const labelTable = {};
     const labelRequestTable = [];
-    let addr = 0;
+    let decodeData = false;
+    let addr = 512;
     let lineCount = 0;
     const parserDebugTable = []
     for (const line of cleanLines) {
+        // @ts-ignore
         if (line[0] == ".") {
+            // @ts-ignore
             if (line.substring(1, 5) == "org ") {
+                // @ts-ignore
                 const orgArg = +line.substring(5)
                 if (!isNaN(orgArg)) {
                     if (orgArg >= addr) {
@@ -336,31 +353,66 @@ export default function assemble(ASM = "") {
                 } else {
                     throw new Error(`Argument Error, unknown directive argument in line ${lineNumberTable[lineCount]}!`);
                 }
+            } else if (line.substring(1) == "text") {
+                decodeData = false;
+            } else if (line.substring(1) == "data") {
+                decodeData = true;
             } else {
                 throw new Error(`Syntax Error, unknown directive in line ${lineNumberTable[lineCount]}!`);
             }
+            // @ts-ignore
         } else if (line[line.length - 1] == ":") {
-            if (addr + 4 > 4095) {
+            if (addr + 4 > 4096) {
                 throw new Error(`Memory Error, program exceedes memory limit at line ${lineNumberTable[lineCount]}!`);
             }
+            // @ts-ignore
             if (line.length == 1) {
                 throw new Error(`Label Error, no label name in line ${lineNumberTable[lineCount]}!`);
             }
+            // @ts-ignore
             const labelArg = line.substring(0, line.length - 1)
             if (!isNaN(+labelArg)) {
                 throw new Error(`Label Error, label name cannot be a number in line ${lineNumberTable[lineCount]}!`);
             }
+            // @ts-ignore
             if (labelTable[labelArg] == undefined) {
+                // @ts-ignore
                 labelTable[labelArg] = addr;
                 parserDebugTable.push(`Label : ${addr}`)
             } else {
                 throw new Error(`Label Error, duplicate label name in line ${lineNumberTable[lineCount]}!`);
             }
+        } else if (decodeData) {
+            const splitData = line.split(",")
+            for (const rawData of splitData) {
+                let data = rawData.trim();
+                if (data == "") {
+                    break;
+                }
+                data = +data;
+                if (isNaN(data)) {
+                    throw new Error(`Data Error, invalid data value in line ${lineNumberTable[lineCount]}!`);
+                }
+                if (data < 0) {
+                    throw new Error(`Data Error, data is negative in line ${lineNumberTable[lineCount]}!`);
+                } else if (data < 256) {
+                    finalRom[addr] = data;
+                    addr++;
+                } else if (data < 65536) {
+                    finalRom[addr] = data >> 8;
+                    finalRom[addr + 1] = data & 0xFF;
+                    addr += 2;
+                } else {
+                    throw new Error(`Data Error, single data value exceeds max of 2 bytes in line ${lineNumberTable[lineCount]}!`);
+                }
+            }
         } else {
             if (addr + 4 > 4095) {
-                throw new Error(`Memory Error, program exceedes memory limit at line ${lineNumberTable[lineCount]}!`);
+                throw new Error(`Memory Error, program exceeds memory limit at line ${lineNumberTable[lineCount]}!`);
             }
+            // @ts-ignore
             const words = line.split(" ");
+            // @ts-ignore
             const checkerFunction = argVerifyTable[words[0]];
             if (checkerFunction == undefined) {
                 throw new Error(`Syntax Error, unknown instruction in line ${lineNumberTable[lineCount]}!`);
@@ -511,16 +563,25 @@ export default function assemble(ASM = "") {
         lineCount++;
     }
     for (const request of labelRequestTable) {
+        // @ts-ignore
         if (labelTable[request[1]] == undefined) {
             throw new Error(`Label Error, no such label as ${request[1]} on line ${lineNumberTable[request[2]]}`)
         }
+        // @ts-ignore
         finalRom[request[0]] |= (labelTable[request[1]] >> 8);
+        // @ts-ignore
         finalRom[request[0] + 1] = 0xFF & labelTable[request[1]];
     }
-    console.log(ASM.split("\n"))
+    /*console.log(ASM.split("\n"))
     console.log(cleanLines)
     console.log(parserDebugTable)
     console.log(finalRom)
     console.log(labelTable)
-    console.log(lineNumberTable)
+
+    console.log(lineNumberTable)*/
+    const exportRom = new Uint8Array(3584);
+    for (let i = 0; i < 3584; i++) {
+        exportRom[i] = finalRom[i + 512];
+    }
+    return exportRom;
 }

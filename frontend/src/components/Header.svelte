@@ -1,6 +1,6 @@
 <div class="header">
     <div class="h1">
-        Chip8 Emulator
+        sv8
     </div>
     <div>
         <a href="/">
@@ -34,11 +34,20 @@
         background-color: lightblue;
         margin-top: 1rem;
         padding: 2px;
+        padding-left: 10px;
+        padding-right: 10px;
         width: fit-content;
         font-size: 1.25rem;
         margin-right: .5rem;
+        border: 1px solid lightcoral;
+    	border-radius: 4px;
+	    box-shadow: 5px 5px 0px -1px lightcoral;
     }
     a:hover {
+        color: white;
+    }
+
+    a:active {
         background-color: lightcoral;
         color: white;
     }

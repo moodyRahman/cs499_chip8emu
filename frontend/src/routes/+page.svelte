@@ -12,7 +12,6 @@
 	import { onMount } from "svelte";
 
     
-    import "$lib/css/main.css"
 	import Editor from "../components/Editor.svelte";
 	import GamePad from "../components/GamePad.svelte";
 	import MessageBoard from "../components/MessageBoard.svelte";
@@ -82,10 +81,6 @@
 
 </script>
 
-<div>
-    <Loader />
-</div>
-
 {#if debug}
 <div>
     <SingleInstruction />
@@ -93,18 +88,24 @@
 {/if}
 
 <div class="lr-container">
-    <div class="register">
-        <Registers />
-    </div>
-    {#if debug}
-        <SpriteDesigner />
-    {/if}
+
 </div>
 
 <div class="lr-container">
-    <Display />
+    <div class="display-container">
+        <Display />
+        {#if debug}
+            <Registers />
+            <SpriteDesigner />
+            <!-- <SpriteDesigner /> -->
+            <!-- <div class="register">
+            </div> -->
+
+        {/if}
+    </div>
     <div>
         <RomDump />
+        <Loader />
         <MessageBoard />
         <GamePad />
     </div>
@@ -117,6 +118,9 @@
 
 <style>
 
+    .display-container {
+        height: 100%;
+    }
     .lr-container {
         display: flex;
         height: auto;

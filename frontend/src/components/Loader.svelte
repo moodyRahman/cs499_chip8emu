@@ -4,7 +4,7 @@
     import * as chip8 from "$lib/chip8/debug.js";
 	import { onMount } from "svelte";
     import config from "../cpu_configs";
-    import { rom_metadata, rom_name as rom_name_store, rom as rom_store, rom_timings_original, rom_timings } from "$lib/stores/cpu_state";
+    import { rom_metadata, rom_name as rom_name_store, rom as rom_store, rom_timings_original, rom_timings, loading, run_game_animation, is_running, display_trigger } from "$lib/stores/cpu_state";
 
     let rom: Uint8Array
     rom_store.subscribe((n) => rom = n)
@@ -13,13 +13,16 @@
     
 
 
-    let name: string = "Pong.ch8"
+    let name: string = "SpaceInvaders.ch8"
     let all_roms: string[] = []
 
     // $: rom_name, loader();
 
     const loader = async () => {
         message = ""
+        chip8.reset();
+        $is_running = false
+        $display_trigger++;
         console.log(`fetching ${config.backend_url}/meta_assets/${name}`)
         const res = await fetch(`${config.backend_url}/meta_assets/${name}`);
         const data = await res.json()
@@ -38,6 +41,9 @@
         rom_name_store.set(name)
         chip8.reset();
         chip8.load_rom(rom);
+        $loading = false
+        $run_game_animation = true;
+        console.log("done loading")
 	}
 
     onMount(loader)
@@ -52,23 +58,49 @@
 </script>
 
 
-<div>
+<div class="container">
     <div>
-        load a rom{message === "" ? "" : ", " + message}
+        Select a game to play{message === "" ? "" : ", " + message}
     </div>
-    <select bind:value={name} on:change={() => message = "be sure to click \"load rom\" before you play the game"}>
+    <select bind:value={name} on:change={() => {
+        if (name === "load ROM from editor ") return
+        loader();
+        // setTimeout(() => {
+        //     message = ""
+        // }, 3000)
+        // message = "be sure to click \"run game\" before you play the game"
+    }}>
 
         <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
-        {#each [...all_roms, "load ROM from editor "] as option }
+        {#each [...all_roms] as option }
             <option value={option}>{option.slice(0, option.indexOf(".ch8"))}</option>
         {/each}
     </select>
-    <button on:click={loader}>
+    <!-- <button on:click={() => {
+        loader();
+        message = "now click on run game to start playing!"
+        setTimeout(() => {
+            message = ""
+        }, 3000)
+        }}>
         load rom
-    </button>
+    </button> -->
 </div>
 
 
 <style>
+
+.container {
+    margin-top: 20px;
+    background-color: lightcoral;
+    padding: 1%;
+    border-radius: 4px;
+    box-shadow: 5px 5px 0px -1px lightblue;
+}
+
+select {
+    width: 100%;
+    font-size: 1.1rem;
+}
 
 </style>

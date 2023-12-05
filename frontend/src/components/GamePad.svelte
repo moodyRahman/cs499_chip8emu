@@ -60,9 +60,9 @@
     
 </script>
 
-
+{#if $rom_mappings.length === 0}
 <div class="container">
-    try pressing these buttons on your keyboard!
+    {show_chip8?"these are the inputs the emulator is actually recieving":"no control metadata found, try pressing these buttons on your keyboard!"}
     <div class="pad">
         {#each data as cell, i}
         <div class={active_keys.includes(cell)?"pressed":""}>
@@ -82,6 +82,7 @@
     </button>
     
 </div>
+{/if}
 
 <svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
@@ -89,12 +90,12 @@
 <style>
 
 .container {
-    width: 100%;
+    width: 400px;
 }
 
 .pad {
     display:grid;
-    gap: 4px;
+    gap: 8px;
     grid-template-columns: repeat(4, 15%);
 }
 
@@ -104,10 +105,16 @@
     text-align: center;
     padding: 1rem;
     width: 100%;
+    border-radius: 4px;
+	box-shadow: 5px 5px 0px -1px lightblue;
 }
 
 .pad > div.pressed {
     background-color: lightblue;
+}
+
+button {
+    margin-top: 10px;
 }
 
 </style>
