@@ -88,8 +88,8 @@
 <div class="lr-container">
     <div class="display-container">
         <Display />
+        <Registers />
         {#if debug}
-            <Registers />
             <SpriteDesigner />
             <!-- <SpriteDesigner /> -->
             <!-- <div class="register">
