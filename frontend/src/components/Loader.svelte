@@ -4,7 +4,7 @@
     import * as chip8 from "$lib/chip8/debug.js";
 	import { onMount } from "svelte";
     import config from "../cpu_configs";
-    import { rom_metadata, rom_name as rom_name_store, rom as rom_store, rom_timings_original, rom_timings, loading, run_game_animation } from "$lib/stores/cpu_state";
+    import { rom_metadata, rom_name as rom_name_store, rom as rom_store, rom_timings_original, rom_timings, loading, run_game_animation, is_running, display_trigger } from "$lib/stores/cpu_state";
 
     let rom: Uint8Array
     rom_store.subscribe((n) => rom = n)
@@ -20,6 +20,9 @@
 
     const loader = async () => {
         message = ""
+        chip8.reset();
+        $is_running = false
+        $display_trigger++;
         console.log(`fetching ${config.backend_url}/meta_assets/${name}`)
         const res = await fetch(`${config.backend_url}/meta_assets/${name}`);
         const data = await res.json()

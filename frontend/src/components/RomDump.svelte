@@ -2,7 +2,7 @@
     
     import * as chip8 from "$lib/chip8/debug.js";
     import HighScore from './HighScore.svelte';
-	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings, rom_timings_original, run_game_animation } from "$lib/stores/cpu_state";
+	import { base_store, debug_mode_store, display_trigger, keypress_store, registers_trigger, rom, rom_name as rom_name_store, rom_timings, rom_timings_original, run_game_animation, is_running } from "$lib/stores/cpu_state";
     import { navigating } from '$app/stores';
 
     import config from "../cpu_configs";
@@ -17,7 +17,7 @@
         clearInterval(ticker)
         ticker = 0
         paused = false;
-        is_running = false;
+        $is_running = false;
         cpu_ticks = 0;
         duration = 0;
         $display_trigger++;
@@ -73,7 +73,8 @@
     // id of the setinterval that's ticking the cpu, set to 0 when cpu should stop ticking
     let ticker = 0;
     let paused = false;  // is the cpu waiting for input? if so
-    let is_running = false;  // is the cpu auto-running?
+    $is_running = false;  // is the cpu auto-running?
+    
 
     $: curr_inst = (raw_rom?(raw_rom[pc - 512] << 8 | raw_rom[pc - 512 + 1]):0)
     $: raw_rom, pc = 512, page = 0  // if raw_rom changes, reset PC and page
@@ -139,7 +140,7 @@
                 error = `error: pc: ${old_pc}, inst: ${chip8.convert_inst_to_string(raw_rom[old_pc - 512] << 8 | raw_rom[old_pc - 512 + 1])}, ${e.message}`
                 if (break_on_chip8_error)
                 {
-                    is_running = false;
+                    $is_running = false;
                 }
             }
         }
@@ -163,9 +164,9 @@
 
 
     // this is what we're running all the time in the background, the variables 
-    // is_running and is_paused control whether or not the tick actually executes
+    // $is_running and is_paused control whether or not the tick actually executes
     const tick = () => {
-        if (!is_running) return
+        if (!$is_running) return
         tick_raw();
     }
 
@@ -185,7 +186,7 @@
 
     const handleEnterPause = (e: KeyboardEvent) => {
         if (e.key !== "Enter") return
-        is_running = !is_running;
+        $is_running = !$is_running;
         $run_game_animation = false;
     }
 
@@ -197,7 +198,7 @@
     let hz_display = 0
 
     setInterval(() => {
-        if (!is_running) return
+        if (!$is_running) return
         if (paused) return
         duration += 0.2
     }, 200)
@@ -366,16 +367,16 @@
                 constantly firing ticks will actually successfully send ticks
             -->
             <button class="tick {(() => {
-                if (is_running) return ""
+                if ($is_running) return ""
                 return $run_game_animation?"click-me":""
             })()} " 
             
             on:click={() => {
-                    is_running = !is_running;
+                    $is_running = !$is_running;
                     $run_game_animation = false
                 }}>
 
-                    {is_running?"pause":"run"} game
+                    {$is_running?"pause":"run"} game
             </button>
 
             <button class="tick" on:click={() => {

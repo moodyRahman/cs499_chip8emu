@@ -67,3 +67,5 @@ export const audio_store = writable(false);
 export const loading = writable(false);
 
 export const run_game_animation = writable(false);
+
+export const is_running = writable(false);
