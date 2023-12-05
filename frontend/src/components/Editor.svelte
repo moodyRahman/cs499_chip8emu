@@ -75,17 +75,26 @@ $: out_string = btoa(JSON.stringify({
         data: code,
         sprites: $sprites_array
     }))
+
 const handleSave = () => {
     download_element.click();
     // save_dialog.showModal()
 }
 
-const handleLoad = () => {
-    load_dialog.showModal()
+const handleLoad = async () => {
+    const selectedFile: any = <HTMLInputElement>document.getElementById("file_in")?.files[0]
+    
+    if (!selectedFile) {
+        err = "please upload a file before loading it"
+    }
+
+    in_string=await selectedFile.text()
+
+    b64_to_state();
+    // load_dialog.showModal()
 }
 
 const b64_to_state = () => {
-    load_dialog.close()
     let data:{
         timings: any,
         name: string,
@@ -99,6 +108,8 @@ const b64_to_state = () => {
     $rom_timings = structuredClone(data.timings)
 
     console.log(data)
+
+    err = ""
 }
 
 const handleReset = () => {
@@ -153,6 +164,7 @@ onMount(() => {
             <button on:click={handleReset}>reset</button> 
             <button on:click={handleSave}>save</button> 
             <button on:click={handleLoad}>load</button>
+            <input type="file" id="file_in"/>
         </div>
         <div class="editor">
             <textarea bind:value={code} bind:this={editor_prop} />
