@@ -1,11 +1,12 @@
 <script lang="ts">
 import assemble from "$lib/assembler/assembler";
-	import { rom, rom_metadata, rom_name } from "$lib/stores/cpu_state";
+	import { rom, rom_metadata, rom_name, rom_timings } from "$lib/stores/cpu_state";
 import { onMount } from "svelte";
 
 let code = ""
 let err = ""
 let name = ""
+let file_out = ""
 
 let editor_prop: any
 
@@ -52,20 +53,52 @@ const handleAssemble = () =>{
     }
 }
 
+const handleSave = () => {
+    
+    let out = {
+        timings:{...$rom_timings},
+        name: name,
+        data: code
+    }
+    out_string = btoa(JSON.stringify(out))
+    save_dialog.showModal()
+}
+
+let save_dialog: any;
+let load_dialog: any;
+
+let out_string = ""
 onMount(() => {
-    console.log(editor_prop)
+    save_dialog = document.querySelector("#save");
+    load_dialog = document.querySelector("#load");
 })
 
 </script>
 
 
 <div class="container">
+    <dialog id="save">
+        <div>
+            <button on:click={save_dialog.close()}>x</button>
+        </div>
+        <div>
+            please copy this string! this contains your source code, name, and CPU timing parameters <br> <br>
+        </div>
+        <div class="modal">
+            {out_string}
+        </div>
+
+    </dialog>
+
+    <dialog id="load">
+
+    </dialog>
     <div class="editor-ui">
         <div>
             code editor
             <button on:click={handleAssemble}>assemble</button> 
             <button>reset</button> 
-            <button>save</button> 
+            <button on:click={handleSave}>save</button> 
             <button>load</button>
         </div>
         <div>
@@ -87,6 +120,18 @@ onMount(() => {
     textarea {
         width: 85%;
         height: 500px;
+    }
+
+    .modal {
+        word-wrap: break-word;
+        font-family: monospace;
+        border: 1px solid black;
+        padding: 10px;
+    }
+
+    pre {
+        font-family: monospace;
+        white-space: pre-wrap;
     }
 
     .container {
