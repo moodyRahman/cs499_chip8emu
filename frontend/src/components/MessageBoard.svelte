@@ -14,6 +14,9 @@ $: curr_key = (numToKey[$keypress_store])
 </script>
 
 <div class="container">
+    <div class="description">
+        {$rom_description}<br>
+    </div>
     <div class="controls">
         {#if $rom_mappings.length > 0}
             <div class="c-header">
@@ -36,6 +39,20 @@ $: curr_key = (numToKey[$keypress_store])
 <style>
     .container {
         width: 400px;
+        /* background-color: lightcoral;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 5px;
+        border-radius: 4px; */
+        margin-top: 10px;
+    }
+
+    .description {
+        margin-top: 10px;
+        font-size: 1.1rem;
+        background-color: lightblue;
+        padding: 5px;
+        border-radius: 4px;
     }
 
     .highlight {

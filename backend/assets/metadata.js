@@ -1,16 +1,17 @@
 const data = {
   "Tetris.ch8": {
     "description": "An arcade classic! Fun for the whole family :)",
-    "mapping": [
-      {
-        "keyboard": "a",
-        "description": "whatever"
-      },
-      {
-        "keyboard": "a",
-        "description": "whatever"
-      }
-    ],
+    "mapping": [],
+    "timing": {
+      "ticks_per_interval": 12,
+      "time_between_intervals_ms": 9,
+      "display_rerender_threshold": 12
+    }
+  },
+  "TicTacToe.ch8": {
+    "description": `Two player TicTacToe, we couldn't afford an AI. The 3 by 3 grid of keys on your keyboard, 
+    '1', '2', '3', 'q', 'w', 'e', 'a', 's', 'd, maps to the three by three in the game. `,
+    "mapping": [],
     "timing": {
       "ticks_per_interval": 12,
       "time_between_intervals_ms": 9,
@@ -101,7 +102,7 @@ const data = {
       },
       {
         "keyboard": "w",
-        "description": "shoot"
+        "description": "start game/ shoot"
       },
       {
         "keyboard": "e",
@@ -152,7 +153,7 @@ const data = {
     "timing": {
       "ticks_per_interval": 6,
       "time_between_intervals_ms": 8,
-      "display_rerender_threshold": 6
+      "display_rerender_threshold": 2
     }
   },
   "Breakout.ch8": {
