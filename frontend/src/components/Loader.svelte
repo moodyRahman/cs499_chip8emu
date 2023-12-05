@@ -72,7 +72,7 @@
     }}>
 
         <!-- Astrododge.ch8  Breakout.ch8  Landing.ch8  Pong.ch8  Pong2.ch8  SpaceInvaders.ch8  Tetris.ch8  TicTacToe.ch8 -->
-        {#each [...all_roms, "load ROM from editor"] as option }
+        {#each [...all_roms] as option }
             <option value={option}>{option.slice(0, option.indexOf(".ch8"))}</option>
         {/each}
     </select>
