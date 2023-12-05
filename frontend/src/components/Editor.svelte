@@ -64,18 +64,20 @@ const handleAssemble = () =>{
 let save_dialog: any;
 let load_dialog: any;
 
+let download_element: HTMLAnchorElement;
+
 let out_string = ""
 let in_string = ""
-const handleSave = () => {
-    
-    let out = {
+
+$: out_string = btoa(JSON.stringify({
         timings:{...$rom_timings},
         name: name,
         data: code,
         sprites: $sprites_array
-    }
-    out_string = btoa(JSON.stringify(out))
-    save_dialog.showModal()
+    }))
+const handleSave = () => {
+    download_element.click();
+    // save_dialog.showModal()
 }
 
 const handleLoad = () => {
@@ -117,6 +119,7 @@ onMount(() => {
 
 
 <div class="container">
+    <a style="display: none;" bind:this={download_element} download={name?name+".chm":"untitled_sourcecode.chm"} href={"data:text/plain;charset=utf-8," + encodeURIComponent(out_string)}>download file</a>
     <dialog id="save">
         <div>
             <button on:click={save_dialog.close()}>x</button>
@@ -125,7 +128,6 @@ onMount(() => {
             please copy this string! this contains your source code, name, and CPU timing parameters <br> <br>
         </div>
         <div class="modal">
-            {out_string}
         </div>
 
     </dialog>
