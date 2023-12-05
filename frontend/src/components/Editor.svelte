@@ -130,7 +130,7 @@ onMount(() => {
 
 
 <div class="container">
-    <a style="display: none;" bind:this={download_element} download={name?name+".chm":"untitled_sourcecode.chm"} href={"data:text/plain;charset=utf-8," + encodeURIComponent(out_string)}>download file</a>
+    <a style="display: none;" bind:this={download_element} download={name?name+".sv8":"untitled.sv8"} href={"data:text/plain;charset=utf-8," + encodeURIComponent(out_string)}>download file</a>
     <dialog id="save">
         <div>
             <button on:click={save_dialog.close()}>x</button>
