@@ -332,7 +332,8 @@ export default function assemble(ASM = "") {
     const finalRom = new Uint8Array(4096);
     const labelTable = {};
     const labelRequestTable = [];
-    let addr = 0;
+    let decodeData = false;
+    let addr = 512;
     let lineCount = 0;
     const parserDebugTable = []
     for (const line of cleanLines) {
@@ -352,12 +353,16 @@ export default function assemble(ASM = "") {
                 } else {
                     throw new Error(`Argument Error, unknown directive argument in line ${lineNumberTable[lineCount]}!`);
                 }
+            } else if (line.substring(1) == "text") {
+                decodeData = false;
+            } else if (line.substring(1) == "data") {
+                decodeData = true;
             } else {
                 throw new Error(`Syntax Error, unknown directive in line ${lineNumberTable[lineCount]}!`);
             }
             // @ts-ignore
         } else if (line[line.length - 1] == ":") {
-            if (addr + 4 > 4095) {
+            if (addr + 4 > 4096) {
                 throw new Error(`Memory Error, program exceedes memory limit at line ${lineNumberTable[lineCount]}!`);
             }
             // @ts-ignore
@@ -377,9 +382,33 @@ export default function assemble(ASM = "") {
             } else {
                 throw new Error(`Label Error, duplicate label name in line ${lineNumberTable[lineCount]}!`);
             }
+        } else if (decodeData) {
+            const splitData = line.split(",")
+            for (const rawData of splitData) {
+                let data = rawData.trim();
+                if (data == "") {
+                    break;
+                }
+                data = +data;
+                if (isNaN(data)) {
+                    throw new Error(`Data Error, invalid data value in line ${lineNumberTable[lineCount]}!`);
+                }
+                if (data < 0) {
+                    throw new Error(`Data Error, data is negative in line ${lineNumberTable[lineCount]}!`);
+                } else if (data < 256) {
+                    finalRom[addr] = data;
+                    addr++;
+                } else if (data < 65536) {
+                    finalRom[addr] = data >> 8;
+                    finalRom[addr + 1] = data & 0xFF;
+                    addr += 2;
+                } else {
+                    throw new Error(`Data Error, single data value exceeds max of 2 bytes in line ${lineNumberTable[lineCount]}!`);
+                }
+            }
         } else {
             if (addr + 4 > 4095) {
-                throw new Error(`Memory Error, program exceedes memory limit at line ${lineNumberTable[lineCount]}!`);
+                throw new Error(`Memory Error, program exceeds memory limit at line ${lineNumberTable[lineCount]}!`);
             }
             // @ts-ignore
             const words = line.split(" ");
@@ -543,11 +572,16 @@ export default function assemble(ASM = "") {
         // @ts-ignore
         finalRom[request[0] + 1] = 0xFF & labelTable[request[1]];
     }
-    console.log(ASM.split("\n"))
+    /*console.log(ASM.split("\n"))
     console.log(cleanLines)
     console.log(parserDebugTable)
     console.log(finalRom)
     console.log(labelTable)
-    console.log(lineNumberTable)
-    return finalRom
+
+    console.log(lineNumberTable)*/
+    const exportRom = new Uint8Array(3584);
+    for (let i = 0; i < 3584; i++) {
+        exportRom[i] = finalRom[i + 512];
+    }
+    return exportRom;
 }
