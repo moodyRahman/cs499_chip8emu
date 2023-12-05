@@ -66,6 +66,11 @@
         display: flex;
         height: auto;
         margin-bottom: 20px;
+        width: fit-content;
+        background-color: lightgrey;
+        padding: 5px;
+        border-radius: 4px;
+	    box-shadow: 5px 5px 0px -1px lightcoral;
     }
 
     .run_one {

@@ -1,7 +1,9 @@
 <script lang="ts">
 import assemble from "$lib/assembler/assembler";
-	import { rom, rom_metadata, rom_name, rom_timings, sprites_array } from "$lib/stores/cpu_state";
+import { rom, rom_metadata, rom_name, rom_timings, run_game_animation, sprites_array } from "$lib/stores/cpu_state";
 import { onMount } from "svelte";
+import * as chip8 from "$lib/chip8/debug.js";
+
 
 let code = ""
 let err = ""
@@ -28,6 +30,12 @@ const handleAssemble = () =>{
                 }
             }
         }
+
+        chip8.reset();
+        chip8.load_rom($rom);
+        $run_game_animation = true;
+
+        
 
         err = ""
         
@@ -135,14 +143,14 @@ onMount(() => {
 
 
     <div class="editor-ui">
+        <div class="name">
+            file name <input type="text" bind:value={name}>
+        </div>
         <div>
             <button on:click={handleAssemble}>assemble</button> 
             <button on:click={handleReset}>reset</button> 
             <button on:click={handleSave}>save</button> 
             <button on:click={handleLoad}>load</button>
-        </div>
-        <div class="name">
-            file name <input type="text" bind:value={name}>
         </div>
         <div class="editor">
             <textarea bind:value={code} bind:this={editor_prop} />

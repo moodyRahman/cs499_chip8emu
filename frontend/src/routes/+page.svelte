@@ -81,12 +81,6 @@
 
 </script>
 
-{#if debug}
-<div>
-    <SingleInstruction />
-</div>
-{/if}
-
 <div class="lr-container">
 
 </div>
@@ -115,6 +109,11 @@
     <Editor />
 {/if}
 
+{#if debug}
+<div style="margin-top: 20px;">
+    <SingleInstruction />
+</div>
+{/if}
 
 <style>
 
