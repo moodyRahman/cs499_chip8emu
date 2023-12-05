@@ -231,7 +231,9 @@ import { implemented_games } from "$lib/highscore";
         <p>
             <code>assemble</code>: assembles the source code and loads it into the emulator. <br>
             <code>reset</code>: resets the textarea. <br>
-            <code>save</code>: stores the current code and CPU timing parameters into a file 
+            <code>save</code>: stores the current code and other emulator data (CPU timing parameters and saved sprites) into a base64 
+            encoded string <br>
+            <code>load</code>: loads a base64 encoded string into current code and other emulator data. 
 
         </p>
     </div>
