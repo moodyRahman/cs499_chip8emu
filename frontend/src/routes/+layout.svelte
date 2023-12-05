@@ -31,7 +31,7 @@
             made with Svelte, AssemblyScript, WASM, and a lot of bitwise math
         </div>
         <div>
-            Ken Prakasam,  Filip Trzcinka, Moody Rahman  
+            Nobel,  Filip Trzcinka, Moody Rahman  
         </div>
         
     </footer>
