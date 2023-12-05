@@ -130,6 +130,33 @@
     at my foot. It felt great to refactor massive swaths of code via a copy paste 
     and everything just working first try. 
   </p>
+
+  <p>
+    The last week of development was spent mostly conducting usability testing. I 
+    ran around campus asking everyone I knew to use the website. I offered no explanation 
+    on how to use it, solely telling them that the website is an emulator. I gained 
+    a lot of insight into UX design, and how visual elements can draw attention or 
+    can be overshadowed. For example, initally sv8 had a 4 by 4 gamepad always displayed, 
+    that served to showcase how the keyboard maps to the native Chip-8 gamepad. 
+    This proved to be incredibly distracting, and people would spend more time fiddling with 
+    that than noticing that there's a "play game" button. This was solved by displaying the 
+    4 by 4 gamepad only for games without metadata, and highlighting the currently pressed 
+    controls to signal to users that this is the action being performed on that keypress. 
+  </p>
+
+  <p>
+    There was also a step back then where you had to click on a "load rom" button, that you had 
+    to click on after selecting the ROM you wanted to play. The issue is that people would 
+    often select their ROM, and then immediately hit "play game". I implemented a little message, 
+    reminding the user to click on "load rom" first, but that proved ineffective. 
+    The solution was to make it so that ROM's were automatically loaded in on selection, 
+    and cutting out that middle step entirely. 
+  </p>
+
+  <p>
+    UX usability testing was all in all, an incredibly humbling experience. 
+  </p>
+
 </div>
 
 
