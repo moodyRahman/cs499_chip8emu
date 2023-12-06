@@ -239,6 +239,103 @@
   </p>
 </div>
 
+<div>
+  <h1>Assembler</h1>
+  <p>
+    The first stage of the assembler is preprocessing. The purpose of this step 
+    is to remove everything that is not important for the actual parsing stage 
+    from the text, as well as split the file up into a table of each line. Comment 
+    lines and blank lines are removed from the text, as well as comments and white 
+    space that trail code or data lines. As this changes the structure of the original 
+    file, we also build a table to map the new line numbers of the processed file with 
+    the original file, so that any errors generated can reference the correct line number.
+  </p>
+  
+  <p>
+    After preprocessing, comes the main meat and potatoes of any Assembler, the
+    parsing and assembling. Parsing first happens by categorizing lines into four
+    main categories, directives, labels, data and code. We will now discuss how each is
+    handled.
+  </p>
+
+  <p>
+    Directives: <br>
+    Any line starting with a period is assumed to be an assembler directive. As there 
+    are only 3 directives, an else if branch is used to check for which is specified. 
+    For the .org directive, first a check is done to make sure the address specified 
+    is valid and if so it is then assigned to the ROM address counter used to keep 
+    track of where in the ROM we are currently assembling to. The other two directives 
+    are .text and .data which are used to specify if text is code or data and they 
+    set a decodeData flag to specify this for later stages. If any of these parts 
+    are given incorrect arguments, errors are thrown. 
+  </p>
+
+  <p>
+    Labels: <br>
+    Any line ending with a colon is assumed to be a label. First, the label name 
+    is checked to see if it is alphanumeric and not an integer (to avoid ambiguity 
+    as integer name labels are impossible to tell apart from numerical addresses in 
+    instruction arguments). If it passes these checks, the ROM address the label 
+    was specified at is recorded along with the label in an address lookup table, 
+    otherwise an error is thrown.
+  </p>
+
+  <p>
+    Data: <br>
+    Data is only parsed if the decodeData is set from an assembler directive. If 
+    it is set, the line is parsed by first splitting the line along any commas, 
+    and then removing white space from this table of split data. The data is then 
+    checked to see if it is in a valid format, and then it's written to the ROM. 
+    The ROM address counter is updated based on how much data was specified in the 
+    line. If any of this fails, an error is thrown.
+  </p>
+
+  <p>
+    Instructions: <br>
+    Any line that doesn't fit into any of the above categories are assumed to be 
+    instructions. First the line is split along white space, to separate arguments. 
+    The first argument is assumed to the specified instruction, and this is then 
+    passed to a special hash table. This table will either return a reference to 
+    the function to run to decode further arguments if the instruction is valid, 
+    or it will return undefined if the instruction is not valid. If it's undefined 
+    we throw an error, otherwise we run the returned function reference. This 
+    function parses the rest of the non instruction arguments, removing things 
+    like the “V” in register definition as well as things like commas. If the 
+    arguments are invalid, an error code is returned which then can be used to 
+    lookup and throw an error. After this is all done the parsed arguments are 
+    placed in a special table for the final step, the assembling of the instructions.
+  </p>
+
+  <p>
+    Using a large switch case block with the instruction used as the switch, we 
+    select what code to run based on the instruction given. This code varies 
+    from instruction to instruction, but it consists of using bitwise operations 
+    to combine an instruction opcode with the decoded arguments fields in certain 
+    configurations. This is then written to the ROM file based on the ROM address 
+    counter which is also incremented by 2 (the size of an instruction) after each 
+    successful iteration. 
+  </p>
+  <p>
+    There is an exception to this, which is instructions that have labels as arguments. 
+    As a label can be defined after an instruction uses it, one final pass must be 
+    done to account for this. While assembling, if an instruction requests a label, 
+    we add it to  a label request table which specifies which instruction at what 
+    address wants what label. After assembly, we then go through the ROM and at 
+    each specified request we check to see if the label exists in our label lookup 
+    table (it rhymes!). If it does, we modify the assembled instruction to have 
+    the correct address, otherwise if it doest exists we throw an error.
+  </p>
+
+  <p>
+    After all of this we should have a fully assembled ROM file, ready for use! 
+    The thing is that CHIP-8 programs start being loaded from address 512. While 
+    we account for this while building our rom for the label addresses to be correct, 
+    by starting our ROM address counter at 512, we must now un-account for this 
+    for the ROM to be loaded correctly! So we simply recopy the top 3.5k of the 
+    ROM into a new buffer, after which we have a finalized ROM! 
+  </p>
+</div>
+
 
 
 </div>
