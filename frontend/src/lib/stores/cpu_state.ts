@@ -1,6 +1,6 @@
 import { derived, writable } from 'svelte/store';
 
-interface metadata {
+export interface metadata {
 	status: number;
 	data: {
 		description: string;
