@@ -106,7 +106,7 @@
     <div>
         Select a game to play{message === "" ? "" : ", " + message}
     </div>
-    <select bind:value={name} on:change={() => {
+    <select class="selector" bind:value={name} on:change={() => {
         if (name === "load ROM from editor ") return
         loader();
         // setTimeout(() => {
@@ -131,6 +131,7 @@
     </button> -->
 
     {#if upload_prompt}
+    <br>
         <input bind:files={file} type="file" id="rom_in"/>
         <button on:click={handleLoad} >upload ROM</button>
     {/if}
@@ -145,10 +146,11 @@
     padding: 1%;
     border-radius: 4px;
     box-shadow: 5px 5px 0px -1px lightblue;
+    width: 100%;
 }
 
 select {
-    width: 100%;
+    width: auto;
     font-size: 1.1rem;
 }
 
