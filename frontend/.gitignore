@@ -8,4 +8,8 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-/src/lib/chip8/
+
+/src/lib/chip8/**
+
+!/src/lib/chip8/debug.js 
+!/src/lib/chip8/release.js 
